@@ -1,28 +1,17 @@
 import React from 'react';
-import {
-  Cpu,
-  Notebook as Robot,
-  // Removemos o Circuit, pois vamos usar nossa própria logo
-  Lightbulb,
-  Wifi,
-  BookOpen,
-  Ship as ChipIcon,
-  Mail,
-  MapPin,
-  Phone,
-} from 'lucide-react';
+import { Lightbulb, Wifi, BookOpen, Ship as ChipIcon, Mail, MapPin, Phone } from 'lucide-react';
+import logo from './assets/Logo.png'; // Importe sua logo aqui
 
 function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-      {/* Navigation */}
+      {/* Navegação */}
       <nav className="bg-gray-900/80 backdrop-blur-sm fixed w-full z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              {/* Aqui, substituímos o ícone Circuit pela sua logo */}
-              <img src="L
-            ogo.png" alt="ELN Technology Logo" className="w-8 h-8" />
+              {/* Substitua o ícone Circuit pela sua logo */}
+              <img src={logo} alt="Logo da ELN Technology" className="w-8 h-8" />
               <span className="text-2xl font-bold text-white">
                 ELN Technology
               </span>
