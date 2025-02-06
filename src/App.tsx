@@ -1,5 +1,13 @@
 import React from 'react';
-import { Lightbulb, Wifi, BookOpen, Ship as ChipIcon, Mail, MapPin, Phone } from 'lucide-react';
+import {
+  Lightbulb,
+  Wifi,
+  BookOpen,
+  Ship as ChipIcon,
+  Mail,
+  MapPin,
+  Phone,
+} from 'lucide-react';
 import logo from './assets/Logo.png'; // Importe sua logo aqui
 
 function App() {
@@ -11,7 +19,11 @@ function App() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               {/* Substitua o ícone Circuit pela sua logo */}
-              <img src={logo} alt="Logo da ELN Technology" className="w-8 h-8" />
+              <img
+                src={logo}
+                alt="Logo da ELN Technology"
+                className="w-8 h-8"
+              />
               <span className="text-2xl font-bold text-white">
                 ELN Technology
               </span>
@@ -256,9 +268,13 @@ function App() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             {/* Company Info */}
             <div>
-            <div className="flex items-center space-x-2 mb-4">
+              <div className="flex items-center space-x-2 mb-4">
                 {/* Substitua aqui também, se quiser usar sua logo no rodapé */}
-                <img src="/logo.png" alt="ELN Technology Logo" className="w-6 h-6" />
+                <img
+                  src="/logo.png"
+                  alt="ELN Technology Logo"
+                  className="w-6 h-6"
+                />
                 <span className="text-xl font-bold text-white">
                   ELN Technology
                 </span>
