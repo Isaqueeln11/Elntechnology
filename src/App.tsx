@@ -1,6 +1,4 @@
 import React from 'react';
-import logo from './img/logo.jpg';  // Importando a logo diretamente
-
 // Importando ícones do lucide-react (não estamos mais usando o Circuit)
 import {
   Cpu,
@@ -21,12 +19,6 @@ function App(): JSX.Element {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              {/* Usando a logo importada */}
-              <img
-                src={logo}  // Usando a logo importada diretamente
-                alt="Logo ELN Technology"
-                className="h-8"  // Ajuste o tamanho da logo conforme necessário
-              />
               <span className="text-2xl font-bold text-white">
                 ELN Technology
               </span>
