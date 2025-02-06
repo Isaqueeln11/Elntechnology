@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from './img/logo.png';  // Importando a logo diretamente
+import logo from './img/logo.jpg';  // Importando a logo diretamente
 
 // Importando ícones do lucide-react (não estamos mais usando o Circuit)
 import {
