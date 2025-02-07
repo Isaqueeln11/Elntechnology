@@ -1,8 +1,9 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import {
   Cpu,
   Notebook as Robot,
-  // Removemos o Circuit, pois vamos usar nossa própria logo
+  BrainCircuit as Circuit,
   Lightbulb,
   Wifi,
   BookOpen,
@@ -11,16 +12,34 @@ import {
   MapPin,
   Phone,
 } from 'lucide-react';
+import IniciarProjeto from './pages/IniciarProjeto';
+import ExplorarSolucoes from './pages/ExplorarSolucoes';
 
 function App() {
   return (
+    <Router>
+      <Routes>
+        <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
+        <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
+        <Route path="/" element={<HomePage />} />
+      </Routes>
+    </Router>
+  );
+}
+
+function HomePage() {
+  return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       {/* Navigation */}
-      <nav className="bg-gray-900/80 backdrop-blur-sm fixed w-full z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+      <nav className="fixed w-full bg-gray-900/90 backdrop-blur-sm z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-2">
-              {/* Aqui, substituímos o ícone Circuit pela sua logo */}
+              <img
+                src="/Eln technology.png"
+                alt="ELN Technology Logo"
+                className="w-16 h-16 object-contain"
+              />
               <span className="text-2xl font-bold text-white">
                 ELN Technology
               </span>
@@ -68,12 +87,18 @@ function App() {
             através da tecnologia.
           </p>
           <div className="flex justify-center gap-4">
-            <button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+            <Link
+              to="/iniciar-projeto"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+            >
               Iniciar Projeto
-            </button>
-            <button className="border border-blue-500 text-blue-500 hover:bg-blue-500/10 px-8 py-3 rounded-lg font-semibold transition-colors">
+            </Link>
+            <Link
+              to="/explorar-solucoes"
+              className="border border-blue-500 text-blue-500 hover:bg-blue-500/10 px-8 py-3 rounded-lg font-semibold transition-colors"
+            >
               Explorar Soluções
-            </button>
+            </Link>
           </div>
         </div>
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80')] opacity-10 bg-cover bg-center" />
@@ -266,7 +291,11 @@ function App() {
             {/* Company Info */}
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                {/* Substitua aqui também, se quiser usar sua logo no rodapé */}
+                <img
+                  src="/Eln technology.png"
+                  alt="ELN Technology Logo"
+                  className="w-14 h-14 object-contain ml-2"
+                />
                 <span className="text-xl font-bold text-white">
                   ELN Technology
                 </span>
