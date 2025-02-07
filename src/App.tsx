@@ -36,7 +36,7 @@ function HomePage() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-2">
               <img
-                src="/Eln technology .png"
+                src="/Eln technology.png"
                 alt="ELN Technology Logo"
                 className="w-16 h-16 object-contain"
               />
@@ -292,7 +292,7 @@ function HomePage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <img
-                  src="/Eln technology .png"
+                  src="/Eln technology.png"
                   alt="ELN Technology Logo"
                   className="w-14 h-14 object-contain ml-2"
                 />
