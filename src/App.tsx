@@ -15,18 +15,6 @@ import {
 import IniciarProjeto from './pages/IniciarProjeto';
 import ExplorarSolucoes from './pages/ExplorarSolucoes';
 
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
-        <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
-        <Route path="/" element={<HomePage />} />
-      </Routes>
-    </Router>
-  );
-}
-
 function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
@@ -369,11 +357,23 @@ function HomePage() {
           </div>
 
           <div className="border-t border-gray-800 pt-8 text-center">
-            <p>© 2024 ELN Technology. Todos os direitos reservados.</p>
+            <p>© 2025 ELN Technology. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
+        <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
+        <Route path="/" element={<HomePage />} />
+      </Routes>
+    </Router>
   );
 }
 
