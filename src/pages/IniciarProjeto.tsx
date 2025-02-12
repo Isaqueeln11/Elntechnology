@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Upload, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { db } from '../firebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
 
 export default function IniciarProjeto() {
   const navigate = useNavigate();
@@ -22,26 +20,19 @@ export default function IniciarProjeto() {
   });
   const [enviado, setEnviado] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (step < 3) {
       setStep(step + 1);
       return;
     }
-
-    // Enviar dados para o Firebase Firestore
-    try {
-      const docRef = await addDoc(collection(db, "projetos"), formData);
-      console.log("Document written with ID: ", docRef.id);
-      setEnviado(true);
-      
-      setTimeout(() => {
-        setEnviado(false);
-        navigate('/');
-      }, 3000);
-    } catch (error) {
-      console.error("Error adding document: ", error);
-    }
+    console.log('Dados do projeto:', formData);
+    setEnviado(true);
+    
+    setTimeout(() => {
+      setEnviado(false);
+      navigate('/');
+    }, 3000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
