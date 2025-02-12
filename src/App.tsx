@@ -32,7 +32,7 @@ function HomePage() {
               <img
                 src="/Eln technology.png"
                 alt="ELN Technology Logo"
-                className="w-16 h-16 object-contain"
+                className="w-17 h-17 object-contain"
               />
               <span className="text-2xl font-bold text-white">
                 ELN Technology
@@ -282,7 +282,7 @@ function HomePage() {
             Entre em contato para discutirmos seu projeto de IoT ou robótica.
           </p>
           <a
-            href="mailto:elntechnologyy.com"
+            href="mailto:elntechnologyy@gmail.com"
             className="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
           >
             Entrar em Contato
@@ -300,7 +300,7 @@ function HomePage() {
                 <img
                   src="/Eln technology.png"
                   alt="ELN Technology Logo"
-                  className="w-14 h-14 object-contain ml-2"
+                  className="w-15 h-15 object-contain ml-2"
                 />
                 <span className="text-xl font-bold text-white">
                   ELN Technology
