@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import {
   Cpu,
   Notebook as Robot,
@@ -16,6 +16,12 @@ import IniciarProjeto from './pages/IniciarProjeto';
 import ExplorarSolucoes from './pages/ExplorarSolucoes';
 
 function HomePage() {
+  const navigate = useNavigate();
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       {/* Navigation */}
@@ -87,18 +93,18 @@ function HomePage() {
             através da tecnologia.
           </p>
           <div className="flex justify-center gap-4">
-            <Link
-              to="/iniciar-projeto"
+            <button
+              onClick={() => handleNavigate('/iniciar-projeto')}
               className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Iniciar Projeto
-            </Link>
-            <Link
-              to="/explorar-solucoes"
+            </button>
+            <button
+              onClick={() => handleNavigate('/explorar-solucoes')}
               className="border border-blue-500 text-blue-500 hover:bg-blue-500/10 px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Explorar Soluções
-            </Link>
+            </button>
           </div>
         </div>
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80')] opacity-10 bg-cover bg-center" />
