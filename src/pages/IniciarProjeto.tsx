@@ -201,10 +201,10 @@ export default function IniciarProjeto() {
                   <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center">
                     <CheckCircle className="w-5 h-5" />
                   </div>
-                  <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items.center justify.center mx-2">
+                  <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center mx-2">
                     <CheckCircle className="w-5 h-5" />
                   </div>
-                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items.center justify.center">3</div>
+                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center">3</div>
                   <span className="ml-2 text-white font-medium">Informações de Contato</span>
                 </div>
               </div>
@@ -231,7 +231,7 @@ export default function IniciarProjeto() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text.white focus:outline.none focus:border-blue-500"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
                   placeholder="seu@email.com"
                   required
                 />
@@ -244,7 +244,7 @@ export default function IniciarProjeto() {
                   name="telefone"
                   value={formData.telefone}
                   onChange={handleChange}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text.white focus:outline.none focus:border-blue-500"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
                   placeholder="(00) 00000-0000"
                   required
                 />
