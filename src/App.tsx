@@ -86,6 +86,20 @@ function HomePage() {
             robótica e sistemas inteligentes. Transformando ideias em realidade
             através da tecnologia.
           </p>
+          <div className="flex justify-center gap-4">
+            <Link
+              to="/iniciar-projeto"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Iniciar Projeto
+            </Link>
+            <Link
+              to="/explorar-solucoes"
+              className="border border-blue-500 text-blue-500 hover:bg-blue-500/10 px-8 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Explorar Soluções
+            </Link>
+          </div>
         </div>
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80')] opacity-10 bg-cover bg-center" />
       </header>
