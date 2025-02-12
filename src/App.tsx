@@ -349,10 +349,10 @@ function HomePage() {
                 <div className="flex items-center space-x-3">
                   <Mail className="w-5 h-5 text-blue-500" />
                   <a
-                    href="mailto:elntechnologyy.com"
+                    href="mailto:elntechnologyy@gmail.com"
                     className="hover:text-white transition-colors"
                   >
-                    elntechnologyy.com
+                    elntechnologyy@gmail.com
                   </a>
                 </div>
                 <div className="flex items-center space-x-3">
