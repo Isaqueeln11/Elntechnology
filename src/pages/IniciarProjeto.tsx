@@ -20,19 +20,37 @@ export default function IniciarProjeto() {
   });
   const [enviado, setEnviado] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step < 3) {
       setStep(step + 1);
       return;
     }
-    console.log('Dados do projeto:', formData);
-    setEnviado(true);
-    
-    setTimeout(() => {
-      setEnviado(false);
-      navigate('/');
-    }, 3000);
+
+    // Enviar dados para o servidor
+    try {
+      const response = await fetch('http://localhost:3000/projetos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        console.log('Dados do projeto enviados com sucesso:', formData);
+        setEnviado(true);
+        
+        setTimeout(() => {
+          setEnviado(false);
+          navigate('/');
+        }, 3000);
+      } else {
+        console.error('Erro ao enviar dados do projeto:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Erro ao enviar dados do projeto:', error);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
