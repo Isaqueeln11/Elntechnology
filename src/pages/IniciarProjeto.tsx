@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Upload, Clock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Upload, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function IniciarProjeto() {

@@ -32,7 +32,7 @@ function HomePage() {
                 ELN Technology
               </span>
             </div>
-            <div className="hidden md:flex space-x-8">
+            <div className="hidden md:flex items-center space-x-8">
               <a
                 href="#servicos"
                 className="text-gray-300 hover:text-white transition-colors"
@@ -57,6 +57,18 @@ function HomePage() {
               >
                 Contato
               </a>
+              <Link
+                to="/explorar-solucoes"
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Explorar Soluções
+              </Link>
+              <Link
+                to="/iniciar-projeto"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                Iniciar Projeto
+              </Link>
             </div>
           </div>
         </div>
@@ -74,20 +86,6 @@ function HomePage() {
             robótica e sistemas inteligentes. Transformando ideias em realidade
             através da tecnologia.
           </p>
-          <div className="flex justify-center gap-4">
-            <Link
-              to="/iniciar-projeto"
-              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-            >
-              Iniciar Projeto
-            </Link>
-            <Link
-              to="/explorar-solucoes"
-              className="border border-blue-500 text-blue-500 hover:bg-blue-500/10 px-8 py-3 rounded-lg font-semibold transition-colors"
-            >
-              Explorar Soluções
-            </Link>
-          </div>
         </div>
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80')] opacity-10 bg-cover bg-center" />
       </header>
@@ -357,7 +355,7 @@ function HomePage() {
           </div>
 
           <div className="border-t border-gray-800 pt-8 text-center">
-            <p>© 2025 ELN Technology. Todos os direitos reservados.</p>
+            <p>© 2024 ELN Technology. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>
@@ -369,9 +367,9 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<HomePage />} />
         <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
         <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
-        <Route path="/" element={<HomePage />} />
       </Routes>
     </Router>
   );
