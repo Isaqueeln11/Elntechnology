@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Upload, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
 
 export default function IniciarProjeto() {
   const navigate = useNavigate();
@@ -21,33 +20,19 @@ export default function IniciarProjeto() {
   });
   const [enviado, setEnviado] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (step < 3) {
       setStep(step + 1);
       return;
     }
-
-    // Enviar dados para o Supabase
-    try {
-      const { data, error } = await supabase
-        .from('projetos')
-        .insert([formData]);
-
-      if (error) {
-        console.error('Erro ao enviar dados do projeto:', error.message);
-      } else {
-        console.log('Dados do projeto enviados com sucesso:', data);
-        setEnviado(true);
-        
-        setTimeout(() => {
-          setEnviado(false);
-          navigate('/');
-        }, 3000);
-      }
-    } catch (error) {
-      console.error('Erro ao enviar dados do projeto:', error);
-    }
+    console.log('Dados do projeto:', formData);
+    setEnviado(true);
+    
+    setTimeout(() => {
+      setEnviado(false);
+      navigate('/');
+    }, 3000);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
