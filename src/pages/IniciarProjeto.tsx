@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Upload, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export default function IniciarProjeto() {
   const navigate = useNavigate();
@@ -16,30 +18,55 @@ export default function IniciarProjeto() {
     telefone: '',
     anexos: [] as File[],
     objetivos: '',
-    requisitos: ''
+    requisitos: '',
+    dataCriacao: new Date()
   });
   const [enviado, setEnviado] = useState(false);
+  const [enviando, setEnviando] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const formatCurrency = (value: string) => {
+    return 'R$ ' + value.replace(/\D/g, '')
+                        .replace(/(\d)(\d{2})$/, '$1,$2')
+                        .replace(/(?=(\d{3})+(\D))\B/g, '.');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step < 3) {
       setStep(step + 1);
       return;
     }
-    console.log('Dados do projeto:', formData);
-    setEnviado(true);
-    
-    setTimeout(() => {
-      setEnviado(false);
-      navigate('/');
-    }, 3000);
+
+    try {
+      setEnviando(true);
+      // Remove the anexos field as File objects can't be stored in Firestore
+      const { anexos, orcamento, ...formDataWithoutFiles } = formData;
+      const formDataToSend = {
+        ...formDataWithoutFiles,
+        orcamento: orcamento.replace('R$ ', '')
+      };
+      
+      // Add the document to Firestore
+      await addDoc(collection(db, 'projetos'), formDataToSend);
+      
+      setEnviado(true);
+      setTimeout(() => {
+        setEnviado(false);
+        navigate('/');
+      }, 3000);
+    } catch (error) {
+      console.error('Erro ao enviar projeto:', error);
+      alert('Ocorreu um erro ao enviar o projeto. Por favor, tente novamente.');
+    } finally {
+      setEnviando(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'orcamento' ? formatCurrency(value) : value
     }));
   };
 
@@ -171,7 +198,7 @@ export default function IniciarProjeto() {
               <div>
                 <label className="block text-gray-300 mb-2">Orçamento Estimado</label>
                 <input 
-                  type="number"
+                  type="text"
                   name="orcamento"
                   value={formData.orcamento}
                   onChange={handleChange}
@@ -315,9 +342,19 @@ export default function IniciarProjeto() {
               )}
               <button 
                 type="submit"
-                className="ml-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-2 rounded-lg transition-colors"
+                disabled={enviando}
+                className={`ml-auto ${
+                  enviando 
+                    ? 'bg-gray-500 cursor-not-allowed' 
+                    : 'bg-blue-500 hover:bg-blue-600'
+                } text-white font-semibold px-8 py-2 rounded-lg transition-colors`}
               >
-                {step === 3 ? 'Enviar Proposta' : 'Próximo'}
+                {enviando 
+                  ? 'Enviando...' 
+                  : step === 3 
+                    ? 'Enviar Proposta' 
+                    : 'Próximo'
+                }
               </button>
             </div>
           </form>

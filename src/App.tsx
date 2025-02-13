@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import {
   Cpu,
   Notebook as Robot,
@@ -16,12 +16,6 @@ import IniciarProjeto from './pages/IniciarProjeto';
 import ExplorarSolucoes from './pages/ExplorarSolucoes';
 
 function HomePage() {
-  const navigate = useNavigate();
-
-  const handleNavigate = (path: string) => {
-    navigate(path);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       {/* Navigation */}
@@ -92,19 +86,19 @@ function HomePage() {
             robótica e sistemas inteligentes. Transformando ideias em realidade
             através da tecnologia.
           </p>
-          <div className="flex justify-center gap-4">
-            <button
-              onClick={() => handleNavigate('/iniciar-projeto')}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-            >
-              Iniciar Projeto
-            </button>
-            <button
-              onClick={() => handleNavigate('/explorar-solucoes')}
-              className="border border-blue-500 text-blue-500 hover:bg-blue-500/10 px-8 py-3 rounded-lg font-semibold transition-colors"
+          <div className="flex justify-center space-x-4">
+            <Link
+              to="/explorar-solucoes"
+              className="text-gray-300 hover:text-white transition-colors bg-gray-800/50 px-6 py-3 rounded-lg"
             >
               Explorar Soluções
-            </button>
+            </Link>
+            <Link
+              to="/iniciar-projeto"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors"
+            >
+              Iniciar Projeto
+            </Link>
           </div>
         </div>
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80')] opacity-10 bg-cover bg-center" />
@@ -282,7 +276,7 @@ function HomePage() {
             Entre em contato para discutirmos seu projeto de IoT ou robótica.
           </p>
           <a
-            href="mailto:elntechnologyy@gmail.com"
+            href="mailto:elntechnologyy.com"
             className="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
           >
             Entrar em Contato
@@ -349,10 +343,10 @@ function HomePage() {
                 <div className="flex items-center space-x-3">
                   <Mail className="w-5 h-5 text-blue-500" />
                   <a
-                    href="mailto:elntechnologyy@gmail.com"
+                    href="mailto:elntechnologyy.com"
                     className="hover:text-white transition-colors"
                   >
-                    elntechnologyy@gmail.com
+                    elntechnologyy.com
                   </a>
                 </div>
                 <div className="flex items-center space-x-3">
