@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import IniciarProjeto from './pages/IniciarProjeto';
 import ExplorarSolucoes from './pages/ExplorarSolucoes';
+import NavigationLinks from './components/NavigationLinks'; // Corrigir o caminho de importação
 
 function HomePage() {
   return (
@@ -57,18 +58,7 @@ function HomePage() {
               >
                 Contato
               </a>
-              <Link
-                to="/explorar-solucoes"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Explorar Soluções
-              </Link>
-              <Link
-                to="/iniciar-projeto"
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                Iniciar Projeto
-              </Link>
+              <NavigationLinks className="space-x-8" />
             </div>
           </div>
         </div>
@@ -86,23 +76,16 @@ function HomePage() {
             robótica e sistemas inteligentes. Transformando ideias em realidade
             através da tecnologia.
           </p>
-          <div className="flex justify-center space-x-4">
-          <Link
-                to="/explorar-solucoes"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Explorar Soluções
-              </Link>
-              <Link
-                to="/iniciar-projeto"
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-              >
-                Iniciar Projeto
-              </Link>
-          </div>
         </div>
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80')] opacity-10 bg-cover bg-center" />
       </header>
+
+      {/* Navigation Links Section */}
+      <section className="py-8 bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <NavigationLinks />
+        </div>
+      </section>
 
       {/* Services Section */}
       <section id="servicos" className="py-20 bg-gray-800/50">
