@@ -19,15 +19,19 @@ export default function IniciarProjeto() {
     anexos: [] as File[],
     objetivos: '',
     requisitos: '',
-    dataCriacao: new Date()
+    dataCriacao: new Date(),
   });
   const [enviado, setEnviado] = useState(false);
   const [enviando, setEnviando] = useState(false);
 
   const formatCurrency = (value: string) => {
-    return 'R$ ' + value.replace(/\D/g, '')
-                        .replace(/(\d)(\d{2})$/, '$1,$2')
-                        .replace(/(?=(\d{3})+(\D))\B/g, '.');
+    return (
+      'R$ ' +
+      value
+        .replace(/\D/g, '')
+        .replace(/(\d)(\d{2})$/, '$1,$2')
+        .replace(/(?=(\d{3})+(\D))\B/g, '.')
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,12 +47,12 @@ export default function IniciarProjeto() {
       const { anexos, orcamento, ...formDataWithoutFiles } = formData;
       const formDataToSend = {
         ...formDataWithoutFiles,
-        orcamento: orcamento.replace('R$ ', '')
+        orcamento: orcamento.replace('R$ ', ''),
       };
-      
+
       // Add the document to Firestore
       await addDoc(collection(db, 'projetos'), formDataToSend);
-      
+
       setEnviado(true);
       setTimeout(() => {
         setEnviado(false);
@@ -62,19 +66,23 @@ export default function IniciarProjeto() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'orcamento' ? formatCurrency(value) : value
+      [name]: name === 'orcamento' ? formatCurrency(value) : value,
     }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        anexos: [...prev.anexos, ...Array.from(e.target.files || [])]
+        anexos: [...prev.anexos, ...Array.from(e.target.files || [])],
       }));
     }
   };
@@ -87,20 +95,30 @@ export default function IniciarProjeto() {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center">1</div>
-                  <span className="ml-2 text-white font-medium">Informações Básicas</span>
+                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center">
+                    1
+                  </div>
+                  <span className="ml-2 text-white font-medium">
+                    Informações Básicas
+                  </span>
                 </div>
                 <div className="flex items-center text-gray-400">
-                  <div className="w-8 h-8 border-2 border-gray-600 rounded-full flex items-center justify-center mr-2">2</div>
-                  <div className="w-8 h-8 border-2 border-gray-600 rounded-full flex items-center justify-center">3</div>
+                  <div className="w-8 h-8 border-2 border-gray-600 rounded-full flex items-center justify-center mr-2">
+                    2
+                  </div>
+                  <div className="w-8 h-8 border-2 border-gray-600 rounded-full flex items-center justify-center">
+                    3
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-gray-300 mb-2">Nome do Projeto</label>
-                <input 
+                <label className="block text-gray-300 mb-2">
+                  Nome do Projeto
+                </label>
+                <input
                   type="text"
                   name="nome"
                   value={formData.nome}
@@ -110,10 +128,12 @@ export default function IniciarProjeto() {
                   required
                 />
               </div>
-              
+
               <div>
-                <label className="block text-gray-300 mb-2">Tipo de Projeto</label>
-                <select 
+                <label className="block text-gray-300 mb-2">
+                  Tipo de Projeto
+                </label>
+                <select
                   name="tipo"
                   value={formData.tipo}
                   onChange={handleChange}
@@ -126,10 +146,10 @@ export default function IniciarProjeto() {
                   <option value="educacional">Educacional</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-gray-300 mb-2">Descrição</label>
-                <textarea 
+                <textarea
                   name="descricao"
                   value={formData.descricao}
                   onChange={handleChange}
@@ -150,17 +170,25 @@ export default function IniciarProjeto() {
                   <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center">
                     <CheckCircle className="w-5 h-5" />
                   </div>
-                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mx-2">2</div>
-                  <span className="text-white font-medium">Detalhes do Projeto</span>
+                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center mx-2">
+                    2
+                  </div>
+                  <span className="text-white font-medium">
+                    Detalhes do Projeto
+                  </span>
                 </div>
-                <div className="w-8 h-8 border-2 border-gray-600 rounded-full flex items-center justify-center">3</div>
+                <div className="w-8 h-8 border-2 border-gray-600 rounded-full flex items-center justify-center">
+                  3
+                </div>
               </div>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-gray-300 mb-2">Objetivos do Projeto</label>
-                <textarea 
+                <label className="block text-gray-300 mb-2">
+                  Objetivos do Projeto
+                </label>
+                <textarea
                   name="objetivos"
                   value={formData.objetivos}
                   onChange={handleChange}
@@ -171,8 +199,10 @@ export default function IniciarProjeto() {
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-2">Requisitos Específicos</label>
-                <textarea 
+                <label className="block text-gray-300 mb-2">
+                  Requisitos Específicos
+                </label>
+                <textarea
                   name="requisitos"
                   value={formData.requisitos}
                   onChange={handleChange}
@@ -183,8 +213,10 @@ export default function IniciarProjeto() {
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-2">Prazo Desejado</label>
-                <input 
+                <label className="block text-gray-300 mb-2">
+                  Prazo Desejado
+                </label>
+                <input
                   type="text"
                   name="prazo"
                   value={formData.prazo}
@@ -196,8 +228,10 @@ export default function IniciarProjeto() {
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-2">Orçamento Estimado</label>
-                <input 
+                <label className="block text-gray-300 mb-2">
+                  Orçamento Estimado
+                </label>
+                <input
                   type="text"
                   name="orcamento"
                   value={formData.orcamento}
@@ -222,16 +256,22 @@ export default function IniciarProjeto() {
                   <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center mx-2">
                     <CheckCircle className="w-5 h-5" />
                   </div>
-                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center">3</div>
-                  <span className="ml-2 text-white font-medium">Informações de Contato</span>
+                  <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center">
+                    3
+                  </div>
+                  <span className="ml-2 text-white font-medium">
+                    Informações de Contato
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-gray-300 mb-2">Nome da Empresa</label>
-                <input 
+                <label className="block text-gray-300 mb-2">
+                  Nome da Empresa
+                </label>
+                <input
                   type="text"
                   name="empresa"
                   value={formData.empresa}
@@ -244,7 +284,7 @@ export default function IniciarProjeto() {
 
               <div>
                 <label className="block text-gray-300 mb-2">E-mail</label>
-                <input 
+                <input
                   type="email"
                   name="email"
                   value={formData.email}
@@ -257,7 +297,7 @@ export default function IniciarProjeto() {
 
               <div>
                 <label className="block text-gray-300 mb-2">Telefone</label>
-                <input 
+                <input
                   type="tel"
                   name="telefone"
                   value={formData.telefone}
@@ -269,16 +309,18 @@ export default function IniciarProjeto() {
               </div>
 
               <div>
-                <label className="block text-gray-300 mb-2">Anexos (opcional)</label>
+                <label className="block text-gray-300 mb-2">
+                  Anexos (opcional)
+                </label>
                 <div className="relative">
-                  <input 
+                  <input
                     type="file"
                     multiple
                     onChange={handleFileChange}
                     className="hidden"
                     id="anexos"
                   />
-                  <label 
+                  <label
                     htmlFor="anexos"
                     className="w-full bg-gray-800 border border-dashed border-gray-600 rounded-lg px-4 py-8 text-gray-400 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-colors"
                   >
@@ -307,29 +349,35 @@ export default function IniciarProjeto() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-8">
-      <button 
+      <button
         onClick={() => navigate('/')}
         className="flex items-center text-gray-300 hover:text-white mb-8"
       >
         <ArrowLeft className="w-5 h-5 mr-2" />
         Voltar
       </button>
-      
+
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-8">Iniciar Projeto</h1>
-        
+
         {enviado ? (
           <div className="bg-green-500/20 border border-green-500 rounded-lg p-8 text-center">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-2">Proposta Enviada!</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">
+              Proposta Enviada!
+            </h2>
             <p className="text-green-400">
-              Recebemos sua proposta com sucesso. Nossa equipe entrará em contato em breve para discutir os próximos passos.
+              Recebemos sua proposta com sucesso. Nossa equipe entrará em
+              contato em breve para discutir os próximos passos.
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="bg-gray-800/50 rounded-xl p-8">
+          <form
+            onSubmit={handleSubmit}
+            className="bg-gray-800/50 rounded-xl p-8"
+          >
             {renderStep()}
-            
+
             <div className="mt-8 flex justify-between">
               {step > 1 && (
                 <button
@@ -340,21 +388,20 @@ export default function IniciarProjeto() {
                   Voltar
                 </button>
               )}
-              <button 
+              <button
                 type="submit"
                 disabled={enviando}
                 className={`ml-auto ${
-                  enviando 
-                    ? 'bg-gray-500 cursor-not-allowed' 
+                  enviando
+                    ? 'bg-gray-500 cursor-not-allowed'
                     : 'bg-blue-500 hover:bg-blue-600'
                 } text-white font-semibold px-8 py-2 rounded-lg transition-colors`}
               >
-                {enviando 
-                  ? 'Enviando...' 
-                  : step === 3 
-                    ? 'Enviar Proposta' 
-                    : 'Próximo'
-                }
+                {enviando
+                  ? 'Enviando...'
+                  : step === 3
+                  ? 'Enviar Proposta'
+                  : 'Próximo'}
               </button>
             </div>
           </form>
