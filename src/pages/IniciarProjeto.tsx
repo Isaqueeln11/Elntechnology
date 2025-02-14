@@ -177,7 +177,7 @@ export default function IniciarProjeto() {
                     Detalhes do Projeto
                   </span>
                 </div>
-                <div className="w-8 h-8 border-2 border-gray-600 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-gray-600 rounded-full flex items-center justify-center text-white">
                   3
                 </div>
               </div>
