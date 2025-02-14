@@ -272,7 +272,7 @@ function HomePage() {
             Entre em contato para discutirmos seu projeto de IoT ou robótica.
           </p>
           <a
-            href="mailto:elntechnologyy.com"
+            href="mailto:elntechnologyy@gmail.com"
             className="inline-block bg-white text-[#159AFD] px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
           >
             Entrar em Contato
@@ -339,10 +339,10 @@ function HomePage() {
                 <div className="flex items-center space-x-3">
                   <Mail className="w-5 h-5 text-[#159AFD]" />
                   <a
-                    href="mailto:elntechnologyy.com"
+                    href="mailto:elntechnologyy@gmail.com"
                     className="hover:text-[#159AFD] transition-colors"
                   >
-                    elntechnologyy.com
+                    elntechnologyy@gmail.com
                   </a>
                 </div>
                 <div className="flex items-center space-x-3">
