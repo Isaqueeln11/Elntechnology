@@ -17,8 +17,16 @@ import IniciarProjeto from './pages/IniciarProjeto';
 import ExplorarSolucoes from './pages/ExplorarSolucoes';
 import NavigationLinks from './components/NavigationLinks';
 import MobileMenu from './components/MobileMenu';
+import Newsletter from './components/Newsletter';
+import Testimonials from './components/Testimonials';
+import FAQ from './components/FAQ';
+import Stats from './components/Stats';
+import BlogPreview from './components/BlogPreview';
+import TechStack from './components/TechStack';
 import Login from './Login';
 import Register from './Register';
+import PCBs from './pages/PCBs';
+import Inovacoes from './pages/Inovacoes';
 
 function HomePage() {
   return (
@@ -62,6 +70,18 @@ function HomePage() {
               >
                 Contato
               </a>
+              <Link
+                to="/pcbs"
+                className="text-gray-300 hover:text-[#159AFD] transition-colors"
+              >
+                PCBs
+              </Link>
+              <Link
+                to="/inovacoes"
+                className="text-gray-300 hover:text-[#159AFD] transition-colors"
+              >
+                Inovações
+              </Link>
               <NavigationLinks className="space-x-8" />
               <div className="flex items-center space-x-4">
                 <Link
@@ -262,21 +282,44 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Stats Section */}
+      <Stats />
+
+      {/* Tech Stack Section */}
+      <TechStack />
+
+      {/* Testimonials Section */}
+      <Testimonials />
+
+      {/* Blog Preview Section */}
+      <BlogPreview />
+
+      {/* FAQ Section */}
+      <FAQ />
+
       {/* Contact Section */}
       <section id="contato" className="py-20 bg-[#159AFD]">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Vamos Criar Algo Incrível?
-          </h2>
-          <p className="text-xl text-white/90 mb-8">
-            Entre em contato para discutirmos seu projeto de IoT ou robótica.
-          </p>
-          <a
-            href="mailto:elntechnologyy@gmail.com"
-            className="inline-block bg-white text-[#159AFD] px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-          >
-            Entrar em Contato
-          </a>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-bold text-white mb-4">
+                Vamos Criar Algo Incrível?
+              </h2>
+              <p className="text-xl text-white/90 mb-8">
+                Entre em contato para discutirmos seu projeto de IoT ou robótica.
+                Nossa equipe está pronta para transformar suas ideias em realidade.
+              </p>
+              <a
+                href="mailto:elntechnologyy@gmail.com"
+                className="inline-block bg-white text-[#159AFD] px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              >
+                Entrar em Contato
+              </a>
+            </div>
+            <div>
+              <Newsletter />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -329,6 +372,18 @@ function HomePage() {
                 >
                   Contato
                 </a>
+                <Link
+                  to="/pcbs"
+                  className="hover:text-[#159AFD] transition-colors"
+                >
+                  PCBs
+                </Link>
+                <Link
+                  to="/inovacoes"
+                  className="hover:text-[#159AFD] transition-colors"
+                >
+                  Inovações
+                </Link>
               </div>
             </div>
 
@@ -382,6 +437,8 @@ function App() {
         <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/pcbs" element={<PCBs />} />
+        <Route path="/inovacoes" element={<Inovacoes />} />
       </Routes>
     </Router>
   );

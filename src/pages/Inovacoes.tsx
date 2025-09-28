@@ -338,7 +338,10 @@ export default function Inovacoes() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <div className="bg-[#0D0F52] rounded-xl p-8 max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-[#159AFD]/20">
               <div className="flex items-center mb-6">
-                <innovations[selectedInnovation].icon className="w-8 h-8 text-[#159AFD] mr-3" />
+                {(() => {
+                  const InnovationIcon = innovations[selectedInnovation].icon;
+                  return <InnovationIcon className="w-8 h-8 text-[#159AFD] mr-3" />;
+                })()}
                 <h2 className="text-3xl font-bold text-white">
                   {innovations[selectedInnovation].title}
                 </h2>
