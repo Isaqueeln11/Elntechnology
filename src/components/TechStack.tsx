@@ -61,28 +61,28 @@ const TechStack = () => {
   ];
 
   return (
-    <section id="tech-stack" className="py-20 bg-gray-50">
-      <div className="container mx-auto px-6">
+    <section id="tech-stack" className="py-20 bg-black/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-800 mb-4">
-            Stack Tecnológico
+            Tecnologias e Ferramentas
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Tecnologias e ferramentas que utilizo para desenvolver soluções completas em IoT e sistemas embarcados
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            Tecnologias e ferramentas que utilizamos para desenvolver soluções completas em IoT, robótica e sistemas embarcados
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {techCategories.map((category, categoryIndex) => (
-            <div key={categoryIndex} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
+            <div key={categoryIndex} className="bg-[#0D0F52]/30 backdrop-blur-sm rounded-xl p-6 border border-[#159AFD]/20 hover:border-[#159AFD]/40 transition-all">
+              <h3 className="text-xl font-bold text-white mb-4 text-center">
                 {category.category}
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 {category.technologies.map((tech, techIndex) => (
-                  <div key={techIndex} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                    <tech.icon className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm text-gray-700">{tech.name}</span>
+                  <div key={techIndex} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-[#0D0F52]/50 transition-colors">
+                    <tech.icon className="w-5 h-5 text-[#159AFD]" />
+                    <span className="text-sm text-gray-300">{tech.name}</span>
                   </div>
                 ))}
               </div>
