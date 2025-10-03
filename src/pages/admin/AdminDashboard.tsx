@@ -1,23 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { 
-  Users, 
-  FolderOpen, 
-  MessageSquare, 
-  DollarSign, 
-  BarChart3,
-  Settings,
-  UserPlus,
-  TrendingUp,
-  Calendar,
-  Bell,
-  Search,
-  Filter,
-  Download,
-  Eye,
-  Edit,
-  Trash2
-} from 'lucide-react';
+import { Users, FolderOpen, MessageSquare, DollarSign, BarChart3, Settings, UserPlus, TrendingUp, Calendar, Bell, Search, Filter, Download, Eye, CreditCard as Edit, Trash2 } from 'lucide-react';
 import DashboardLayout from '../../components/DashboardLayout';
 
 const AdminDashboard = () => {
