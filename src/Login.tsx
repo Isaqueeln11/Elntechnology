@@ -1,17 +1,33 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from './contexts/AuthContext';
 import { ArrowLeft, LogIn } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Adicione a lógica de autenticação aqui
-    console.log('Login:', { email, password });
-    navigate('/');
+    setError('');
+    setIsLoading(true);
+    
+    try {
+      const success = await login(email, password);
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        setError('Email ou senha incorretos');
+      }
+    } catch (err) {
+      setError('Erro ao fazer login. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -30,6 +46,24 @@ const Login = () => {
             <LogIn className="w-12 h-12 text-[#159AFD]" />
           </div>
           <h2 className="text-3xl font-bold text-white text-center mb-8">Bem-vindo de volta</h2>
+          
+          {/* Demo Credentials */}
+          <div className="bg-[#159AFD]/10 border border-[#159AFD]/30 rounded-lg p-4 mb-6">
+            <h3 className="text-white font-semibold mb-2">Credenciais de Demonstração:</h3>
+            <div className="text-sm text-gray-300 space-y-1">
+              <p><strong>Cliente:</strong> cliente@empresa.com</p>
+              <p><strong>Admin:</strong> admin@elntechnology.com</p>
+              <p><strong>Técnico:</strong> tecnico@elntechnology.com</p>
+              <p><strong>Senha:</strong> 123456</p>
+            </div>
+          </div>
+          
+          {error && (
+            <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3 mb-6">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+          
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label className="block text-gray-300 mb-2 text-sm">Email</label>
@@ -55,9 +89,14 @@ const Login = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-[#159AFD] hover:bg-[#508AD0] text-white p-3 rounded-lg font-semibold transition-colors"
+              disabled={isLoading}
+              className={`w-full ${
+                isLoading 
+                  ? 'bg-gray-500 cursor-not-allowed' 
+                  : 'bg-[#159AFD] hover:bg-[#508AD0]'
+              } text-white p-3 rounded-lg font-semibold transition-colors`}
             >
-              Entrar
+              {isLoading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
           <p className="mt-6 text-center text-gray-400">

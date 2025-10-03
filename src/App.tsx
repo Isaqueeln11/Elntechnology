@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import {
   Cpu,
   Notebook as Robot,
@@ -27,6 +29,8 @@ import Login from './Login';
 import Register from './Register';
 import PCBs from './pages/PCBs';
 import Inovacoes from './pages/Inovacoes';
+import Dashboard from './pages/Dashboard';
+import Unauthorized from './pages/Unauthorized';
 
 function HomePage() {
   return (
@@ -472,17 +476,28 @@ function HomePage() {
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
-        <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/pcbs" element={<PCBs />} />
-        <Route path="/inovacoes" element={<Inovacoes />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
+          <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/pcbs" element={<PCBs />} />
+          <Route path="/inovacoes" element={<Inovacoes />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
