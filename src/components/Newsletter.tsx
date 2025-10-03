@@ -15,40 +15,44 @@ const Newsletter = () => {
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:border-white/40 transition-all duration-500 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/10 to-transparent rounded-bl-full"></div>
       <div className="flex items-center mb-4">
-        <Mail className="w-6 h-6 text-white mr-2" />
-        <h3 className="text-xl font-semibold text-white">Newsletter</h3>
+        <div className="bg-white/20 p-2 rounded-lg mr-3">
+          <Mail className="w-6 h-6 text-white" />
+        </div>
+        <h3 className="text-xl font-semibold text-white">Newsletter Tecnológica</h3>
       </div>
       
       {isSubscribed ? (
-        <div className="flex items-center text-green-400">
-          <CheckCircle className="w-5 h-5 mr-2" />
-          <span>Obrigado! Você foi inscrito com sucesso.</span>
+        <div className="flex items-center text-green-300 bg-green-500/20 p-4 rounded-xl border border-green-500/30">
+          <CheckCircle className="w-6 h-6 mr-3 animate-pulse" />
+          <span className="font-semibold">Obrigado! Você foi inscrito com sucesso.</span>
         </div>
       ) : (
         <>
-          <p className="text-white/90 mb-4">
+          <p className="text-white/90 mb-6 leading-relaxed">
             Receba as últimas novidades sobre IoT, robótica e inovações tecnológicas.
           </p>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Seu melhor e-mail"
-              className="w-full px-4 py-2 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:border-white/50 transition-colors"
+              className="w-full px-6 py-4 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:border-white/60 focus:bg-white/25 transition-all duration-300"
               required
             />
             <button
               type="submit"
-              className="w-full bg-white text-[#159AFD] px-4 py-2 rounded-lg font-semibold hover:bg-white/90 transition-colors"
+              className="w-full bg-white text-[#159AFD] px-6 py-4 rounded-xl font-semibold hover:bg-white/90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Inscrever-se
             </button>
           </form>
         </>
       )}
+      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-white/50 to-transparent"></div>
     </div>
   );
 };
