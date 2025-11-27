@@ -61,7 +61,7 @@ const MobileMenu = () => {
           <div className="pt-4 border-t border-[#159AFD]/20">
             <Link
               to="/login"
-              className="flex items-center text-gray-300 hover:text-[#159AFD] transition-colors py-2"
+              className="flex items-center text-gray-300 hover:text-white transition-colors py-2"
               onClick={() => setIsOpen(false)}
             >
               <User className="w-5 h-5 mr-2" />
@@ -69,7 +69,7 @@ const MobileMenu = () => {
             </Link>
             <Link
               to="/register"
-              className="block bg-[#159AFD]/20 hover:bg-[#159AFD]/30 text-[#FFFFFF] px-4 py-2 rounded-lg transition-colors text-center mt-2"
+              className="block bg-[#159AFD]/20 hover:bg-[#159AFD]/30 text-white px-4 py-2 rounded-lg transition-colors text-center mt-2"
               onClick={() => setIsOpen(false)}
             >
               Criar Conta

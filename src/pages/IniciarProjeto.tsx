@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Upload, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../firebase';
 
 export default function IniciarProjeto() {
   const navigate = useNavigate();
@@ -43,15 +41,10 @@ export default function IniciarProjeto() {
 
     try {
       setEnviando(true);
-      // Remove the anexos field as File objects can't be stored in Firestore
-      const { anexos, orcamento, ...formDataWithoutFiles } = formData;
-      const formDataToSend = {
-        ...formDataWithoutFiles,
-        orcamento: orcamento.replace('R$ ', ''),
-      };
-
-      // Add the document to Firestore
-      await addDoc(collection(db, 'projetos'), formDataToSend);
+      // Simular envio do projeto
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      console.log('Projeto enviado:', formData);
 
       setEnviado(true);
       setTimeout(() => {
