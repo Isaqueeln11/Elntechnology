@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+}
+
+.circuit-grid {
+  background-image:
+    linear-gradient(rgba(21, 154, 253, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 154, 253, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at 20% 20%, rgba(21, 154, 253, 0.16), transparent 28%),
+    radial-gradient(circle at 80% 10%, rgba(13, 15, 82, 0.12), transparent 24%);
+  background-size: 42px 42px, 42px 42px, 100% 100%, 100% 100%;
+  animation: circuit-drift 18s linear infinite;
+}
+
+.hero-spin {
+  animation: hero-spin 18s linear infinite;
+}
+
+@keyframes circuit-drift {
+  from {
+    background-position: 0 0, 0 0, center, center;
+  }
+
+  to {
+    background-position: 84px 42px, 42px 84px, center, center;
+  }
+}
+
+@keyframes hero-spin {
+  from {
+    transform: rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.04);
+  }
+
+  to {
+    transform: rotate(360deg) scale(1);
+  }
+}

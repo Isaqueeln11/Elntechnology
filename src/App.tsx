@@ -1,5 +1,27 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import {
+  ArrowRight,
+  Box,
+  Bot,
+  CheckCircle2,
+  ChevronRight,
+  CircuitBoard,
+  Cpu,
+  Mail,
+  Menu,
+  Microscope,
+  Phone,
+  Printer,
+  Rocket,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  Wifi,
+  Wrench,
+  X,
+  Zap,
+} from 'lucide-react';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './Login';
@@ -10,315 +32,442 @@ import ExplorarSolucoes from './pages/ExplorarSolucoes';
 import IniciarProjeto from './pages/IniciarProjeto';
 import Inovacoes from './pages/Inovacoes';
 import PCBs from './pages/PCBs';
-import NavigationLinks from './components/NavigationLinks';
-import MobileMenu from './components/MobileMenu';
-import Newsletter from './components/Newsletter';
-import Testimonials from './components/Testimonials';
-import FAQ from './components/FAQ';
-import Stats from './components/Stats';
-import BlogPreview from './components/BlogPreview';
-import TechStack from './components/TechStack';
-import { Cpu, Zap, Shield, Smartphone, ArrowRight, CheckCircle, Star, Users, Award, Clock, Headphones as HeadphonesIcon, Menu, X, ChevronRight, Play, ExternalLink } from 'lucide-react';
+import logoUrl from '../ELN TECHNOLOGY.svg';
+
+const navLinks = [
+  { label: 'Servicos', href: '#servicos' },
+  { label: 'Processo', href: '#processo' },
+  { label: 'Projetos', href: '#projetos' },
+  { label: 'Contato', href: '#contato' },
+];
+
+const services = [
+  {
+    icon: Wifi,
+    title: 'IoT e automacao',
+    description:
+      'Sensores, dashboards, comunicacao wireless e monitoramento em tempo real para casas, empresas e industrias.',
+    items: ['ESP32, Arduino e Raspberry Pi', 'Controle por app ou painel web', 'Alertas e relatorios inteligentes'],
+  },
+  {
+    icon: Printer,
+    title: 'Impressao 3D',
+    description:
+      'Prototipos, pecas sob medida, suportes, caixas para placas e modelos funcionais para validar ideias rapido.',
+    items: ['Modelagem para fabricacao', 'Prototipagem rapida', 'Acabamento e ajustes tecnicos'],
+  },
+  {
+    icon: Bot,
+    title: 'Robos e sistemas inteligentes',
+    description:
+      'Projetos de robotica educacional, assistiva e industrial com controle, sensores, motores e programacao.',
+    items: ['Robos moveis e bracos roboticos', 'Controle de motores', 'Visao e automacao de tarefas'],
+  },
+  {
+    icon: CircuitBoard,
+    title: 'Eletronica e PCBs',
+    description:
+      'Desenvolvimento de circuitos, placas, firmware e integracao completa entre hardware e software.',
+    items: ['Esquematico e layout PCB', 'Firmware embarcado', 'Montagem e testes'],
+  },
+];
+
+const projectCards = [
+  {
+    title: 'Casa conectada',
+    tag: 'IoT',
+    text: 'Automacao de iluminacao, sensores de presenca, temperatura e controle remoto seguro.',
+    icon: Cpu,
+  },
+  {
+    title: 'Prototipo funcional',
+    tag: '3D + eletronica',
+    text: 'Da ideia ao produto: desenho tecnico, impressao 3D, circuito e testes em bancada.',
+    icon: Box,
+  },
+  {
+    title: 'Robo personalizado',
+    tag: 'Robotica',
+    text: 'Robo para estudo, apresentacao, rotina operacional ou prova de conceito.',
+    icon: Bot,
+  },
+];
+
+const process = [
+  'Entendimento da ideia e objetivo',
+  'Desenho da solucao e escolha dos componentes',
+  'Prototipo, testes e ajustes',
+  'Entrega organizada com orientacao de uso',
+];
+
+const featureItems = [
+  { icon: ShieldCheck, label: 'Projeto com testes' },
+  { icon: Wrench, label: 'Montagem organizada' },
+  { icon: Microscope, label: 'Detalhe tecnico' },
+  { icon: Rocket, label: 'Ideia pronta para crescer' },
+];
 
 function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [selectedService, setSelectedService] = React.useState('IoT e automacao');
+  const [formStatus, setFormStatus] = React.useState('');
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const name = data.get('name')?.toString().trim();
+    setFormStatus(
+      name
+        ? `${name}, sua solicitacao foi preparada. A ELN Technology entra em contato para alinhar os detalhes.`
+        : 'Solicitacao preparada. A ELN Technology entra em contato para alinhar os detalhes.',
+    );
+    event.currentTarget.reset();
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <Cpu className="w-8 h-8 text-blue-400" />
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                ELN Technology
-              </span>
-            </div>
-            
-            <div className="hidden md:block">
-              <NavigationLinks />
-            </div>
-            
-            <div className="hidden md:flex items-center space-x-4">
-              <a href="/login" className="text-gray-300 hover:text-white transition-colors">
+    <div className="min-h-screen bg-[#F7FBFF] text-slate-950">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-sky-100/70 bg-white/90 shadow-sm backdrop-blur-xl">
+        <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <a href="#inicio" className="flex items-center gap-3" aria-label="ELN Technology">
+            <img src={logoUrl} alt="ELN Technology" className="h-12 w-28 object-contain sm:w-36" />
+          </a>
+
+          <div className="hidden items-center gap-8 lg:flex">
+            {navLinks.map((link) => (
+              <a key={link.href} href={link.href} className="text-sm font-semibold text-slate-700 transition hover:text-sky-600">
+                {link.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="hidden items-center gap-3 lg:flex">
+            <Link to="/login" className="rounded-md px-4 py-2 text-sm font-semibold text-slate-700 transition hover:text-sky-600">
+              Login
+            </Link>
+            <a
+              href="#contato"
+              className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/20 transition hover:bg-[#0D0F52]"
+            >
+              Iniciar projeto
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+
+          <button
+            type="button"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-sky-100 text-slate-900 lg:hidden"
+            onClick={() => setIsMenuOpen((value) => !value)}
+            aria-label="Abrir menu"
+          >
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </nav>
+
+        {isMenuOpen && (
+          <div className="border-t border-sky-100 bg-white px-4 py-4 lg:hidden">
+            <div className="mx-auto flex max-w-7xl flex-col gap-2">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="rounded-md px-3 py-3 font-semibold text-slate-700 hover:bg-sky-50"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
+                </a>
+              ))}
+              <Link to="/login" className="rounded-md px-3 py-3 font-semibold text-slate-700 hover:bg-sky-50">
                 Login
-              </a>
-              <a href="/register" className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-300">
-                Começar
-              </a>
-            </div>
-            
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-gray-300 hover:text-white"
-              >
-                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
+              </Link>
             </div>
           </div>
-        </div>
-        
-        {isMenuOpen && <MobileMenu />}
-      </nav>
+        )}
+      </header>
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-cyan-600/20"></div>
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-1 h-1 bg-cyan-400 rounded-full animate-ping"></div>
-          <div className="absolute bottom-20 left-1/4 w-1.5 h-1.5 bg-blue-300 rounded-full animate-pulse"></div>
-        </div>
-        
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center">
-            <div className="flex justify-center space-x-4 mb-8">
-              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm border border-blue-500/30">
-                IoT Solutions
-              </span>
-              <span className="px-3 py-1 bg-cyan-500/20 text-cyan-300 rounded-full text-sm border border-cyan-500/30">
-                Robótica
-              </span>
-              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm border border-purple-500/30">
-                PCB Design
-              </span>
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
-                Inovação em
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-300 bg-clip-text text-transparent">
-                Tecnologia
-              </span>
-            </h1>
-            
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Desenvolvemos soluções IoT, sistemas robóticos e PCBs personalizados 
-              para transformar suas ideias em realidade tecnológica.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/iniciar-projeto" className="group bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/25">
-                <span className="flex items-center justify-center">
-                  Iniciar Projeto
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </a>
-              <a href="/explorar-solucoes" className="group bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl border border-white/20 hover:bg-white/20 transition-all duration-500 transform hover:scale-105">
-                <span className="flex items-center justify-center">
-                  <Play className="mr-2 w-5 h-5" />
-                  Explorar Soluções
-                </span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute inset-0 bg-black/30"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/10 to-transparent"></div>
-        
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Nossos Serviços
-              </span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Soluções completas em tecnologia para impulsionar seu negócio
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: Cpu,
-                title: "IoT Solutions",
-                description: "Sistemas inteligentes conectados para automação industrial e residencial",
-                gradient: "from-blue-500 to-cyan-500"
-              },
-              {
-                icon: Zap,
-                title: "Robótica",
-                description: "Desenvolvimento de robôs e sistemas automatizados personalizados",
-                gradient: "from-purple-500 to-pink-500"
-              },
-              {
-                icon: Shield,
-                title: "PCB Design",
-                description: "Projeto e fabricação de placas de circuito impresso profissionais",
-                gradient: "from-green-500 to-emerald-500"
-              },
-              {
-                icon: Smartphone,
-                title: "Sistemas Embarcados",
-                description: "Desenvolvimento de firmware e software para microcontroladores",
-                gradient: "from-orange-500 to-red-500"
-              }
-            ].map((service, index) => (
-              <div key={index} className="group relative">
-                <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-500 transform hover:scale-105 hover:shadow-2xl">
-                  <div className={`w-16 h-16 bg-gradient-to-r ${service.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                    <service.icon className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-4">{service.title}</h3>
-                  <p className="text-gray-400 leading-relaxed">{service.description}</p>
-                  <div className={`h-1 bg-gradient-to-r ${service.gradient} rounded-full mt-6 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
-                </div>
+      <main id="inicio">
+        <section className="relative overflow-hidden bg-white pt-28">
+          <div className="absolute inset-0 circuit-grid opacity-70" />
+          <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 pb-20 pt-10 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pb-24">
+            <div className="relative z-10">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-md border border-sky-100 bg-sky-50 px-4 py-2 text-sm font-bold text-[#0D0F52]">
+                <Sparkles className="h-4 w-4 text-[#159AFD]" />
+                Inovacao em tecnologia para tirar ideias do papel
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Stats Section */}
-      <Stats />
+              <h1 className="max-w-4xl text-4xl font-black leading-tight text-[#0D0F52] sm:text-5xl lg:text-7xl">
+                ELN Technology
+                <span className="mt-3 block text-[#159AFD]">IoT, impressao 3D, robos e eletronica.</span>
+              </h1>
 
-      {/* Tech Stack */}
-      <TechStack />
-
-      {/* Projects Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 to-purple-900/20"></div>
-        
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Projetos em Destaque
-              </span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Conheça alguns dos nossos projetos mais inovadores
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Sistema IoT Industrial",
-                category: "IoT",
-                image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=500",
-                description: "Monitoramento em tempo real de equipamentos industriais"
-              },
-              {
-                title: "Robô Colaborativo",
-                category: "Robótica",
-                image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=500",
-                description: "Automação de processos de manufatura"
-              },
-              {
-                title: "PCB Multi-layer",
-                category: "Hardware",
-                image: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=500",
-                description: "Placa de alta densidade para aplicações críticas"
-              }
-            ].map((project, index) => (
-              <div key={index} className="group relative overflow-hidden rounded-2xl">
-                <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 relative">
-                  <img 
-                    src={project.image} 
-                    alt={project.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                  <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 bg-blue-500/80 text-white rounded-full text-sm backdrop-blur-sm">
-                      {project.category}
-                    </span>
-                  </div>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
-                    <p className="text-gray-300 text-sm">{project.description}</p>
-                  </div>
-                  <div className="absolute inset-0 bg-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <span className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-lg border border-white/30 flex items-center">
-                      Ver Projeto <ExternalLink className="ml-2 w-4 h-4" />
-                    </span>
-                  </div>
-                </div>
-                <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <Testimonials />
-
-      {/* Blog Preview */}
-      <BlogPreview />
-
-      {/* FAQ */}
-      <FAQ />
-
-      {/* Newsletter */}
-      <Newsletter />
-
-      {/* Footer */}
-      <footer className="bg-black/50 backdrop-blur-sm border-t border-white/10 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="col-span-2">
-              <div className="flex items-center space-x-2 mb-4">
-                <Cpu className="w-8 h-8 text-blue-400" />
-                <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                  ELN Technology
-                </span>
-              </div>
-              <p className="text-gray-400 mb-4 max-w-md">
-                Transformando ideias em soluções tecnológicas inovadoras através de IoT, robótica e sistemas embarcados.
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+                Criamos solucoes sob medida para automacao, prototipos, sistemas embarcados e projetos inteligentes.
+                Tudo organizado, testado e pensado para funcionar no mundo real.
               </p>
-              <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                  </svg>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href="#contato"
+                  className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0D0F52] px-6 py-4 font-bold text-white shadow-xl shadow-slate-900/15 transition hover:-translate-y-0.5 hover:bg-[#159AFD]"
+                >
+                  Solicitar orcamento
+                  <Send className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
-                  </svg>
+                <a
+                  href="#servicos"
+                  className="inline-flex items-center justify-center gap-2 rounded-md border border-sky-200 bg-white px-6 py-4 font-bold text-[#0D0F52] transition hover:-translate-y-0.5 hover:border-[#159AFD] hover:text-[#159AFD]"
+                >
+                  Ver solucoes
+                  <ChevronRight className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
+              </div>
+
+              <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
+                {['IoT', 'Robos', '3D'].map((item, index) => (
+                  <div key={item} className="rounded-md border border-sky-100 bg-white/90 p-4 shadow-sm">
+                    <div className="text-2xl font-black text-[#159AFD]">{index + 1}+</div>
+                    <div className="mt-1 text-xs font-bold uppercase text-slate-500">{item}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative z-10">
+              <div className="relative mx-auto max-w-xl">
+                <div className="absolute -inset-6 rounded-full border border-sky-100 hero-spin" />
+                <div className="relative overflow-hidden rounded-md border border-sky-100 bg-white p-5 shadow-2xl shadow-sky-900/10">
+                  <img src={logoUrl} alt="Logo ELN Technology" className="w-full object-contain" />
+                  <div className="mt-5 grid grid-cols-2 gap-3">
+                    {[
+                      ['Prototipos', 'rapidos'],
+                      ['Sistemas', 'conectados'],
+                      ['Hardware', 'sob medida'],
+                      ['Entrega', 'organizada'],
+                    ].map(([top, bottom]) => (
+                      <div key={top} className="rounded-md bg-slate-950 px-4 py-3 text-white">
+                        <div className="text-sm font-bold">{top}</div>
+                        <div className="text-xs text-sky-200">{bottom}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="servicos" className="bg-[#EEF7FF] py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+              <div>
+                <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Servicos</p>
+                <h2 className="mt-3 text-3xl font-black text-[#0D0F52] sm:text-5xl">Tudo separado, claro e pronto para evoluir.</h2>
+                <p className="mt-5 text-lg leading-8 text-slate-600">
+                  Escolha uma area para ver como a ELN Technology pode estruturar seu projeto com tecnologia, design tecnico e testes.
+                </p>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  {services.map((service) => (
+                    <button
+                      key={service.title}
+                      type="button"
+                      onClick={() => setSelectedService(service.title)}
+                      className={`rounded-md px-4 py-3 text-sm font-bold transition ${
+                        selectedService === service.title
+                          ? 'bg-[#0D0F52] text-white shadow-lg shadow-slate-900/15'
+                          : 'bg-white text-slate-700 hover:bg-sky-100'
+                      }`}
+                    >
+                      {service.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                {services.map((service) => {
+                  const Icon = service.icon;
+                  const isActive = selectedService === service.title;
+                  return (
+                    <article
+                      key={service.title}
+                      className={`rounded-md border bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                        isActive ? 'border-[#159AFD] ring-4 ring-sky-100' : 'border-sky-100'
+                      }`}
+                    >
+                      <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
+                        <Icon className="h-7 w-7" />
+                      </div>
+                      <h3 className="mt-5 text-xl font-black text-[#0D0F52]">{service.title}</h3>
+                      <p className="mt-3 leading-7 text-slate-600">{service.description}</p>
+                      <ul className="mt-5 space-y-3">
+                        {service.items.map((item) => (
+                          <li key={item} className="flex gap-3 text-sm font-semibold text-slate-700">
+                            <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-[#159AFD]" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="processo" className="bg-white py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.1fr]">
+              <div>
+                <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Processo</p>
+                <h2 className="mt-3 text-3xl font-black text-[#0D0F52] sm:text-5xl">Da ideia ao prototipo funcionando.</h2>
+                <p className="mt-5 text-lg leading-8 text-slate-600">
+                  A entrega fica organizada em etapas para voce acompanhar o andamento e entender cada decisao tecnica.
+                </p>
+              </div>
+
+              <div className="relative">
+                <div className="absolute left-6 top-6 hidden h-[calc(100%-3rem)] w-px bg-sky-200 sm:block" />
+                <div className="space-y-5">
+                  {process.map((step, index) => (
+                    <div key={step} className="relative flex gap-5 rounded-md border border-sky-100 bg-[#F7FBFF] p-5">
+                      <div className="z-10 flex h-12 w-12 flex-none items-center justify-center rounded-md bg-[#0D0F52] font-black text-white">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-black text-[#0D0F52]">{step}</h3>
+                        <p className="mt-2 text-slate-600">
+                          {index === 0 && 'Voce explica a necessidade, o uso esperado e o tipo de resultado desejado.'}
+                          {index === 1 && 'Definimos arquitetura, componentes, materiais, custo e tempo de producao.'}
+                          {index === 2 && 'Montamos a primeira versao, medimos, corrigimos e melhoramos a solucao.'}
+                          {index === 3 && 'Voce recebe o projeto de forma limpa, com funcionamento validado e proximo passo claro.'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="projetos" className="bg-[#0D0F52] py-20 text-white">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+              <div>
+                <p className="text-sm font-black uppercase tracking-widest text-sky-300">Aplicacoes</p>
+                <h2 className="mt-3 text-3xl font-black sm:text-5xl">Projetos que o site ja apresenta com clareza.</h2>
+              </div>
+              <a href="#contato" className="inline-flex items-center gap-2 rounded-md bg-white px-5 py-3 font-bold text-[#0D0F52] transition hover:bg-sky-100">
+                Conversar sobre projeto
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+
+            <div className="mt-10 grid gap-5 md:grid-cols-3">
+              {projectCards.map((project) => {
+                const Icon = project.icon;
+                return (
+                  <article key={project.title} className="rounded-md border border-white/10 bg-white/10 p-6 backdrop-blur transition hover:-translate-y-1 hover:bg-white/20">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#159AFD]">
+                        <Icon className="h-6 w-6" />
+                      </div>
+                      <span className="rounded-md border border-sky-300/30 px-3 py-1 text-xs font-black uppercase text-sky-200">{project.tag}</span>
+                    </div>
+                    <h3 className="mt-6 text-2xl font-black">{project.title}</h3>
+                    <p className="mt-3 leading-7 text-sky-100">{project.text}</p>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white py-16">
+          <div className="mx-auto grid max-w-7xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
+            {featureItems.map(({ icon: Icon, label }) => {
+              return (
+                <div key={label} className="flex items-center gap-4 rounded-md border border-sky-100 bg-[#F7FBFF] p-5">
+                  <Icon className="h-7 w-7 text-[#159AFD]" />
+                  <span className="font-black text-[#0D0F52]">{label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section id="contato" className="bg-[#EEF7FF] py-20">
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+            <div>
+              <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Contato</p>
+              <h2 className="mt-3 text-3xl font-black text-[#0D0F52] sm:text-5xl">Conte sua ideia para a ELN Technology.</h2>
+              <p className="mt-5 text-lg leading-8 text-slate-600">
+                Use o formulario para organizar o pedido. Ele funciona na pagina e deixa a solicitacao pronta para retorno.
+              </p>
+              <div className="mt-8 space-y-4">
+                <a href="mailto:contato@elntechnology.com" className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]">
+                  <Mail className="h-5 w-5" />
+                  contato@elntechnology.com
+                </a>
+                <a href="tel:+5585999999999" className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]">
+                  <Phone className="h-5 w-5" />
+                  +55 (85) 99999-9999
                 </a>
               </div>
             </div>
-            
-            <div>
-              <h3 className="text-white font-semibold mb-4">Serviços</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">IoT Solutions</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Robótica</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">PCB Design</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Sistemas Embarcados</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-white font-semibold mb-4">Contato</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>contato@elntechnology.com</li>
-                <li>+55 (11) 9999-9999</li>
-                <li>São Paulo, SP</li>
-              </ul>
-            </div>
+
+            <form onSubmit={handleSubmit} className="rounded-md border border-sky-100 bg-white p-6 shadow-xl shadow-sky-900/10">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="text-sm font-bold text-slate-700">
+                  Nome
+                  <input name="name" required className="mt-2 w-full rounded-md border border-sky-100 px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100" />
+                </label>
+                <label className="text-sm font-bold text-slate-700">
+                  WhatsApp
+                  <input name="phone" required className="mt-2 w-full rounded-md border border-sky-100 px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100" />
+                </label>
+              </div>
+
+              <label className="mt-4 block text-sm font-bold text-slate-700">
+                Tipo de projeto
+                <select name="type" className="mt-2 w-full rounded-md border border-sky-100 px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100">
+                  <option>IoT e automacao</option>
+                  <option>Impressao 3D</option>
+                  <option>Robotica</option>
+                  <option>Eletronica e PCB</option>
+                  <option>Outro projeto de tecnologia</option>
+                </select>
+              </label>
+
+              <label className="mt-4 block text-sm font-bold text-slate-700">
+                Descreva sua ideia
+                <textarea
+                  name="message"
+                  required
+                  rows={5}
+                  className="mt-2 w-full resize-none rounded-md border border-sky-100 px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100"
+                />
+              </label>
+
+              <button type="submit" className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#159AFD] px-6 py-4 font-black text-white transition hover:bg-[#0D0F52]">
+                Enviar solicitacao
+                <Zap className="h-5 w-5" />
+              </button>
+
+              {formStatus && <p className="mt-4 rounded-md bg-emerald-50 p-4 text-sm font-bold text-emerald-700">{formStatus}</p>}
+            </form>
           </div>
-          
-          <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 ELN Technology. Todos os direitos reservados.</p>
+        </section>
+      </main>
+
+      <footer className="border-t border-sky-100 bg-white py-8">
+        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 px-4 text-sm text-slate-500 sm:px-6 lg:flex-row lg:items-center lg:px-8">
+          <div className="flex items-center gap-3">
+            <img src={logoUrl} alt="" className="h-10 w-24 object-contain" />
+            <span className="font-semibold">ELN Technology - Inovacao em Tecnologia</span>
           </div>
+          <span>(c) 2026 ELN Technology. Todos os direitos reservados.</span>
         </div>
       </footer>
     </div>
@@ -338,13 +487,13 @@ function App() {
           <Route path="/inovacoes" element={<Inovacoes />} />
           <Route path="/pcbs" element={<PCBs />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
-          <Route 
-            path="/dashboard" 
+          <Route
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <Dashboard />
               </ProtectedRoute>
-            } 
+            }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
