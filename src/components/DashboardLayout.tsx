@@ -18,13 +18,18 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
-  const { user, logout } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
+  const { user, logout, updateUserProfile } = useAuth();
+  const { isDark } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const handleThemeToggle = () => {
+    const nextTheme = isDark ? 'light' : 'dark';
+    updateUserProfile({ theme: nextTheme });
   };
 
   return (
@@ -63,7 +68,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               </button>
               <button
                 type="button"
-                onClick={toggleTheme}
+                onClick={handleThemeToggle}
                 className={`rounded-md p-2 transition-colors ${isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
                 title={isDark ? 'Modo claro' : 'Modo noturno'}
               >

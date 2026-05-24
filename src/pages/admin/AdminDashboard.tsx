@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
 import {
+  Activity,
   BarChart3,
   Bell,
   CreditCard,
@@ -12,8 +13,10 @@ import {
   Settings,
   Trash2,
   UploadCloud,
+  UserPlus,
   Users,
 } from 'lucide-react';
+import type { ThemeMode } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { db } from '../../firebase';
@@ -88,6 +91,24 @@ interface NotificationRecord extends BaseRecord {
   message?: string;
   target?: string;
   status?: string;
+  type?: string;
+  userId?: string;
+}
+
+interface UserRecord extends BaseRecord {
+  name?: string;
+  email?: string;
+  role?: string;
+  company?: string;
+  theme?: ThemeMode;
+  createdAt?: unknown;
+}
+
+interface SystemEventRecord extends BaseRecord {
+  title?: string;
+  message?: string;
+  type?: string;
+  createdAt?: unknown;
 }
 
 const tabs = [
@@ -229,6 +250,8 @@ const AdminDashboard = () => {
   const [invoices, setInvoices] = useState<InvoiceRecord[]>([]);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [notifications, setNotifications] = useState<NotificationRecord[]>([]);
+  const [registeredUsers, setRegisteredUsers] = useState<UserRecord[]>([]);
+  const [systemEvents, setSystemEvents] = useState<SystemEventRecord[]>([]);
 
   const [clientForm, setClientForm] = useState({ name: '', email: '', phone: '', company: '' });
   const [projectForm, setProjectForm] = useState({ name: '', client: '', status: 'Planejamento', budget: '', deadline: '', technician: '', progress: '0', description: '' });
@@ -238,10 +261,10 @@ const AdminDashboard = () => {
   const [invoiceForm, setInvoiceForm] = useState({ title: '', client: '', amount: '', dueDate: '', status: 'Pendente' });
   const [orderForm, setOrderForm] = useState({ title: '', client: '', type: 'Novo projeto', budget: '', status: 'Novo', notes: '' });
   const [notificationForm, setNotificationForm] = useState({ title: '', message: '', target: 'Todos', status: 'Rascunho' });
-  const [profileForm, setProfileForm] = useState({ name: user?.name || '', company: user?.company || '', avatar: user?.avatar || '' });
+  const [profileForm, setProfileForm] = useState({ name: user?.name || '', company: user?.company || '', avatar: user?.avatar || '', theme: user?.theme || 'dark' as ThemeMode });
 
   useEffect(() => {
-    setProfileForm({ name: user?.name || '', company: user?.company || '', avatar: user?.avatar || '' });
+    setProfileForm({ name: user?.name || '', company: user?.company || '', avatar: user?.avatar || '', theme: user?.theme || 'dark' });
   }, [user]);
 
   useEffect(() => {
@@ -254,6 +277,8 @@ const AdminDashboard = () => {
       onSnapshot(collection(db, 'invoices'), (snapshot) => setInvoices(asList<InvoiceRecord>(snapshot))),
       onSnapshot(collection(db, 'orders'), (snapshot) => setOrders(asList<OrderRecord>(snapshot))),
       onSnapshot(collection(db, 'notifications'), (snapshot) => setNotifications(asList<NotificationRecord>(snapshot))),
+      onSnapshot(collection(db, 'users'), (snapshot) => setRegisteredUsers(asList<UserRecord>(snapshot))),
+      onSnapshot(collection(db, 'systemEvents'), (snapshot) => setSystemEvents(asList<SystemEventRecord>(snapshot))),
     ];
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
@@ -263,11 +288,21 @@ const AdminDashboard = () => {
     const projectRevenue = projects.reduce((sum, project) => sum + moneyNumber(project.budget), 0);
     const invoiceRevenue = invoices.filter((invoice) => invoice.status === 'Pago').reduce((sum, invoice) => sum + moneyNumber(invoice.amount), 0);
     const openTickets = tickets.filter((ticket) => ticket.status !== 'Resolvido').length;
-    return { projectRevenue, invoiceRevenue, openTickets };
-  }, [invoices, projects, tickets]);
+    const newUsers = notifications.filter((notification) => notification.type === 'new-user' && notification.status !== 'Lida').length;
+    const pendingInvoices = invoices.filter((invoice) => invoice.status !== 'Pago').length;
+    const openOrders = orders.filter((order) => order.status !== 'Concluido').length;
+    return { projectRevenue, invoiceRevenue, openTickets, newUsers, pendingInvoices, openOrders };
+  }, [invoices, notifications, orders, projects, tickets]);
 
   async function createRecord<T extends object>(collectionName: CollectionName, data: T, reset: () => void, message: string) {
     await addDoc(collection(db, collectionName), { ...data, createdBy: user?.id || '', createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+    await addDoc(collection(db, 'systemEvents'), {
+      title: message,
+      message: `Registro salvo em ${collectionName}.`,
+      type: collectionName,
+      createdBy: user?.id || '',
+      createdAt: serverTimestamp(),
+    });
     reset();
     setStatus(message);
   }
@@ -315,6 +350,7 @@ const AdminDashboard = () => {
 
   const stats = [
     { label: 'Clientes', value: String(clients.length), icon: Users, hint: 'base cadastrada' },
+    { label: 'Usuarios', value: String(registeredUsers.length), icon: UserPlus, hint: totals.newUsers ? `${totals.newUsers} novo(s)` : 'contas reais' },
     { label: 'Projetos Ativos', value: String(projects.filter((project) => project.status !== 'Concluido').length), icon: FolderOpen, hint: 'em operacao' },
     { label: 'Tickets Abertos', value: String(totals.openTickets), icon: MessageSquare, hint: 'precisam de resposta' },
     { label: 'Faturado Pago', value: toMoney(totals.invoiceRevenue), icon: CreditCard, hint: 'recebido' },
@@ -339,17 +375,33 @@ const AdminDashboard = () => {
 
   const renderOverview = () => (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {totals.newUsers > 0 && (
+        <button
+          type="button"
+          onClick={() => setActiveTab('notifications')}
+          className="flex w-full items-start gap-3 rounded-lg border border-[#159AFD]/30 bg-[#159AFD]/10 p-4 text-left transition hover:bg-[#159AFD]/15"
+        >
+          <Bell className="mt-0.5 h-5 w-5 flex-none text-[#159AFD]" />
+          <span>
+            <span className="block font-black text-slate-950 dark:text-white">Novo cadastro no sistema</span>
+            <span className="mt-1 block text-sm leading-6 text-slate-600 dark:text-slate-300">
+              Existem {totals.newUsers} notificacao(oes) de novo usuario aguardando leitura.
+            </span>
+          </span>
+        </button>
+      )}
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-5">
         {stats.map((stat) => (
           <div key={stat.label} className={`${panelClass} p-5`}>
             <div className="mb-5 flex items-center justify-between gap-4">
               <div className="flex h-11 w-11 items-center justify-center rounded-md bg-[#159AFD]/15 text-[#159AFD]">
                 <stat.icon className="h-6 w-6" />
               </div>
-              <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-semibold text-slate-400">{stat.hint}</span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500 dark:bg-white/5 dark:text-slate-400">{stat.hint}</span>
             </div>
-            <p className="mb-1 truncate text-2xl font-black text-white">{stat.value}</p>
-            <p className="text-sm text-slate-400">{stat.label}</p>
+            <p className="mb-1 truncate text-2xl font-black text-slate-950 dark:text-white">{stat.value}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -358,40 +410,60 @@ const AdminDashboard = () => {
         <div className={`${panelClass} p-6`}>
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>
-              <h3 className="text-lg font-bold text-white">Operacao em tempo real</h3>
-              <p className="mt-1 text-sm text-slate-400">Resumo puxado das colecoes do Firestore.</p>
+              <h3 className="text-lg font-bold text-slate-950 dark:text-white">Operacao em tempo real</h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Resumo puxado das colecoes do Firestore.</p>
             </div>
             <BarChart3 className="h-6 w-6 text-[#159AFD]" />
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-md bg-white/[0.04] p-4">
+            <div className="rounded-md bg-slate-50 p-4 dark:bg-white/[0.04]">
               <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Pedidos</p>
-              <p className="mt-2 text-2xl font-black text-white">{orders.length}</p>
+              <p className="mt-2 text-2xl font-black text-slate-950 dark:text-white">{orders.length}</p>
             </div>
-            <div className="rounded-md bg-white/[0.04] p-4">
+            <div className="rounded-md bg-slate-50 p-4 dark:bg-white/[0.04]">
               <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Receita projetos</p>
-              <p className="mt-2 text-2xl font-black text-white">{toMoney(totals.projectRevenue)}</p>
+              <p className="mt-2 text-2xl font-black text-slate-950 dark:text-white">{toMoney(totals.projectRevenue)}</p>
             </div>
-            <div className="rounded-md bg-white/[0.04] p-4">
+            <div className="rounded-md bg-slate-50 p-4 dark:bg-white/[0.04]">
               <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Notificacoes</p>
-              <p className="mt-2 text-2xl font-black text-white">{notifications.length}</p>
+              <p className="mt-2 text-2xl font-black text-slate-950 dark:text-white">{notifications.length}</p>
             </div>
           </div>
         </div>
 
         <div className={`${panelClass} p-6`}>
-          <h3 className="text-lg font-bold text-white">Proximas acoes</h3>
+          <h3 className="text-lg font-bold text-slate-950 dark:text-white">Proximas acoes</h3>
           <div className="mt-5 space-y-3">
             {[
-              `${orders.filter((order) => order.status !== 'Concluido').length} pedido(s) em aberto`,
+              `${totals.openOrders} pedido(s) em aberto`,
               `${tickets.filter((ticket) => ticket.status !== 'Resolvido').length} ticket(s) aguardando`,
-              `${invoices.filter((invoice) => invoice.status !== 'Pago').length} faturamento(s) pendente(s)`,
+              `${totals.pendingInvoices} faturamento(s) pendente(s)`,
+              `${registeredUsers.length} usuario(s) com acesso criado`,
             ].map((item) => (
-              <div key={item} className="rounded-md border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-slate-300">
+              <div key={item} className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-300">
                 {item}
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className={`${panelClass} p-6`}>
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-bold text-slate-950 dark:text-white">Atividades recentes</h3>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Eventos gravados quando algo importante acontece.</p>
+          </div>
+          <Activity className="h-6 w-6 text-[#159AFD]" />
+        </div>
+        <div className="grid gap-3">
+          {systemEvents.length === 0 && <EmptyState title="Sem atividades ainda" text="Quando usuarios, clientes, projetos e pedidos forem criados, eles aparecem aqui." />}
+          {systemEvents.slice(0, 6).map((event) => (
+            <div key={event.id} className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 dark:border-white/10 dark:bg-white/[0.03]">
+              <p className="font-bold text-slate-950 dark:text-white">{event.title || 'Atividade'}</p>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{event.message || event.type || 'Evento do sistema'}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -624,7 +696,7 @@ const AdminDashboard = () => {
         <>
           <Field label="Titulo" value={notificationForm.title} onChange={(title) => setNotificationForm({ ...notificationForm, title })} />
           <SelectField label="Destino" value={notificationForm.target} onChange={(target) => setNotificationForm({ ...notificationForm, target })} options={['Todos', 'Clientes', 'Tecnicos', 'Admin']} />
-          <SelectField label="Status" value={notificationForm.status} onChange={(statusValue) => setNotificationForm({ ...notificationForm, status: statusValue })} options={['Rascunho', 'Enviada']} />
+          <SelectField label="Status" value={notificationForm.status} onChange={(statusValue) => setNotificationForm({ ...notificationForm, status: statusValue })} options={['Rascunho', 'Nova', 'Enviada', 'Lida']} />
           <TextAreaField label="Mensagem" value={notificationForm.message} onChange={(message) => setNotificationForm({ ...notificationForm, message })} />
         </>
       }
@@ -635,7 +707,10 @@ const AdminDashboard = () => {
         subtitle: `${notification.target || 'Todos'} - ${notification.status || 'Rascunho'}`,
         meta: notification.message || '',
         status: notification.status,
-        actions: [{ label: 'Enviar', onClick: () => changeStatus('notifications', notification.id, 'Enviada') }],
+        actions: [
+          { label: 'Enviar', onClick: () => changeStatus('notifications', notification.id, 'Enviada') },
+          { label: 'Marcar lida', onClick: () => changeStatus('notifications', notification.id, 'Lida') },
+        ],
         remove: () => removeRecord('notifications', notification.id),
       }))}
     />

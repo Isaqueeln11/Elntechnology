@@ -8,8 +8,9 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import { ThemeMode, useTheme } from './ThemeContext';
 
 export interface User {
   id: string;
@@ -18,6 +19,7 @@ export interface User {
   role: 'client' | 'admin' | 'technician';
   company?: string;
   avatar?: string;
+  theme?: ThemeMode;
 }
 
 interface RegisterUserInput {
@@ -32,7 +34,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   register: (data: RegisterUserInput) => Promise<{ success: boolean; message?: string }>;
   resetPassword: (email: string) => Promise<{ success: boolean; message: string }>;
-  updateUserProfile: (data: Partial<Pick<User, 'name' | 'company' | 'avatar'>>) => Promise<{ success: boolean; message: string }>;
+  updateUserProfile: (data: Partial<Pick<User, 'name' | 'company' | 'avatar' | 'theme'>>) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -84,6 +86,7 @@ async function readUserProfile(uid: string, fallbackEmail: string | null, fallba
       role: role as User['role'],
       company: data.company ? String(data.company) : undefined,
       avatar: data.avatar ? String(data.avatar) : avatarUrl(String(data.name || fallbackName || 'Usuario')),
+      theme: data.theme === 'light' ? 'light' : 'dark',
     };
 
     if (role === 'admin' && data.role !== 'admin') {
@@ -108,6 +111,7 @@ async function readUserProfile(uid: string, fallbackEmail: string | null, fallba
     role: isOwnerEmail(fallbackEmail) ? 'admin' : 'client',
     company: 'ELN Technology',
     avatar: avatarUrl(fallbackName || fallbackEmail || 'Usuario'),
+    theme: 'dark',
   };
 
   await setDoc(profileRef, {
@@ -130,6 +134,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -141,6 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       try {
         const profile = await readUserProfile(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName);
+        if (profile.theme) setTheme(profile.theme);
         setUser(profile);
       } catch {
         setUser({
@@ -150,6 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           role: isOwnerEmail(firebaseUser.email) ? 'admin' : 'client',
           company: 'ELN Technology',
           avatar: avatarUrl(firebaseUser.displayName || firebaseUser.email || 'Usuario'),
+          theme,
         });
       } finally {
         setIsLoading(false);
@@ -169,6 +176,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         credential.user.email,
         credential.user.displayName,
       );
+      if (profile.theme) setTheme(profile.theme);
       setUser(profile);
       return { success: true };
     } catch (error) {
@@ -198,12 +206,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: isOwnerEmail(data.email) ? 'admin' : 'client',
         company: data.company || 'ELN Technology',
         avatar,
+        theme,
       };
 
       await setDoc(doc(db, 'users', credential.user.uid), {
         ...profile,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
+      });
+
+      await addDoc(collection(db, 'notifications'), {
+        title: 'Novo usuario cadastrado',
+        message: `${data.name} criou uma conta com o email ${data.email.trim()}.`,
+        target: 'Admin',
+        status: 'Nova',
+        type: 'new-user',
+        userId: credential.user.uid,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      await addDoc(collection(db, 'systemEvents'), {
+        title: 'Cadastro de usuario',
+        message: `${data.name} entrou no sistema.`,
+        type: 'user-created',
+        userId: credential.user.uid,
+        createdAt: serverTimestamp(),
       });
 
       setUser(profile);
@@ -229,7 +257,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateUserProfile = async (data: Partial<Pick<User, 'name' | 'company' | 'avatar'>>) => {
+  const updateUserProfile = async (data: Partial<Pick<User, 'name' | 'company' | 'avatar' | 'theme'>>) => {
     if (!auth.currentUser || !user) {
       return { success: false, message: 'Usuario nao autenticado.' };
     }
@@ -240,6 +268,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name: data.name?.trim() || user.name,
         company: data.company?.trim() || user.company,
         avatar: data.avatar?.trim() || user.avatar,
+        theme: data.theme || user.theme || theme,
       };
 
       await updateProfile(auth.currentUser, {
@@ -253,12 +282,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           name: nextUser.name,
           company: nextUser.company || '',
           avatar: nextUser.avatar || '',
+          theme: nextUser.theme || 'dark',
           updatedAt: serverTimestamp(),
         },
         { merge: true },
       );
 
       setUser(nextUser);
+      if (nextUser.theme) setTheme(nextUser.theme);
       return { success: true, message: 'Perfil atualizado com sucesso.' };
     } catch {
       return { success: false, message: 'Nao foi possivel atualizar o perfil.' };
