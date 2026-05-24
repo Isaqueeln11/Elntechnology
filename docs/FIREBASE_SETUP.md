@@ -12,6 +12,11 @@ O projeto agora usa Firebase real para login, cadastro e banco.
    - `clientes`
    - `projetos`
    - `technicians`
+   - `supportTickets`
+   - `documents`
+   - `invoices`
+   - `orders`
+   - `notifications`
    - `firmwareReleases`
 
 ## Regras mais seguras
@@ -81,6 +86,26 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    match /supportTickets/{ticketId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /documents/{documentId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /invoices/{invoiceId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /notifications/{notificationId} {
+      allow read, write: if isAdmin();
+    }
+
     match /projetos/{projectId} {
       allow create: if isAdmin()
         || (
@@ -103,6 +128,7 @@ service cloud.firestore {
 - Login tem recuperacao de senha por email.
 - Perfil do admin pode salvar nome, empresa e foto no documento do usuario.
 - Clientes, tecnicos e projetos do painel admin ficam protegidos para escrita de admin.
+- Notificacoes, suporte, documentos, faturamento e pedidos tambem ficam protegidos para admin.
 - OTA grava no Firestore, mas regras recomendadas deixam escrita apenas para admin.
 
 ## Observacao sobre OTA
