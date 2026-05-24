@@ -9,6 +9,9 @@ O projeto agora usa Firebase real para login, cadastro e banco.
 3. Em Firestore Database, crie o banco em modo production ou test.
 4. Crie as colecoes automaticamente pelo app:
    - `users`
+   - `clientes`
+   - `projetos`
+   - `technicians`
    - `firmwareReleases`
 
 ## Regras mais seguras
@@ -51,11 +54,22 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /clientes/{clientId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /technicians/{technicianId} {
+      allow read, write: if isAdmin();
+    }
+
     match /projetos/{projectId} {
-      allow create: if request.resource.data.nome is string
-        && request.resource.data.email is string
-        && request.resource.data.telefone is string
-        && request.resource.data.tipo is string;
+      allow create: if isAdmin()
+        || (
+          request.resource.data.nome is string
+          && request.resource.data.email is string
+          && request.resource.data.telefone is string
+          && request.resource.data.tipo is string
+        );
       allow read, update, delete: if isAdmin();
     }
   }
@@ -68,6 +82,8 @@ service cloud.firestore {
 - Admin e tecnico devem ser liberados manualmente no Firestore.
 - Cadastro envia verificacao de email pelo Firebase Auth.
 - Login tem recuperacao de senha por email.
+- Perfil do admin pode salvar nome, empresa e foto no documento do usuario.
+- Clientes, tecnicos e projetos do painel admin ficam protegidos para escrita de admin.
 - OTA grava no Firestore, mas regras recomendadas deixam escrita apenas para admin.
 
 ## Observacao sobre OTA

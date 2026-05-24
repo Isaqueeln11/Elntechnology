@@ -32,6 +32,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   register: (data: RegisterUserInput) => Promise<{ success: boolean; message?: string }>;
   resetPassword: (email: string) => Promise<{ success: boolean; message: string }>;
+  updateUserProfile: (data: Partial<Pick<User, 'name' | 'company' | 'avatar'>>) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -207,8 +208,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUserProfile = async (data: Partial<Pick<User, 'name' | 'company' | 'avatar'>>) => {
+    if (!auth.currentUser || !user) {
+      return { success: false, message: 'Usuario nao autenticado.' };
+    }
+
+    try {
+      const nextUser: User = {
+        ...user,
+        name: data.name?.trim() || user.name,
+        company: data.company?.trim() || user.company,
+        avatar: data.avatar?.trim() || user.avatar,
+      };
+
+      await updateProfile(auth.currentUser, {
+        displayName: nextUser.name,
+        photoURL: nextUser.avatar,
+      });
+
+      await setDoc(
+        doc(db, 'users', user.id),
+        {
+          name: nextUser.name,
+          company: nextUser.company || '',
+          avatar: nextUser.avatar || '',
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+
+      setUser(nextUser);
+      return { success: true, message: 'Perfil atualizado com sucesso.' };
+    } catch {
+      return { success: false, message: 'Nao foi possivel atualizar o perfil.' };
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, resetPassword, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, register, resetPassword, updateUserProfile, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
