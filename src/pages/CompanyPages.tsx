@@ -308,8 +308,8 @@ function CompanyPage({ data }: { data: PageData }) {
               <p className={`mt-5 max-w-3xl text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{data.description}</p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  to="/dashboard"
+              <Link
+                  to="/dashboard?tab=sitePages"
                   className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 font-black text-white transition hover:bg-[#0D0F52]"
                 >
                   Abrir dashboard
@@ -393,7 +393,7 @@ function CompanyPage({ data }: { data: PageData }) {
                   Conteudos adicionados pelo painel
                 </h2>
               </div>
-              <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
+              <Link to="/dashboard?tab=sitePages" className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
                 Adicionar conteudo
                 <ArrowRight className="h-4 w-4" />
               </Link>

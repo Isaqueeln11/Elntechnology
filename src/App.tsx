@@ -416,7 +416,7 @@ function HomePage() {
                 </p>
               </div>
               <Link
-                to="/dashboard"
+                to="/dashboard?tab=sitePages"
                 className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 font-black text-white transition hover:bg-[#0D0F52]"
               >
                 Abrir admin
@@ -709,6 +709,7 @@ function App() {
             <Route path="/produtos" element={<ProdutosPage />} />
             <Route path="/videos-futuro" element={<VideosFuturoPage />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="/dashboard/paginas" element={<Navigate to="/dashboard?tab=sitePages" replace />} />
             <Route
               path="/dashboard"
               element={

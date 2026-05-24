@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { useSearchParams } from 'react-router-dom';
 import {
   Activity,
   BarChart3,
@@ -251,7 +252,9 @@ function compressImage(file: File): Promise<string> {
 const AdminDashboard = () => {
   const { user, updateUserProfile } = useAuth();
   const { isDark } = useTheme();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [searchParams] = useSearchParams();
+  const requestedTab = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(requestedTab || user?.preferences?.dashboardStartPage || 'overview');
   const [status, setStatus] = useState('');
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
@@ -301,10 +304,15 @@ const AdminDashboard = () => {
   }, [user]);
 
   useEffect(() => {
+    if (requestedTab && tabs.some((tab) => tab.id === requestedTab)) {
+      setActiveTab(requestedTab);
+      return;
+    }
+
     if (user?.preferences?.dashboardStartPage) {
       setActiveTab(user.preferences.dashboardStartPage);
     }
-  }, [user?.preferences?.dashboardStartPage]);
+  }, [requestedTab, user?.preferences?.dashboardStartPage]);
 
   useEffect(() => {
     const subscriptions = [
