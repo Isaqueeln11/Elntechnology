@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import {
   ArrowRight,
+  BarChart3,
   Box,
   Bot,
   CheckCircle2,
@@ -13,6 +14,8 @@ import {
   Menu,
   Microscope,
   Moon,
+  MonitorPlay,
+  Package,
   Phone,
   Printer,
   Rocket,
@@ -20,6 +23,7 @@ import {
   ShieldCheck,
   Sparkles,
   Sun,
+  Users,
   Wifi,
   Wrench,
   X,
@@ -36,10 +40,20 @@ import ExplorarSolucoes from './pages/ExplorarSolucoes';
 import IniciarProjeto from './pages/IniciarProjeto';
 import Inovacoes from './pages/Inovacoes';
 import PCBs from './pages/PCBs';
+import {
+  AtividadesAnalisePage,
+  DesenvolvimentosPage,
+  EquipePage,
+  MelhoriasPage,
+  ProdutosPage,
+  ProjetosDesenvolvidos,
+  VideosFuturoPage,
+} from './pages/CompanyPages';
 import logoUrl from '../ELN TECHNOLOGY.svg';
 
 const navLinks = [
   { label: 'Sobre', href: '#sobre' },
+  { label: 'Areas', href: '#areas' },
   { label: 'Servicos', href: '#servicos' },
   { label: 'Processo', href: '#processo' },
   { label: 'Projetos', href: '#projetos' },
@@ -127,6 +141,51 @@ const aboutItems = [
     icon: ShieldCheck,
     title: 'Atendimento direto',
     text: 'O cliente fala com quem entende o projeto, acompanha as etapas e recebe orientacao para evoluir.',
+  },
+];
+
+const siteAreas = [
+  {
+    icon: CircuitBoard,
+    title: 'Projetos desenvolvidos',
+    text: 'Publique projetos prontos, fotos, links, arquivos e resultado final.',
+    href: '/projetos-desenvolvidos',
+  },
+  {
+    icon: Wrench,
+    title: 'Melhorias',
+    text: 'Organize correcoes, prioridades, seguranca e proximas funcoes.',
+    href: '/melhorias',
+  },
+  {
+    icon: Users,
+    title: 'Equipe',
+    text: 'Mostre administrador, tecnicos, parceiros, cargos e responsabilidades.',
+    href: '/equipe',
+  },
+  {
+    icon: BarChart3,
+    title: 'Atividades e analise',
+    text: 'Acompanhe atividades, indicadores, eventos e relatorios.',
+    href: '/atividades-analise',
+  },
+  {
+    icon: Rocket,
+    title: 'Desenvolvimentos',
+    text: 'Liste firmware, painel, hardware, OTA e versoes em construcao.',
+    href: '/desenvolvimentos',
+  },
+  {
+    icon: Package,
+    title: 'Produtos',
+    text: 'Monte catalogo com produtos, equipamentos, servicos e valores.',
+    href: '/produtos',
+  },
+  {
+    icon: MonitorPlay,
+    title: 'Videos e futuro',
+    text: 'Espaco para demonstracoes, novidades, roadmap e videos futuros.',
+    href: '/videos-futuro',
   },
 ];
 
@@ -339,6 +398,51 @@ function HomePage() {
                     </div>
                   </div>
                 </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="areas" className={`${isDark ? 'bg-[#080B24]' : 'bg-white'} py-20`}>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
+              <div>
+                <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Espacos do site</p>
+                <h2 className={`mt-3 max-w-4xl text-3xl font-black leading-tight sm:text-5xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
+                  Subpaginas prontas para organizar conteudo, equipe, produtos e evolucao.
+                </h2>
+                <p className={`mt-5 max-w-3xl text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                  Cada area agora tem sua propria pagina, com espaco para fotos, videos, status, arquivos, valores e informacoes que voce for cadastrando.
+                </p>
+              </div>
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 font-black text-white transition hover:bg-[#0D0F52]"
+              >
+                Abrir admin
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {siteAreas.map(({ icon: Icon, title, text, href }) => (
+                <Link
+                  key={href}
+                  to={href}
+                  className={`group rounded-md border p-6 transition hover:-translate-y-1 hover:border-[#159AFD] ${
+                    isDark ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-sky-100 bg-[#F7FBFF] shadow-sm hover:bg-white'
+                  }`}
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#159AFD] text-white">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <h3 className={`mt-5 text-xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{title}</h3>
+                  <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{text}</p>
+                  <span className="mt-5 inline-flex items-center gap-2 text-sm font-black text-[#159AFD]">
+                    Abrir pagina
+                    <ChevronRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  </span>
+                </Link>
               ))}
             </div>
           </div>
@@ -597,6 +701,13 @@ function App() {
             <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
             <Route path="/inovacoes" element={<Inovacoes />} />
             <Route path="/pcbs" element={<PCBs />} />
+            <Route path="/projetos-desenvolvidos" element={<ProjetosDesenvolvidos />} />
+            <Route path="/melhorias" element={<MelhoriasPage />} />
+            <Route path="/equipe" element={<EquipePage />} />
+            <Route path="/atividades-analise" element={<AtividadesAnalisePage />} />
+            <Route path="/desenvolvimentos" element={<DesenvolvimentosPage />} />
+            <Route path="/produtos" element={<ProdutosPage />} />
+            <Route path="/videos-futuro" element={<VideosFuturoPage />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route
               path="/dashboard"
