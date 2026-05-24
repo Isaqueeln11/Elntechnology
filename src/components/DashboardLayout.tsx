@@ -7,8 +7,11 @@ import {
   Settings, 
   User,
   Bell,
-  Search
+  Search,
+  Moon,
+  Sun
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -16,6 +19,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -24,9 +28,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#070A1F]">
+    <div className={`min-h-screen transition-colors ${isDark ? 'bg-[#070A1F]' : 'bg-[#F4F8FC]'}`}>
       {/* Top Navigation */}
-      <nav className="sticky top-0 z-40 border-b border-white/10 bg-[#080B24]/95 backdrop-blur-xl">
+      <nav className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/95' : 'border-slate-200 bg-white/95'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex min-h-16 items-center justify-between gap-3 py-3">
             {/* Logo */}
@@ -36,7 +40,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 alt="ELN Technology Logo"
                 className="h-10 w-10 flex-none object-contain"
               />
-              <span className="notranslate hidden truncate text-lg font-bold text-white sm:block lg:text-xl" translate="no">ELN Technology</span>
+              <span className={`notranslate hidden truncate text-lg font-bold sm:block lg:text-xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`} translate="no">ELN Technology</span>
             </Link>
 
             {/* Search Bar */}
@@ -46,16 +50,24 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 <input
                   type="text"
                   placeholder="Buscar projetos, clientes, tickets..."
-                  className="w-full rounded-md border border-white/10 bg-white/[0.04] py-2 pl-10 pr-4 text-white placeholder-gray-500 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10"
+                  className={`w-full rounded-md border py-2 pl-10 pr-4 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10 ${isDark ? 'border-white/10 bg-white/[0.04] text-white placeholder-gray-500' : 'border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400'}`}
                 />
               </div>
             </div>
 
             {/* User Menu */}
             <div className="flex flex-none items-center space-x-2 sm:space-x-4">
-              <button className="relative rounded-md p-2 text-gray-400 transition-colors hover:bg-white/5 hover:text-white">
+              <button className={`relative rounded-md p-2 transition-colors ${isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}>
                 <Bell className="w-6 h-6" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+              </button>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className={`rounded-md p-2 transition-colors ${isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
+                title={isDark ? 'Modo claro' : 'Modo noturno'}
+              >
+                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
               
               <div className="flex items-center space-x-3">
@@ -65,14 +77,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                   className="h-9 w-9 rounded-full border border-[#159AFD]/50 object-cover"
                 />
                 <div className="hidden md:block">
-                  <p className="text-white text-sm font-medium">{user?.name}</p>
-                  <p className="text-gray-400 text-xs capitalize">{user?.role}</p>
+                  <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{user?.name}</p>
+                  <p className={`text-xs capitalize ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>{user?.role}</p>
                 </div>
               </div>
 
               <button
                 onClick={handleLogout}
-                className="rounded-md p-2 text-gray-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
+                className={`rounded-md p-2 transition-colors hover:bg-red-500/10 hover:text-red-400 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}
                 title="Sair"
               >
                 <LogOut className="w-5 h-5" />

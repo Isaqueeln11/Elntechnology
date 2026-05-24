@@ -12,18 +12,21 @@ import {
   Mail,
   Menu,
   Microscope,
+  Moon,
   Phone,
   Printer,
   Rocket,
   Send,
   ShieldCheck,
   Sparkles,
+  Sun,
   Wifi,
   Wrench,
   X,
   Zap,
 } from 'lucide-react';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './Login';
 import Register from './Register';
@@ -139,6 +142,7 @@ function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [selectedService, setSelectedService] = React.useState('IoT e automacao');
   const [formStatus, setFormStatus] = React.useState('');
+  const { isDark, toggleTheme } = useTheme();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -161,8 +165,8 @@ function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7FBFF] text-slate-950">
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-sky-100/70 bg-white/90 shadow-sm backdrop-blur-xl">
+    <div className={`min-h-screen transition-colors ${isDark ? 'bg-[#070A1F] text-white' : 'bg-[#F7FBFF] text-slate-950'}`}>
+      <header className={`fixed inset-x-0 top-0 z-50 border-b shadow-sm backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/92' : 'border-sky-100/70 bg-white/90'}`}>
         <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <a href="#inicio" className="flex items-center gap-3" aria-label="ELN Technology">
             <img src={logoUrl} alt="ELN Technology" className="h-12 w-28 object-contain sm:w-36" />
@@ -170,14 +174,22 @@ function HomePage() {
 
           <div className="hidden items-center gap-8 lg:flex">
             {navLinks.map((link) => (
-              <a key={link.href} href={link.href} className="text-sm font-semibold text-slate-700 transition hover:text-sky-600">
+              <a key={link.href} href={link.href} className={`text-sm font-semibold transition hover:text-sky-500 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 {link.label}
               </a>
             ))}
           </div>
 
           <div className="hidden items-center gap-3 lg:flex">
-            <Link to="/login" className="rounded-md px-4 py-2 text-sm font-semibold text-slate-700 transition hover:text-sky-600">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-md border transition ${isDark ? 'border-white/10 text-slate-200 hover:bg-white/10' : 'border-sky-100 text-slate-700 hover:bg-sky-50'}`}
+              aria-label="Alternar tema"
+            >
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+            <Link to="/login" className={`rounded-md px-4 py-2 text-sm font-semibold transition hover:text-sky-500 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
               Login
             </Link>
             <a
@@ -191,7 +203,7 @@ function HomePage() {
 
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-sky-100 text-slate-900 lg:hidden"
+            className={`inline-flex h-11 w-11 items-center justify-center rounded-md border lg:hidden ${isDark ? 'border-white/10 text-white' : 'border-sky-100 text-slate-900'}`}
             onClick={() => setIsMenuOpen((value) => !value)}
             aria-label="Abrir menu"
           >
@@ -200,19 +212,22 @@ function HomePage() {
         </nav>
 
         {isMenuOpen && (
-          <div className="border-t border-sky-100 bg-white px-4 py-4 lg:hidden">
+          <div className={`border-t px-4 py-4 lg:hidden ${isDark ? 'border-white/10 bg-[#080B24]' : 'border-sky-100 bg-white'}`}>
             <div className="mx-auto flex max-w-7xl flex-col gap-2">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="rounded-md px-3 py-3 font-semibold text-slate-700 hover:bg-sky-50"
+                  className={`rounded-md px-3 py-3 font-semibold ${isDark ? 'text-slate-200 hover:bg-white/10' : 'text-slate-700 hover:bg-sky-50'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.label}
                 </a>
               ))}
-              <Link to="/login" className="rounded-md px-3 py-3 font-semibold text-slate-700 hover:bg-sky-50">
+              <button type="button" onClick={toggleTheme} className={`rounded-md px-3 py-3 text-left font-semibold ${isDark ? 'text-slate-200 hover:bg-white/10' : 'text-slate-700 hover:bg-sky-50'}`}>
+                {isDark ? 'Modo claro' : 'Modo noturno'}
+              </button>
+              <Link to="/login" className={`rounded-md px-3 py-3 font-semibold ${isDark ? 'text-slate-200 hover:bg-white/10' : 'text-slate-700 hover:bg-sky-50'}`}>
                 Login
               </Link>
             </div>
@@ -571,29 +586,31 @@ function HomePage() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
-          <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
-          <Route path="/inovacoes" element={<Inovacoes />} />
-          <Route path="/pcbs" element={<PCBs />} />
-          <Route path="/unauthorized" element={<Unauthorized />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
+            <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
+            <Route path="/inovacoes" element={<Inovacoes />} />
+            <Route path="/pcbs" element={<PCBs />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
