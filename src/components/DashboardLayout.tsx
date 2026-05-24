@@ -36,7 +36,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 alt="ELN Technology Logo"
                 className="h-10 w-10 flex-none object-contain"
               />
-              <span className="hidden truncate text-lg font-bold text-white sm:block lg:text-xl">ELN Technology</span>
+              <span className="notranslate hidden truncate text-lg font-bold text-white sm:block lg:text-xl" translate="no">ELN Technology</span>
             </Link>
 
             {/* Search Bar */}

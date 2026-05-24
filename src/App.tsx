@@ -36,6 +36,7 @@ import PCBs from './pages/PCBs';
 import logoUrl from '../ELN TECHNOLOGY.svg';
 
 const navLinks = [
+  { label: 'Sobre', href: '#sobre' },
   { label: 'Servicos', href: '#servicos' },
   { label: 'Processo', href: '#processo' },
   { label: 'Projetos', href: '#projetos' },
@@ -107,6 +108,32 @@ const featureItems = [
   { icon: Microscope, label: 'Detalhe tecnico' },
   { icon: Rocket, label: 'Ideia pronta para crescer' },
 ];
+
+const aboutItems = [
+  {
+    icon: CircuitBoard,
+    title: 'Hardware e software juntos',
+    text: 'A equipe pensa no circuito, no firmware, no painel e na experiencia de uso como uma solucao unica.',
+  },
+  {
+    icon: Microscope,
+    title: 'Prototipos testados',
+    text: 'Cada entrega passa por montagem, validacao e ajustes para reduzir erro antes do uso real.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Atendimento direto',
+    text: 'O cliente fala com quem entende o projeto, acompanha as etapas e recebe orientacao para evoluir.',
+  },
+];
+
+function BrandName({ className = '' }: { className?: string }) {
+  return (
+    <span className={`notranslate ${className}`} translate="no">
+      ELN Technology
+    </span>
+  );
+}
 
 function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -204,7 +231,7 @@ function HomePage() {
               </div>
 
               <h1 className="max-w-4xl text-4xl font-black leading-tight text-[#0D0F52] sm:text-5xl lg:text-7xl">
-                ELN Technology
+                <BrandName />
                 <span className="mt-3 block text-[#159AFD]">IoT, impressao 3D, robos e eletronica.</span>
               </h1>
 
@@ -264,6 +291,44 @@ function HomePage() {
           </div>
         </section>
 
+        <section id="sobre" className="bg-[#F7FBFF] py-20">
+          <div className="mx-auto grid max-w-7xl items-start gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+            <div>
+              <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Sobre nos</p>
+              <h2 className="mt-3 text-3xl font-black leading-tight text-[#0D0F52] sm:text-5xl">
+                Uma equipe focada em transformar ideia em sistema funcionando.
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-slate-600">
+                A <BrandName /> nasceu para unir eletronica, impressao 3D, automacao, robotica e desenvolvimento web em projetos prontos para uso.
+                O trabalho e conduzido por Isaque Domingos Santana Silva, fundador e administrador da ELN, com apoio tecnico conforme a necessidade de cada solucao.
+              </p>
+              <div className="mt-8 rounded-md border border-sky-100 bg-white p-5 shadow-sm">
+                <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Administrador</p>
+                <h3 className="mt-2 text-2xl font-black text-[#0D0F52]">Isaque Domingos Santana Silva</h3>
+                <p className="mt-3 leading-7 text-slate-600">
+                  Responsavel por organizar clientes, projetos, valores, tecnicos, atualizacoes OTA e entregas dentro do painel administrativo.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-5">
+              {aboutItems.map(({ icon: Icon, title, text }) => (
+                <article key={title} className="rounded-md border border-sky-100 bg-white p-6 shadow-sm">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-[#0D0F52]">{title}</h3>
+                      <p className="mt-2 leading-7 text-slate-600">{text}</p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section id="servicos" className="bg-[#EEF7FF] py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
@@ -271,7 +336,7 @@ function HomePage() {
                 <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Servicos</p>
                 <h2 className="mt-3 text-3xl font-black text-[#0D0F52] sm:text-5xl">Tudo separado, claro e pronto para evoluir.</h2>
                 <p className="mt-5 text-lg leading-8 text-slate-600">
-                  Escolha uma area para ver como a ELN Technology pode estruturar seu projeto com tecnologia, design tecnico e testes.
+                  Escolha uma area para ver como a <BrandName /> pode estruturar seu projeto com tecnologia, design tecnico e testes.
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -410,7 +475,9 @@ function HomePage() {
           <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
             <div>
               <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Contato</p>
-              <h2 className="mt-3 text-3xl font-black text-[#0D0F52] sm:text-5xl">Conte sua ideia para a ELN Technology.</h2>
+              <h2 className="mt-3 max-w-3xl break-words text-3xl font-black leading-tight text-[#0D0F52] sm:text-4xl lg:text-5xl">
+                Conte sua ideia para a <BrandName />.
+              </h2>
               <p className="mt-5 text-lg leading-8 text-slate-600">
                 Use o formulario para organizar o pedido. Ele funciona na pagina e deixa a solicitacao pronta para retorno.
               </p>
@@ -493,9 +560,9 @@ function HomePage() {
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 px-4 text-sm text-slate-500 sm:px-6 lg:flex-row lg:items-center lg:px-8">
           <div className="flex items-center gap-3">
             <img src={logoUrl} alt="" className="h-10 w-24 object-contain" />
-            <span className="font-semibold">ELN Technology</span>
+            <BrandName className="font-semibold" />
           </div>
-          <span>(c) 2026 ELN Technology. Todos os direitos reservados.</span>
+          <span>(c) 2026 <BrandName />. Todos os direitos reservados.</span>
         </div>
       </footer>
     </div>

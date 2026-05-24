@@ -16,7 +16,12 @@ O projeto agora usa Firebase real para login, cadastro e banco.
 
 ## Regras mais seguras
 
-Novas contas entram como `client`. Para transformar uma conta em admin, edite o documento em `users/{uid}` no Firestore e altere `role` para `admin`.
+Novas contas entram como `client`, exceto os emails donos do sistema:
+
+- `isaqueeln11@gmail.com`
+- `elntechnologyinnovations@gmail.com`
+
+Esses emails sao reconhecidos como `admin`. Para transformar outra conta em admin, edite o documento em `users/{uid}` no Firestore e altere `role` para `admin`.
 
 ```txt
 rules_version = '2';
@@ -35,16 +40,30 @@ service cloud.firestore {
       return signedIn() && currentUser().data.role == "admin";
     }
 
+    function isOwnerEmail() {
+      return signedIn()
+        && request.auth.token.email in [
+          "isaqueeln11@gmail.com",
+          "elntechnologyinnovations@gmail.com"
+        ];
+    }
+
     match /users/{userId} {
       allow create: if signedIn()
         && request.auth.uid == userId
-        && request.resource.data.role == "client";
+        && (
+          request.resource.data.role == "client"
+          || (isOwnerEmail() && request.resource.data.role == "admin")
+        );
 
       allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
 
       allow update: if signedIn()
         && request.auth.uid == userId
-        && request.resource.data.role == resource.data.role;
+        && (
+          request.resource.data.role == resource.data.role
+          || (isOwnerEmail() && request.resource.data.role == "admin")
+        );
 
       allow delete: if isAdmin();
     }
@@ -78,7 +97,7 @@ service cloud.firestore {
 
 ## Segurança extra ativada no app
 
-- Cadastro sempre cria `role: "client"`.
+- Cadastro sempre cria `role: "client"`, exceto os emails donos configurados no app.
 - Admin e tecnico devem ser liberados manualmente no Firestore.
 - Cadastro envia verificacao de email pelo Firebase Auth.
 - Login tem recuperacao de senha por email.

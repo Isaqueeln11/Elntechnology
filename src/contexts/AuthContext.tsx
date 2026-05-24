@@ -39,6 +39,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const ownerEmails = ['isaqueeln11@gmail.com', 'elntechnologyinnovations@gmail.com'];
+
+function isOwnerEmail(email?: string | null) {
+  return Boolean(email && ownerEmails.includes(email.toLowerCase()));
+}
+
 function avatarUrl(name: string) {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=159AFD&color=fff`;
 }
@@ -70,21 +76,36 @@ async function readUserProfile(uid: string, fallbackEmail: string | null, fallba
 
   if (profile.exists()) {
     const data = profile.data();
-    return {
+    const role = isOwnerEmail(fallbackEmail) ? 'admin' : (data.role || 'client');
+    const userProfile = {
       id: uid,
       name: String(data.name || fallbackName || 'Usuario'),
       email: String(data.email || fallbackEmail || ''),
-      role: (data.role || 'client') as User['role'],
+      role: role as User['role'],
       company: data.company ? String(data.company) : undefined,
       avatar: data.avatar ? String(data.avatar) : avatarUrl(String(data.name || fallbackName || 'Usuario')),
     };
+
+    if (role === 'admin' && data.role !== 'admin') {
+      await setDoc(
+        profileRef,
+        {
+          role: 'admin',
+          email: fallbackEmail || data.email || '',
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+    }
+
+    return userProfile;
   }
 
   const newProfile: User = {
     id: uid,
     name: fallbackName || 'Usuario',
     email: fallbackEmail || '',
-    role: 'client',
+    role: isOwnerEmail(fallbackEmail) ? 'admin' : 'client',
     company: 'ELN Technology',
     avatar: avatarUrl(fallbackName || fallbackEmail || 'Usuario'),
   };
@@ -126,7 +147,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: firebaseUser.uid,
           name: firebaseUser.displayName || 'Usuario',
           email: firebaseUser.email || '',
-          role: 'client',
+          role: isOwnerEmail(firebaseUser.email) ? 'admin' : 'client',
           company: 'ELN Technology',
           avatar: avatarUrl(firebaseUser.displayName || firebaseUser.email || 'Usuario'),
         });
@@ -174,7 +195,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: credential.user.uid,
         name: data.name,
         email: data.email.trim(),
-        role: 'client',
+        role: isOwnerEmail(data.email) ? 'admin' : 'client',
         company: data.company || 'ELN Technology',
         avatar,
       };

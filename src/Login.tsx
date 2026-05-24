@@ -59,7 +59,7 @@ const Login = () => {
           <ArrowLeft className="h-4 w-4" />
           Voltar
         </button>
-        <span className="text-sm font-black uppercase tracking-widest text-[#159AFD]">ELN Technology</span>
+        <span className="notranslate text-sm font-black uppercase tracking-widest text-[#159AFD]" translate="no">ELN Technology</span>
       </header>
 
       <main className="mx-auto grid min-h-[calc(100vh-88px)] w-full max-w-6xl items-center gap-8 px-4 pb-10 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]">
