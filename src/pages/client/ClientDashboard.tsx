@@ -134,9 +134,9 @@ const ClientDashboard = () => {
 
       {/* Recent Projects */}
       <div className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm rounded-xl border border-[#159AFD]/30 p-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-xl font-semibold text-white">Projetos Recentes</h3>
-          <button className="bg-[#159AFD] hover:bg-[#508AD0] text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+          <button className="flex w-full items-center justify-center rounded-lg bg-[#159AFD] px-4 py-2 text-white transition-colors hover:bg-[#508AD0] sm:w-auto">
             <Plus className="w-4 h-4 mr-2" />
             Novo Projeto
           </button>
@@ -144,13 +144,13 @@ const ClientDashboard = () => {
         <div className="space-y-4">
           {projects.slice(0, 3).map((project) => (
             <div key={project.id} className="bg-black/20 p-4 rounded-lg border border-[#159AFD]/20">
-              <div className="flex items-center justify-between mb-2">
+              <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <h4 className="text-white font-medium">{project.name}</h4>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
                   {project.status}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-sm text-gray-400 mb-3">
+              <div className="mb-3 flex flex-col gap-1 text-sm text-gray-400 sm:flex-row sm:items-center sm:justify-between">
                 <span>Técnico: {project.technician}</span>
                 <span>Prazo: {project.deadline}</span>
               </div>
@@ -173,9 +173,9 @@ const ClientDashboard = () => {
 
   const renderProjects = () => (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-2xl font-bold text-white">Meus Projetos</h3>
-        <button className="bg-[#159AFD] hover:bg-[#508AD0] text-white px-6 py-3 rounded-lg transition-colors flex items-center">
+        <button className="flex w-full items-center justify-center rounded-lg bg-[#159AFD] px-6 py-3 text-white transition-colors hover:bg-[#508AD0] sm:w-auto">
           <Plus className="w-5 h-5 mr-2" />
           Novo Projeto
         </button>
@@ -184,7 +184,7 @@ const ClientDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {projects.map((project) => (
           <div key={project.id} className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm rounded-xl border border-[#159AFD]/30 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <h4 className="text-xl font-semibold text-white">{project.name}</h4>
               <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
                 {project.status}
@@ -192,21 +192,21 @@ const ClientDashboard = () => {
             </div>
             
             <div className="space-y-3 mb-4">
-              <div className="flex items-center justify-between text-gray-300">
+              <div className="flex flex-col gap-1 text-gray-300 sm:flex-row sm:items-center sm:justify-between">
                 <span className="flex items-center">
                   <User className="w-4 h-4 mr-2" />
                   Técnico
                 </span>
                 <span>{project.technician}</span>
               </div>
-              <div className="flex items-center justify-between text-gray-300">
+              <div className="flex flex-col gap-1 text-gray-300 sm:flex-row sm:items-center sm:justify-between">
                 <span className="flex items-center">
                   <Calendar className="w-4 h-4 mr-2" />
                   Prazo
                 </span>
                 <span>{project.deadline}</span>
               </div>
-              <div className="flex items-center justify-between text-gray-300">
+              <div className="flex flex-col gap-1 text-gray-300 sm:flex-row sm:items-center sm:justify-between">
                 <span className="flex items-center">
                   <CreditCard className="w-4 h-4 mr-2" />
                   Orçamento
@@ -228,7 +228,7 @@ const ClientDashboard = () => {
               </div>
             </div>
             
-            <div className="flex space-x-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <button className="flex-1 bg-[#159AFD]/20 hover:bg-[#159AFD]/30 text-[#159AFD] py-2 rounded-lg transition-colors">
                 Ver Detalhes
               </button>
@@ -244,9 +244,9 @@ const ClientDashboard = () => {
 
   const renderTickets = () => (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-2xl font-bold text-white">Tickets de Suporte</h3>
-        <button className="bg-[#159AFD] hover:bg-[#508AD0] text-white px-6 py-3 rounded-lg transition-colors flex items-center">
+        <button className="flex w-full items-center justify-center rounded-lg bg-[#159AFD] px-6 py-3 text-white transition-colors hover:bg-[#508AD0] sm:w-auto">
           <Plus className="w-5 h-5 mr-2" />
           Novo Ticket
         </button>
@@ -255,9 +255,9 @@ const ClientDashboard = () => {
       <div className="space-y-4">
         {tickets.map((ticket) => (
           <div key={ticket.id} className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm rounded-xl border border-[#159AFD]/30 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h4 className="text-lg font-semibold text-white">{ticket.title}</h4>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
                   {ticket.priority}
                 </span>
@@ -267,12 +267,12 @@ const ClientDashboard = () => {
               </div>
             </div>
             
-            <div className="flex items-center justify-between text-gray-300 mb-4">
+            <div className="mb-4 flex flex-col gap-1 text-gray-300 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-sm">Projeto: {ticket.project}</span>
               <span className="text-sm">Criado em: {ticket.created}</span>
             </div>
             
-            <div className="flex space-x-2">
+            <div className="grid grid-cols-1 gap-2 sm:flex sm:space-x-2">
               <button className="bg-[#159AFD] hover:bg-[#508AD0] text-white px-4 py-2 rounded-lg transition-colors">
                 Ver Conversa
               </button>
@@ -299,9 +299,9 @@ const ClientDashboard = () => {
     <DashboardLayout>
       <div className="space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-white sm:text-3xl">
               Bem-vindo, {user?.name}!
             </h1>
             <p className="text-gray-400 mt-1">{user?.company}</p>
@@ -320,12 +320,12 @@ const ClientDashboard = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 bg-[#0D0F52]/30 p-1 rounded-xl border border-[#159AFD]/30">
+        <div className="mobile-scrollbar flex space-x-1 overflow-x-auto rounded-xl border border-[#159AFD]/30 bg-[#0D0F52]/30 p-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center px-4 py-2 rounded-lg transition-all ${
+              className={`flex flex-none items-center whitespace-nowrap rounded-lg px-4 py-2 transition-all ${
                 activeTab === tab.id
                   ? 'bg-[#159AFD] text-white'
                   : 'text-gray-400 hover:text-white hover:bg-[#159AFD]/20'

@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-05-24T00:00:00.000Z",
+  "strategy": "deviceId",
+  "devices": {
+    "esp32-gateway": {
+      "name": "Gateway IoT ESP32",
+      "board": "esp32",
+      "latestVersion": "1.0.0",
+      "firmware": {
+        "version": "1.0.0",
+        "url": "/firmware/esp32-gateway-1.0.0.bin",
+        "sha256": "preencha-o-sha256-do-binario-real",
+        "size": 0,
+        "notes": "Primeira versao publicada para teste OTA."
+      }
+    }
+  }
+}

@@ -28,19 +28,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       {/* Top Navigation */}
       <nav className="bg-[#0D0F52]/90 backdrop-blur-sm border-b border-[#159AFD]/20 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex min-h-16 items-center justify-between gap-3 py-3">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/" className="flex min-w-0 items-center space-x-2">
               <img
                 src="/Eln technology.png"
                 alt="ELN Technology Logo"
-                className="w-10 h-10 object-contain"
+                className="h-10 w-10 flex-none object-contain"
               />
-              <span className="text-xl font-bold text-white">ELN Technology</span>
+              <span className="hidden truncate text-lg font-bold text-white sm:block lg:text-xl">ELN Technology</span>
             </Link>
 
             {/* Search Bar */}
-            <div className="flex-1 max-w-lg mx-8">
+            <div className="mx-4 hidden max-w-lg flex-1 md:block lg:mx-8">
               <div className="relative">
                 <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
@@ -52,7 +52,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             </div>
 
             {/* User Menu */}
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-none items-center space-x-2 sm:space-x-4">
               <button className="relative p-2 text-gray-400 hover:text-white transition-colors">
                 <Bell className="w-6 h-6" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
@@ -83,14 +83,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         {children}
       </main>
 
       {/* Quick Actions Floating Button */}
-      <div className="fixed bottom-6 right-6">
+      <div className="fixed bottom-4 right-4 z-30 sm:bottom-6 sm:right-6">
         <div className="relative group">
-          <button className="w-14 h-14 bg-[#159AFD] hover:bg-[#508AD0] rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110">
+          <button className="flex h-12 w-12 items-center justify-center rounded-full bg-[#159AFD] shadow-lg transition-all duration-300 hover:scale-110 hover:bg-[#508AD0] sm:h-14 sm:w-14">
             <Settings className="w-6 h-6 text-white" />
           </button>
           

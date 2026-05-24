@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Users, FolderOpen, MessageSquare, DollarSign, BarChart3, Settings, UserPlus, TrendingUp, Calendar, Bell, Search, Filter, Download, Eye, CreditCard as Edit, Trash2 } from 'lucide-react';
+import { Users, FolderOpen, MessageSquare, DollarSign, BarChart3, Settings, UserPlus, TrendingUp, Calendar, Bell, Search, Filter, Download, Eye, CreditCard as Edit, Trash2, UploadCloud } from 'lucide-react';
 import DashboardLayout from '../../components/DashboardLayout';
+import OtaAdminPanel from '../../components/OtaAdminPanel';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -176,7 +177,7 @@ const AdminDashboard = () => {
             { action: 'Pagamento recebido', client: 'AutoSystems', time: '1 dia atrás' },
             { action: 'Projeto concluído', client: 'SmartFactory', time: '2 dias atrás' }
           ].map((activity, index) => (
-            <div key={index} className="flex items-center justify-between py-2 border-b border-[#159AFD]/20 last:border-b-0">
+            <div key={index} className="flex flex-col gap-1 border-b border-[#159AFD]/20 py-2 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-white">{activity.action}</p>
                 <p className="text-gray-400 text-sm">{activity.client}</p>
@@ -191,18 +192,18 @@ const AdminDashboard = () => {
 
   const renderClients = () => (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <h3 className="text-2xl font-bold text-white">Gerenciar Clientes</h3>
-        <div className="flex items-center space-x-4">
-          <div className="relative">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:space-x-4">
+          <div className="relative w-full sm:w-auto">
             <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Buscar clientes..."
-              className="pl-10 pr-4 py-2 bg-[#0D0F52]/30 border border-[#159AFD]/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#159AFD]"
+              className="w-full rounded-lg border border-[#159AFD]/30 bg-[#0D0F52]/30 py-2 pl-10 pr-4 text-white placeholder-gray-400 focus:border-[#159AFD] focus:outline-none"
             />
           </div>
-          <button className="bg-[#159AFD] hover:bg-[#508AD0] text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+          <button className="flex w-full items-center justify-center rounded-lg bg-[#159AFD] px-4 py-2 text-white transition-colors hover:bg-[#508AD0] sm:w-auto">
             <UserPlus className="w-4 h-4 mr-2" />
             Novo Cliente
           </button>
@@ -268,9 +269,9 @@ const AdminDashboard = () => {
 
   const renderProjects = () => (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-2xl font-bold text-white">Gerenciar Projetos</h3>
-        <div className="flex items-center space-x-4">
+        <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center sm:space-x-4">
           <button className="flex items-center px-4 py-2 bg-[#0D0F52]/30 border border-[#159AFD]/30 rounded-lg text-gray-300 hover:text-white transition-colors">
             <Filter className="w-4 h-4 mr-2" />
             Filtros
@@ -285,7 +286,7 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {projects.map((project) => (
           <div key={project.id} className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm rounded-xl border border-[#159AFD]/30 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <h4 className="text-lg font-semibold text-white">{project.name}</h4>
               <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
                 {project.status}
@@ -293,19 +294,19 @@ const AdminDashboard = () => {
             </div>
             
             <div className="space-y-2 mb-4 text-sm">
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                 <span className="text-gray-400">Cliente:</span>
                 <span className="text-white">{project.client}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                 <span className="text-gray-400">Técnico:</span>
                 <span className="text-white">{project.technician}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                 <span className="text-gray-400">Orçamento:</span>
                 <span className="text-white">{project.budget}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                 <span className="text-gray-400">Prazo:</span>
                 <span className="text-white">{project.deadline}</span>
               </div>
@@ -324,7 +325,7 @@ const AdminDashboard = () => {
               </div>
             </div>
             
-            <div className="flex space-x-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <button className="flex-1 bg-[#159AFD]/20 hover:bg-[#159AFD]/30 text-[#159AFD] py-2 rounded-lg transition-colors text-sm">
                 Ver Detalhes
               </button>
@@ -340,9 +341,9 @@ const AdminDashboard = () => {
 
   const renderTechnicians = () => (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-2xl font-bold text-white">Gerenciar Técnicos</h3>
-        <button className="bg-[#159AFD] hover:bg-[#508AD0] text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+        <button className="flex w-full items-center justify-center rounded-lg bg-[#159AFD] px-4 py-2 text-white transition-colors hover:bg-[#508AD0] sm:w-auto">
           <UserPlus className="w-4 h-4 mr-2" />
           Novo Técnico
         </button>
@@ -351,14 +352,14 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {technicians.map((tech) => (
           <div key={tech.id} className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm rounded-xl border border-[#159AFD]/30 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <div className="w-12 h-12 bg-[#159AFD]/20 rounded-full flex items-center justify-center mr-3">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center">
+                <div className="mr-3 flex h-12 w-12 flex-none items-center justify-center rounded-full bg-[#159AFD]/20">
                   <Users className="w-6 h-6 text-[#159AFD]" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h4 className="text-lg font-semibold text-white">{tech.name}</h4>
-                  <p className="text-gray-400 text-sm">{tech.email}</p>
+                  <p className="break-words text-sm text-gray-400">{tech.email}</p>
                 </div>
               </div>
               <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(tech.status)}`}>
@@ -392,7 +393,7 @@ const AdminDashboard = () => {
               </div>
             </div>
             
-            <div className="flex space-x-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <button className="flex-1 bg-[#159AFD]/20 hover:bg-[#159AFD]/30 text-[#159AFD] py-2 rounded-lg transition-colors text-sm">
                 Ver Perfil
               </button>
@@ -411,6 +412,7 @@ const AdminDashboard = () => {
     { id: 'clients', label: 'Clientes', icon: Users },
     { id: 'projects', label: 'Projetos', icon: FolderOpen },
     { id: 'technicians', label: 'Técnicos', icon: Users },
+    { id: 'ota', label: 'OTA', icon: UploadCloud },
     { id: 'reports', label: 'Relatórios', icon: BarChart3 },
     { id: 'settings', label: 'Configurações', icon: Settings }
   ];
@@ -419,9 +421,9 @@ const AdminDashboard = () => {
     <DashboardLayout>
       <div className="space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-white sm:text-3xl">
               Painel Administrativo
             </h1>
             <p className="text-gray-400 mt-1">Bem-vindo, {user?.name}</p>
@@ -440,7 +442,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 bg-[#0D0F52]/30 p-1 rounded-xl border border-[#159AFD]/30 overflow-x-auto">
+        <div className="mobile-scrollbar flex space-x-1 overflow-x-auto rounded-xl border border-[#159AFD]/30 bg-[#0D0F52]/30 p-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -463,6 +465,7 @@ const AdminDashboard = () => {
           {activeTab === 'clients' && renderClients()}
           {activeTab === 'projects' && renderProjects()}
           {activeTab === 'technicians' && renderTechnicians()}
+          {activeTab === 'ota' && <OtaAdminPanel />}
           {activeTab === 'reports' && (
             <div className="text-center py-12">
               <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />

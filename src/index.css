@@ -4,10 +4,43 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   min-width: 320px;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .mobile-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .mobile-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .circuit-grid {

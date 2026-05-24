@@ -176,8 +176,8 @@ const TechnicianDashboard = () => {
             { task: 'Reunião com cliente TechCorp', project: 'Sistema IoT Industrial', time: '16:00', status: 'scheduled' },
             { task: 'Documentar correções implementadas', project: 'Geral', time: '17:30', status: 'pending' }
           ].map((task, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
-              <div className="flex items-center">
+            <div key={index} className="flex flex-col gap-2 rounded-lg bg-black/20 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex min-w-0 items-center">
                 <div className={`w-3 h-3 rounded-full mr-3 ${
                   task.status === 'completed' ? 'bg-green-400' : 
                   task.status === 'scheduled' ? 'bg-yellow-400' : 'bg-gray-400'
@@ -197,7 +197,7 @@ const TechnicianDashboard = () => {
 
   const renderProjects = () => (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-2xl font-bold text-white">Meus Projetos</h3>
         <div className="flex items-center space-x-2">
           <button className="bg-[#159AFD]/20 hover:bg-[#159AFD]/30 text-[#159AFD] px-4 py-2 rounded-lg transition-colors">
@@ -209,9 +209,9 @@ const TechnicianDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {myProjects.map((project) => (
           <div key={project.id} className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm rounded-xl border border-[#159AFD]/30 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h4 className="text-xl font-semibold text-white">{project.name}</h4>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(project.priority)}`}>
                   {project.priority}
                 </span>
@@ -224,21 +224,21 @@ const TechnicianDashboard = () => {
             <p className="text-gray-300 mb-4">{project.description}</p>
             
             <div className="space-y-3 mb-4">
-              <div className="flex items-center justify-between text-gray-300">
+              <div className="flex flex-col gap-1 text-gray-300 sm:flex-row sm:items-center sm:justify-between">
                 <span className="flex items-center">
                   <User className="w-4 h-4 mr-2" />
                   Cliente
                 </span>
                 <span>{project.client}</span>
               </div>
-              <div className="flex items-center justify-between text-gray-300">
+              <div className="flex flex-col gap-1 text-gray-300 sm:flex-row sm:items-center sm:justify-between">
                 <span className="flex items-center">
                   <Calendar className="w-4 h-4 mr-2" />
                   Prazo
                 </span>
                 <span>{project.deadline}</span>
               </div>
-              <div className="flex items-center justify-between text-gray-300">
+              <div className="flex flex-col gap-1 text-gray-300 sm:flex-row sm:items-center sm:justify-between">
                 <span className="flex items-center">
                   <Clock className="w-4 h-4 mr-2" />
                   Tempo Gasto
@@ -260,7 +260,7 @@ const TechnicianDashboard = () => {
               </div>
             </div>
             
-            <div className="flex space-x-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <button className="flex-1 bg-[#159AFD] hover:bg-[#508AD0] text-white py-2 rounded-lg transition-colors flex items-center justify-center">
                 <Play className="w-4 h-4 mr-2" />
                 Continuar
@@ -277,9 +277,9 @@ const TechnicianDashboard = () => {
 
   const renderRepairTickets = () => (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-2xl font-bold text-white">Roteiro de Reparos</h3>
-        <button className="bg-[#159AFD] hover:bg-[#508AD0] text-white px-4 py-2 rounded-lg transition-colors">
+        <button className="w-full rounded-lg bg-[#159AFD] px-4 py-2 text-white transition-colors hover:bg-[#508AD0] sm:w-auto">
           Novo Ticket
         </button>
       </div>
@@ -287,9 +287,9 @@ const TechnicianDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {repairTickets.map((ticket) => (
           <div key={ticket.id} className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm rounded-xl border border-[#159AFD]/30 p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h4 className="text-lg font-semibold text-white">{ticket.title}</h4>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
                   {ticket.priority}
                 </span>
@@ -300,15 +300,15 @@ const TechnicianDashboard = () => {
             </div>
             
             <div className="space-y-2 mb-4 text-sm">
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                 <span className="text-gray-400">Cliente:</span>
                 <span className="text-white">{ticket.client}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                 <span className="text-gray-400">Projeto:</span>
                 <span className="text-white">{ticket.project}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
                 <span className="text-gray-400">Criado:</span>
                 <span className="text-white">{ticket.created}</span>
               </div>
@@ -319,14 +319,14 @@ const TechnicianDashboard = () => {
             <div className="space-y-2 mb-4">
               <h5 className="text-white font-medium text-sm">Etapas do Reparo:</h5>
               {ticket.steps.map((step) => (
-                <div key={step.id} className="flex items-center justify-between p-2 bg-black/20 rounded">
-                  <div className="flex items-center">
+                <div key={step.id} className="flex flex-col gap-2 rounded bg-black/20 p-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex min-w-0 items-center">
                     <div className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${
                       step.completed ? 'bg-green-400' : 'bg-gray-400'
                     }`}>
                       {step.completed && <CheckCircle className="w-3 h-3 text-white" />}
                     </div>
-                    <span className={`text-sm ${step.completed ? 'text-gray-400 line-through' : 'text-white'}`}>
+                    <span className={`text-sm ${step.completed ? 'text-gray-400 line-through' : 'text-white'} break-words`}>
                       {step.description}
                     </span>
                   </div>
@@ -335,7 +335,7 @@ const TechnicianDashboard = () => {
               ))}
             </div>
             
-            <div className="flex space-x-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <button 
                 onClick={() => setSelectedTicket(ticket.id)}
                 className="flex-1 bg-[#159AFD] hover:bg-[#508AD0] text-white py-2 rounded-lg transition-colors text-sm"
@@ -353,9 +353,9 @@ const TechnicianDashboard = () => {
       {/* Repair Work Modal */}
       {selectedTicket && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[#0D0F52] rounded-xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-[#159AFD]/20">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-xl border border-[#159AFD]/20 bg-[#0D0F52] p-4 sm:p-8">
+            <div className="mb-6 flex items-start justify-between gap-3">
+              <h2 className="text-xl font-bold text-white sm:text-2xl">
                 Roteiro de Reparo - Ticket #{selectedTicket}
               </h2>
               <button
@@ -373,14 +373,14 @@ const TechnicianDashboard = () => {
                 <div className="space-y-3">
                   {repairTickets.find(t => t.id === selectedTicket)?.steps.map((step) => (
                     <div key={step.id} className="bg-black/20 p-4 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
+                      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex min-w-0 items-center">
                           <button className={`w-6 h-6 rounded-full mr-3 flex items-center justify-center ${
                             step.completed ? 'bg-green-400' : 'bg-gray-600 hover:bg-[#159AFD]'
                           } transition-colors`}>
                             {step.completed && <CheckCircle className="w-4 h-4 text-white" />}
                           </button>
-                          <span className={`${step.completed ? 'text-gray-400 line-through' : 'text-white'}`}>
+                          <span className={`${step.completed ? 'text-gray-400 line-through' : 'text-white'} break-words`}>
                             {step.description}
                           </span>
                         </div>
@@ -441,14 +441,14 @@ const TechnicianDashboard = () => {
               </div>
             </div>
             
-            <div className="flex justify-between mt-8">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between">
               <button
                 onClick={() => setSelectedTicket(null)}
                 className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
               >
                 Salvar e Fechar
               </button>
-              <div className="flex space-x-2">
+              <div className="grid grid-cols-1 gap-2 sm:flex sm:space-x-2">
                 <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center">
                   <Pause className="w-4 h-4 mr-2" />
                   Pausar
@@ -477,9 +477,9 @@ const TechnicianDashboard = () => {
     <DashboardLayout>
       <div className="space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-white sm:text-3xl">
               Painel Técnico
             </h1>
             <p className="text-gray-400 mt-1">Bem-vindo, {user?.name}</p>
@@ -498,12 +498,12 @@ const TechnicianDashboard = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 bg-[#0D0F52]/30 p-1 rounded-xl border border-[#159AFD]/30">
+        <div className="mobile-scrollbar flex space-x-1 overflow-x-auto rounded-xl border border-[#159AFD]/30 bg-[#0D0F52]/30 p-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center px-4 py-2 rounded-lg transition-all ${
+              className={`flex flex-none items-center whitespace-nowrap rounded-lg px-4 py-2 transition-all ${
                 activeTab === tab.id
                   ? 'bg-[#159AFD] text-white'
                   : 'text-gray-400 hover:text-white hover:bg-[#159AFD]/20'
