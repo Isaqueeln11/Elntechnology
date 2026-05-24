@@ -1,0 +1,24 @@
+Esta e a pasta oficial de atualizacao da Valvula Pro.
+
+Para publicar uma nova versao:
+
+1. Compile o firmware da ESP32.
+2. Copie o arquivo .bin gerado para esta pasta.
+3. Renomeie o arquivo para firmware.bin.
+4. Edite version.txt e coloque a nova versao.
+
+Exemplo:
+
+version.txt
+2.5.3
+
+firmware.bin
+arquivo gerado pela IDE/PlatformIO
+
+URLs publicadas depois do deploy:
+
+https://elntechnology.com/valvula-pro/update/version.txt
+https://elntechnology.com/valvula-pro/update/firmware.bin
+
+Nao apague version.txt.
+Nao coloque token do GitHub ou senha aqui.
