@@ -1,0 +1,13 @@
+/valvula-pro/update/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/valvula-pro/update/*.bin
+  Content-Type: application/octet-stream
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/update/valvula-pro/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/update/valvula-pro/*.bin
+  Content-Type: application/octet-stream
+  Cache-Control: no-cache, no-store, must-revalidate
