@@ -1,5 +1,7 @@
-import React, { useMemo, useState } from 'react';
-import { CheckCircle, Copy, Cpu, Download, FileCode2, Plus, Trash2, UploadCloud } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { CheckCircle, Copy, Cpu, Database, Download, FileCode2, Plus, Trash2, UploadCloud } from 'lucide-react';
+import { db } from '../firebase';
 
 interface FirmwareRelease {
   id: string;
@@ -15,24 +17,6 @@ interface FirmwareRelease {
   createdAt: string;
 }
 
-const releasesStorageKey = 'eln-ota-releases';
-
-const defaultReleases: FirmwareRelease[] = [
-  {
-    id: 'esp32-gateway-1-0-0',
-    deviceId: 'esp32-gateway',
-    deviceName: 'Gateway IoT ESP32',
-    board: 'esp32',
-    version: '1.0.0',
-    binUrl: '/firmware/esp32-gateway-1.0.0.bin',
-    sha256: 'preencha-o-sha256-do-binario-real',
-    size: '0',
-    notes: 'Primeira versao publicada para teste OTA.',
-    active: true,
-    createdAt: '2026-05-24',
-  },
-];
-
 const emptyForm = {
   deviceId: 'esp32-gateway',
   deviceName: 'Gateway IoT ESP32',
@@ -43,31 +27,6 @@ const emptyForm = {
   size: '',
   notes: '',
 };
-
-function createId() {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
-  }
-
-  return Date.now().toString();
-}
-
-function readReleases(): FirmwareRelease[] {
-  try {
-    const stored = window.localStorage?.getItem(releasesStorageKey);
-    return stored ? JSON.parse(stored) : defaultReleases;
-  } catch {
-    return defaultReleases;
-  }
-}
-
-function writeReleases(releases: FirmwareRelease[]) {
-  try {
-    window.localStorage?.setItem(releasesStorageKey, JSON.stringify(releases));
-  } catch {
-    // Local-only admin data until the project has a backend.
-  }
-}
 
 function makeManifest(releases: FirmwareRelease[]) {
   const activeReleases = releases.filter((release) => release.active);
@@ -91,53 +50,84 @@ function makeManifest(releases: FirmwareRelease[]) {
   return {
     generatedAt: new Date().toISOString(),
     strategy: 'deviceId',
+    source: 'firestore',
     devices,
   };
 }
 
 const OtaAdminPanel = () => {
-  const [releases, setReleases] = useState<FirmwareRelease[]>(() => readReleases());
+  const [releases, setReleases] = useState<FirmwareRelease[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [copyStatus, setCopyStatus] = useState('');
+  const [databaseStatus, setDatabaseStatus] = useState('Conectando ao Firestore...');
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, 'firmwareReleases'),
+      (snapshot) => {
+        const nextReleases = snapshot.docs
+          .map((item) => ({ id: item.id, ...item.data() }) as FirmwareRelease)
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+        setReleases(nextReleases);
+        setDatabaseStatus('Dados sincronizados com Firestore.');
+      },
+      () => {
+        setDatabaseStatus('Nao foi possivel conectar ao Firestore. Verifique as regras do banco.');
+      },
+    );
+
+    return unsubscribe;
+  }, []);
 
   const manifest = useMemo(() => makeManifest(releases), [releases]);
   const manifestJson = useMemo(() => JSON.stringify(manifest, null, 2), [manifest]);
 
-  function saveReleases(nextReleases: FirmwareRelease[]) {
-    setReleases(nextReleases);
-    writeReleases(nextReleases);
-  }
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setIsSaving(true);
 
-    const nextRelease: FirmwareRelease = {
-      ...form,
-      id: createId(),
-      active: true,
-      createdAt: new Date().toISOString().slice(0, 10),
-    };
+    try {
+      await addDoc(collection(db, 'firmwareReleases'), {
+        ...form,
+        active: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
 
-    saveReleases([nextRelease, ...releases]);
-    setForm({
-      ...emptyForm,
-      deviceId: form.deviceId,
-      deviceName: form.deviceName,
-      board: form.board,
-      binUrl: form.binUrl.replace(form.version, 'NOVA-VERSAO'),
-    });
+      setForm({
+        ...emptyForm,
+        deviceId: form.deviceId,
+        deviceName: form.deviceName,
+        board: form.board,
+        binUrl: form.binUrl.replace(form.version, 'NOVA-VERSAO'),
+      });
+      setDatabaseStatus('Firmware salvo no Firestore.');
+    } catch {
+      setDatabaseStatus('Erro ao salvar no Firestore. Verifique permissao e conexao.');
+    } finally {
+      setIsSaving(false);
+    }
   }
 
-  function toggleRelease(id: string) {
-    saveReleases(
-      releases.map((release) => (
-        release.id === id ? { ...release, active: !release.active } : release
-      )),
-    );
+  async function toggleRelease(release: FirmwareRelease) {
+    try {
+      await updateDoc(doc(db, 'firmwareReleases', release.id), {
+        active: !release.active,
+        updatedAt: new Date().toISOString(),
+      });
+    } catch {
+      setDatabaseStatus('Erro ao atualizar firmware no Firestore.');
+    }
   }
 
-  function removeRelease(id: string) {
-    saveReleases(releases.filter((release) => release.id !== id));
+  async function removeRelease(id: string) {
+    try {
+      await deleteDoc(doc(db, 'firmwareReleases', id));
+    } catch {
+      setDatabaseStatus('Erro ao remover firmware do Firestore.');
+    }
   }
 
   async function copyManifest() {
@@ -153,6 +143,13 @@ const OtaAdminPanel = () => {
 
   return (
     <div className="space-y-8">
+      <div className="rounded-xl border border-[#159AFD]/30 bg-[#159AFD]/10 p-4 text-sm font-semibold text-sky-100">
+        <div className="flex items-center gap-3">
+          <Database className="h-5 w-5 flex-none text-[#159AFD]" />
+          <span>{databaseStatus}</span>
+        </div>
+      </div>
+
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <section className="rounded-xl border border-[#159AFD]/30 bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 p-5 backdrop-blur-sm sm:p-6">
           <div className="mb-5 flex items-center gap-3">
@@ -161,7 +158,7 @@ const OtaAdminPanel = () => {
             </div>
             <div>
               <h3 className="text-xl font-semibold text-white">Novo firmware OTA</h3>
-              <p className="text-sm text-gray-400">Cadastre a versao e o caminho do arquivo .bin publicado no site.</p>
+              <p className="text-sm text-gray-400">Cadastre a versao no banco Firestore.</p>
             </div>
           </div>
 
@@ -256,9 +253,12 @@ const OtaAdminPanel = () => {
               />
             </label>
 
-            <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#159AFD] px-4 py-3 font-semibold text-white transition hover:bg-[#508AD0]">
+            <button
+              disabled={isSaving}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#159AFD] px-4 py-3 font-semibold text-white transition hover:bg-[#508AD0] disabled:cursor-not-allowed disabled:bg-gray-600"
+            >
               <Plus className="h-5 w-5" />
-              Adicionar firmware
+              {isSaving ? 'Salvando...' : 'Adicionar firmware'}
             </button>
           </form>
         </section>
@@ -271,7 +271,7 @@ const OtaAdminPanel = () => {
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-white">Manifesto do equipamento</h3>
-                <p className="text-sm text-gray-400">Endpoint sugerido: /ota/manifest.json</p>
+                <p className="text-sm text-gray-400">Gerado com os dados ativos do Firestore.</p>
               </div>
             </div>
 
@@ -315,6 +315,12 @@ const OtaAdminPanel = () => {
         </div>
 
         <div className="space-y-3">
+          {releases.length === 0 && (
+            <div className="rounded-lg border border-[#159AFD]/20 bg-black/20 p-5 text-sm text-gray-300">
+              Nenhum firmware salvo no Firestore ainda.
+            </div>
+          )}
+
           {releases.map((release) => (
             <article key={release.id} className="rounded-lg border border-[#159AFD]/20 bg-black/20 p-4">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -333,14 +339,14 @@ const OtaAdminPanel = () => {
                   </div>
                   <p className="mt-2 break-all text-sm text-gray-400">{release.binUrl}</p>
                   <p className="mt-1 text-sm text-gray-500">
-                    {release.deviceId} / {release.board} / {release.createdAt}
+                    {release.deviceId} / {release.board} / {release.createdAt.slice(0, 10)}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 sm:flex">
                   <button
                     type="button"
-                    onClick={() => toggleRelease(release.id)}
+                    onClick={() => toggleRelease(release)}
                     className="rounded-lg border border-[#159AFD]/30 px-3 py-2 text-sm text-gray-200 hover:bg-[#159AFD]/20"
                   >
                     {release.active ? 'Desativar' : 'Ativar'}

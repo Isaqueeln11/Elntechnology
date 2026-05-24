@@ -1,6 +1,17 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from 'firebase/auth';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase';
 
-interface User {
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -13,128 +24,77 @@ interface RegisterUserInput {
   name: string;
   email: string;
   password: string;
-  role: User['role'];
   company?: string;
-}
-
-interface StoredUser extends User {
-  password: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   register: (data: RegisterUserInput) => Promise<{ success: boolean; message?: string }>;
+  resetPassword: (email: string) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const sessionStorageKey = 'user';
-const usersStorageKey = 'eln-users';
+function avatarUrl(name: string) {
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=159AFD&color=fff`;
+}
 
-const demoUsers: StoredUser[] = [
-  {
-    id: '1',
-    name: 'Joao Silva',
-    email: 'cliente@empresa.com',
-    password: '123456',
+function firebaseMessage(error: unknown) {
+  const code = typeof error === 'object' && error && 'code' in error ? String(error.code) : '';
+
+  switch (code) {
+    case 'auth/email-already-in-use':
+      return 'Este email ja esta cadastrado.';
+    case 'auth/invalid-email':
+      return 'Email invalido.';
+    case 'auth/weak-password':
+      return 'A senha precisa ter pelo menos 6 caracteres.';
+    case 'auth/invalid-credential':
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+      return 'Email ou senha incorretos.';
+    case 'auth/network-request-failed':
+      return 'Falha de rede ao conectar com o Firebase.';
+    default:
+      return 'Nao foi possivel concluir a operacao.';
+  }
+}
+
+async function readUserProfile(uid: string, fallbackEmail: string | null, fallbackName: string | null): Promise<User> {
+  const profileRef = doc(db, 'users', uid);
+  const profile = await getDoc(profileRef);
+
+  if (profile.exists()) {
+    const data = profile.data();
+    return {
+      id: uid,
+      name: String(data.name || fallbackName || 'Usuario'),
+      email: String(data.email || fallbackEmail || ''),
+      role: (data.role || 'client') as User['role'],
+      company: data.company ? String(data.company) : undefined,
+      avatar: data.avatar ? String(data.avatar) : avatarUrl(String(data.name || fallbackName || 'Usuario')),
+    };
+  }
+
+  const newProfile: User = {
+    id: uid,
+    name: fallbackName || 'Usuario',
+    email: fallbackEmail || '',
     role: 'client',
-    company: 'TechCorp Ltda',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=150&h=150',
-  },
-  {
-    id: '2',
-    name: 'Admin ELN',
-    email: 'admin@elntechnology.com',
-    password: '123456',
-    role: 'admin',
     company: 'ELN Technology',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150',
-  },
-  {
-    id: '3',
-    name: 'Carlos Tecnico',
-    email: 'tecnico@elntechnology.com',
-    password: '123456',
-    role: 'technician',
-    company: 'ELN Technology',
-    avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=150&h=150',
-  },
-];
+    avatar: avatarUrl(fallbackName || fallbackEmail || 'Usuario'),
+  };
 
-function canUseLocalStorage() {
-  return typeof window !== 'undefined' && Boolean(window.localStorage);
-}
+  await setDoc(profileRef, {
+    ...newProfile,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
 
-function publicUser(user: StoredUser): User {
-  const { password, ...safeUser } = user;
-  return safeUser;
-}
-
-function readStoredUser(): User | null {
-  try {
-    if (!canUseLocalStorage()) {
-      return null;
-    }
-
-    const storedUser = window.localStorage.getItem(sessionStorageKey);
-    return storedUser ? JSON.parse(storedUser) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeStoredUser(user: User) {
-  try {
-    window.localStorage?.setItem(sessionStorageKey, JSON.stringify(user));
-  } catch {
-    // Login should still work in restricted/private browser contexts.
-  }
-}
-
-function clearStoredUser() {
-  try {
-    window.localStorage?.removeItem(sessionStorageKey);
-  } catch {
-    // Logout should still clear the in-memory session.
-  }
-}
-
-function readUsers(): StoredUser[] {
-  try {
-    if (!canUseLocalStorage()) {
-      return demoUsers;
-    }
-
-    const storedUsers = window.localStorage.getItem(usersStorageKey);
-
-    if (!storedUsers) {
-      window.localStorage.setItem(usersStorageKey, JSON.stringify(demoUsers));
-      return demoUsers;
-    }
-
-    return JSON.parse(storedUsers);
-  } catch {
-    return demoUsers;
-  }
-}
-
-function writeUsers(users: StoredUser[]) {
-  try {
-    window.localStorage?.setItem(usersStorageKey, JSON.stringify(users));
-  } catch {
-    // Local demo accounts are best-effort until a real database exists.
-  }
-}
-
-function createId() {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
-  }
-
-  return Date.now().toString();
+  return newProfile;
 }
 
 export const useAuth = () => {
@@ -150,73 +110,105 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    readUsers();
-    const storedUser = readStoredUser();
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
 
-    if (storedUser) {
-      setUser(storedUser);
-    }
+      try {
+        const profile = await readUserProfile(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName);
+        setUser(profile);
+      } catch {
+        setUser({
+          id: firebaseUser.uid,
+          name: firebaseUser.displayName || 'Usuario',
+          email: firebaseUser.email || '',
+          role: 'client',
+          company: 'ELN Technology',
+          avatar: avatarUrl(firebaseUser.displayName || firebaseUser.email || 'Usuario'),
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    });
 
-    setIsLoading(false);
+    return unsubscribe;
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const foundUser = readUsers().find((account) => account.email.toLowerCase() === email.toLowerCase());
-
-    if (foundUser && foundUser.password === password) {
-      const safeUser = publicUser(foundUser);
-      setUser(safeUser);
-      writeStoredUser(safeUser);
-      setIsLoading(false);
+    try {
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      const profile = await readUserProfile(
+        credential.user.uid,
+        credential.user.email,
+        credential.user.displayName,
+      );
+      setUser(profile);
       return true;
+    } catch {
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
-    return false;
   };
 
   const register = async (data: RegisterUserInput) => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const users = readUsers();
-    const alreadyExists = users.some((account) => account.email.toLowerCase() === data.email.toLowerCase());
+    try {
+      const credential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const avatar = avatarUrl(data.name);
 
-    if (alreadyExists) {
+      await updateProfile(credential.user, {
+        displayName: data.name,
+        photoURL: avatar,
+      });
+      await sendEmailVerification(credential.user);
+
+      const profile: User = {
+        id: credential.user.uid,
+        name: data.name,
+        email: data.email,
+        role: 'client',
+        company: data.company || 'ELN Technology',
+        avatar,
+      };
+
+      await setDoc(doc(db, 'users', credential.user.uid), {
+        ...profile,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      setUser(profile);
+      return { success: true };
+    } catch (error) {
+      return { success: false, message: firebaseMessage(error) };
+    } finally {
       setIsLoading(false);
-      return { success: false, message: 'Este email ja esta cadastrado.' };
     }
-
-    const newUser: StoredUser = {
-      id: createId(),
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      role: data.role,
-      company: data.company || 'ELN Technology',
-      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=159AFD&color=fff`,
-    };
-
-    writeUsers([...users, newUser]);
-
-    const safeUser = publicUser(newUser);
-    setUser(safeUser);
-    writeStoredUser(safeUser);
-    setIsLoading(false);
-
-    return { success: true };
   };
 
   const logout = () => {
+    signOut(auth);
     setUser(null);
-    clearStoredUser();
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return { success: true, message: 'Enviamos um email para redefinir sua senha.' };
+    } catch (error) {
+      return { success: false, message: firebaseMessage(error) };
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, register, resetPassword, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

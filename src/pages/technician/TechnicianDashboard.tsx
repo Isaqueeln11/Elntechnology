@@ -6,17 +6,13 @@ import {
   MessageSquare, 
   Clock, 
   CheckCircle,
-  AlertTriangle,
   User,
   Calendar,
   Bell,
   Play,
   Pause,
-  RotateCcw,
   FileText,
-  Camera,
-  Upload,
-  Send
+  Camera
 } from 'lucide-react';
 import DashboardLayout from '../../components/DashboardLayout';
 

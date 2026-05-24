@@ -8,9 +8,7 @@ import {
   CreditCard, 
   Settings,
   Plus,
-  Clock,
   CheckCircle,
-  AlertCircle,
   BarChart3,
   Calendar,
   Bell

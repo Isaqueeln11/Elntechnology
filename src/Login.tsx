@@ -1,25 +1,21 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, LockKeyhole, LogIn, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Database, LockKeyhole, LogIn, Mail, ShieldCheck } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
-
-const demoAccounts = [
-  { label: 'Cliente', email: 'cliente@empresa.com' },
-  { label: 'Admin', email: 'admin@elntechnology.com' },
-  { label: 'Tecnico', email: 'tecnico@elntechnology.com' },
-];
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [status, setStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, resetPassword } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setStatus('');
     setIsSubmitting(true);
 
     try {
@@ -33,6 +29,23 @@ const Login = () => {
       setError('Erro ao fazer login. Tente novamente.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    setError('');
+    setStatus('');
+
+    if (!email) {
+      setError('Digite seu email para receber a recuperacao de senha.');
+      return;
+    }
+
+    const result = await resetPassword(email);
+    if (result.success) {
+      setStatus(result.message);
+    } else {
+      setError(result.message);
     }
   };
 
@@ -56,13 +69,17 @@ const Login = () => {
             Gerencie projetos, clientes e atualizacoes OTA.
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
-            Entre com sua conta para acessar o painel correto. As senhas ficam ocultas e nao aparecem na tela de acesso.
+            Entre com uma conta criada no Firebase para acessar o painel correto. Nao existem mais contas prontas.
           </p>
 
           <div className="mt-8 grid gap-3">
-            {['Painel administrativo', 'Controle de firmware', 'Historico local de usuarios'].map((item) => (
+            {['Firebase Authentication', 'Perfis no Firestore', 'Controle de firmware no banco'].map((item) => (
               <div key={item} className="flex items-center gap-3 rounded-md border border-sky-100 bg-white p-4 shadow-sm">
-                <ShieldCheck className="h-5 w-5 flex-none text-[#159AFD]" />
+                {item.includes('Firestore') || item.includes('banco') ? (
+                  <Database className="h-5 w-5 flex-none text-[#159AFD]" />
+                ) : (
+                  <ShieldCheck className="h-5 w-5 flex-none text-[#159AFD]" />
+                )}
                 <span className="font-bold text-[#0D0F52]">{item}</span>
               </div>
             ))}
@@ -81,26 +98,26 @@ const Login = () => {
           </div>
 
           <div className="mb-6 rounded-md border border-sky-100 bg-[#F7FBFF] p-4">
-            <p className="text-sm font-bold text-[#0D0F52]">Contas de demonstracao</p>
-            <div className="mt-3 space-y-2">
-              {demoAccounts.map((account) => (
-                <button
-                  key={account.email}
-                  type="button"
-                  onClick={() => setEmail(account.email)}
-                  className="flex w-full items-center justify-between gap-3 rounded-md bg-white px-3 py-2 text-left text-sm transition hover:text-[#159AFD]"
-                >
-                  <span className="font-bold text-slate-700">{account.label}</span>
-                  <span className="truncate text-slate-500">{account.email}</span>
-                </button>
-              ))}
+            <div className="flex items-start gap-3">
+              <Database className="mt-0.5 h-5 w-5 flex-none text-[#159AFD]" />
+              <div>
+                <p className="text-sm font-bold text-[#0D0F52]">Login conectado ao Firebase</p>
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  Use uma conta criada em "Criar conta". O acesso agora valida email e senha no Firebase Auth.
+                </p>
+              </div>
             </div>
-            <p className="mt-3 text-xs font-semibold text-slate-500">Senhas nao sao exibidas por seguranca.</p>
           </div>
 
           {error && (
             <div className="mb-5 rounded-md border border-red-200 bg-red-50 p-3">
               <p className="text-sm font-semibold text-red-700">{error}</p>
+            </div>
+          )}
+
+          {status && (
+            <div className="mb-5 rounded-md border border-emerald-200 bg-emerald-50 p-3">
+              <p className="text-sm font-semibold text-emerald-700">{status}</p>
             </div>
           )}
 
@@ -121,7 +138,16 @@ const Login = () => {
             </label>
 
             <label className="block text-sm font-bold text-slate-700">
-              Senha
+              <span className="flex items-center justify-between gap-3">
+                Senha
+                <button
+                  type="button"
+                  onClick={handlePasswordReset}
+                  className="text-xs font-black text-[#159AFD] transition hover:text-[#0D0F52]"
+                >
+                  Esqueci minha senha
+                </button>
+              </span>
               <span className="relative mt-2 block">
                 <LockKeyhole className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                 <input

@@ -117,10 +117,18 @@ function HomePage() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const name = data.get('name')?.toString().trim();
+    const phone = data.get('phone')?.toString().trim();
+    const type = data.get('type')?.toString().trim();
+    const message = data.get('message')?.toString().trim();
+    const text = encodeURIComponent(
+      `Ola, sou ${name || 'um cliente'}.\nWhatsApp: ${phone || 'nao informado'}\nProjeto: ${type || 'nao informado'}\n\n${message || ''}`,
+    );
+
+    window.open(`https://wa.me/5581997092380?text=${text}`, '_blank', 'noopener,noreferrer');
     setFormStatus(
       name
-        ? `${name}, sua solicitacao foi preparada. A ELN Technology entra em contato para alinhar os detalhes.`
-        : 'Solicitacao preparada. A ELN Technology entra em contato para alinhar os detalhes.',
+        ? `${name}, sua solicitacao foi preparada no WhatsApp.`
+        : 'Solicitacao preparada no WhatsApp.',
     );
     event.currentTarget.reset();
   }

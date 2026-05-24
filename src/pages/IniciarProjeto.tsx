@@ -23,6 +23,7 @@ export default function IniciarProjeto() {
   });
   const [enviado, setEnviado] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  const [erroEnvio, setErroEnvio] = useState('');
 
   const formatCurrency = (value: string) => {
     return (
@@ -43,10 +44,12 @@ export default function IniciarProjeto() {
 
     try {
       setEnviando(true);
+      setErroEnvio('');
       // Remove the anexos field as File objects can't be stored in Firestore
-      const { anexos, orcamento, ...formDataWithoutFiles } = formData;
+      const { orcamento, ...formDataWithoutFiles } = formData;
       const formDataToSend = {
         ...formDataWithoutFiles,
+        anexos: formData.anexos.map((file) => file.name),
         orcamento: orcamento.replace('R$ ', ''),
       };
 
@@ -58,9 +61,8 @@ export default function IniciarProjeto() {
         setEnviado(false);
         navigate('/');
       }, 3000);
-    } catch (error) {
-      console.error('Erro ao enviar projeto:', error);
-      alert('Ocorreu um erro ao enviar o projeto. Por favor, tente novamente.');
+    } catch {
+      setErroEnvio('Ocorreu um erro ao enviar o projeto. Verifique sua conexao e tente novamente.');
     } finally {
       setEnviando(false);
     }
@@ -376,6 +378,11 @@ export default function IniciarProjeto() {
             onSubmit={handleSubmit}
             className="bg-gray-800/50 rounded-xl p-8"
           >
+            {erroEnvio && (
+              <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/20 p-4 text-sm font-semibold text-red-200">
+                {erroEnvio}
+              </div>
+            )}
             {renderStep()}
 
             <div className="mt-8 flex justify-between">
