@@ -24,9 +24,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0D0F52] to-black">
+    <div className="min-h-screen bg-[#070A1F]">
       {/* Top Navigation */}
-      <nav className="bg-[#0D0F52]/90 backdrop-blur-sm border-b border-[#159AFD]/20 sticky top-0 z-40">
+      <nav className="sticky top-0 z-40 border-b border-white/10 bg-[#080B24]/95 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex min-h-16 items-center justify-between gap-3 py-3">
             {/* Logo */}
@@ -46,14 +46,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 <input
                   type="text"
                   placeholder="Buscar projetos, clientes, tickets..."
-                  className="w-full pl-10 pr-4 py-2 bg-[#0D0F52]/50 border border-[#159AFD]/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#159AFD] transition-colors"
+                  className="w-full rounded-md border border-white/10 bg-white/[0.04] py-2 pl-10 pr-4 text-white placeholder-gray-500 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10"
                 />
               </div>
             </div>
 
             {/* User Menu */}
             <div className="flex flex-none items-center space-x-2 sm:space-x-4">
-              <button className="relative p-2 text-gray-400 hover:text-white transition-colors">
+              <button className="relative rounded-md p-2 text-gray-400 transition-colors hover:bg-white/5 hover:text-white">
                 <Bell className="w-6 h-6" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
               </button>
@@ -62,7 +62,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 <img
                   src={user?.avatar}
                   alt={user?.name}
-                  className="w-8 h-8 rounded-full border-2 border-[#159AFD]"
+                  className="h-9 w-9 rounded-full border border-[#159AFD]/50 object-cover"
                 />
                 <div className="hidden md:block">
                   <p className="text-white text-sm font-medium">{user?.name}</p>
@@ -72,7 +72,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
               <button
                 onClick={handleLogout}
-                className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+                className="rounded-md p-2 text-gray-400 transition-colors hover:bg-red-500/10 hover:text-red-300"
                 title="Sair"
               >
                 <LogOut className="w-5 h-5" />
@@ -90,12 +90,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       {/* Quick Actions Floating Button */}
       <div className="fixed bottom-4 right-4 z-30 sm:bottom-6 sm:right-6">
         <div className="relative group">
-          <button className="flex h-12 w-12 items-center justify-center rounded-full bg-[#159AFD] shadow-lg transition-all duration-300 hover:scale-110 hover:bg-[#508AD0] sm:h-14 sm:w-14">
+          <button className="flex h-12 w-12 items-center justify-center rounded-md bg-[#159AFD] shadow-lg shadow-[#159AFD]/20 transition-all duration-300 hover:bg-[#508AD0] sm:h-14 sm:w-14">
             <Settings className="w-6 h-6 text-white" />
           </button>
           
           {/* Quick Actions Menu */}
-          <div className="absolute bottom-16 right-0 bg-[#0D0F52]/90 backdrop-blur-sm rounded-lg border border-[#159AFD]/30 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none group-hover:pointer-events-auto">
+          <div className="pointer-events-none absolute bottom-16 right-0 rounded-lg border border-white/10 bg-[#080B24]/95 p-2 opacity-0 shadow-xl shadow-black/25 backdrop-blur-sm transition-opacity duration-300 group-hover:pointer-events-auto group-hover:opacity-100">
             <div className="space-y-1 w-48">
               <Link
                 to="/"

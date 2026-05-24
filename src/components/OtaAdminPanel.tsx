@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage';
 import { CheckCircle, Copy, Cpu, Database, Download, FileCode2, Plus, Trash2, UploadCloud } from 'lucide-react';
-import { db } from '../firebase';
+import { db, storage } from '../firebase';
 
 interface FirmwareRelease {
   id: string;
@@ -27,6 +28,14 @@ const emptyForm = {
   size: '',
   notes: '',
 };
+
+async function fileSha256(file: File) {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
 
 function makeManifest(releases: FirmwareRelease[]) {
   const activeReleases = releases.filter((release) => release.active);
@@ -61,6 +70,7 @@ const OtaAdminPanel = () => {
   const [copyStatus, setCopyStatus] = useState('');
   const [databaseStatus, setDatabaseStatus] = useState('Conectando ao Firestore...');
   const [isSaving, setIsSaving] = useState(false);
+  const [firmwareFile, setFirmwareFile] = useState<File | null>(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -89,8 +99,34 @@ const OtaAdminPanel = () => {
     setIsSaving(true);
 
     try {
+      let binUrl = form.binUrl.trim();
+
+      if (firmwareFile) {
+        const safeDeviceId = form.deviceId.trim().replace(/[^a-zA-Z0-9-_]/g, '-');
+        const safeVersion = form.version.trim().replace(/[^a-zA-Z0-9.-_]/g, '-');
+        const safeFileName = firmwareFile.name.replace(/[^a-zA-Z0-9.-_]/g, '-');
+        const fileRef = storageRef(storage, `firmware/${safeDeviceId}/${safeVersion}/${Date.now()}-${safeFileName}`);
+
+        setDatabaseStatus('Enviando arquivo .bin para o Firebase Storage...');
+        await uploadBytes(fileRef, firmwareFile, {
+          contentType: 'application/octet-stream',
+          customMetadata: {
+            deviceId: form.deviceId,
+            version: form.version,
+          },
+        });
+        binUrl = await getDownloadURL(fileRef);
+      }
+
+      if (!binUrl) {
+        setDatabaseStatus('Envie um arquivo .bin ou cole uma URL valida.');
+        setIsSaving(false);
+        return;
+      }
+
       await addDoc(collection(db, 'firmwareReleases'), {
         ...form,
+        binUrl,
         active: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -101,13 +137,41 @@ const OtaAdminPanel = () => {
         deviceId: form.deviceId,
         deviceName: form.deviceName,
         board: form.board,
-        binUrl: form.binUrl.replace(form.version, 'NOVA-VERSAO'),
+        binUrl: '',
       });
+      setFirmwareFile(null);
       setDatabaseStatus('Firmware salvo no Firestore.');
     } catch {
-      setDatabaseStatus('Erro ao salvar no Firestore. Verifique permissao e conexao.');
+      setDatabaseStatus('Erro ao salvar/upload do firmware. Verifique Storage, regras e conexao.');
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  async function handleFirmwareFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith('.bin')) {
+      setDatabaseStatus('Escolha um arquivo com extensao .bin.');
+      event.target.value = '';
+      return;
+    }
+
+    setFirmwareFile(file);
+    setDatabaseStatus('Calculando SHA-256 do arquivo .bin...');
+
+    try {
+      const sha256 = await fileSha256(file);
+      setForm((current) => ({
+        ...current,
+        binUrl: '',
+        sha256,
+        size: String(file.size),
+      }));
+      setDatabaseStatus(`Arquivo selecionado: ${file.name}. SHA-256 calculado.`);
+    } catch {
+      setDatabaseStatus('Nao foi possivel calcular o SHA-256 do arquivo.');
     }
   }
 
@@ -222,13 +286,24 @@ const OtaAdminPanel = () => {
             </div>
 
             <label className="block text-sm font-medium text-gray-300">
-              URL do .bin
+              Arquivo .bin do firmware
+              <input
+                type="file"
+                accept=".bin,application/octet-stream"
+                onChange={handleFirmwareFile}
+                className="mt-2 w-full rounded-lg border border-dashed border-[#159AFD]/30 bg-black/30 p-3 text-sm text-gray-300 file:mr-4 file:rounded-lg file:border-0 file:bg-[#159AFD] file:px-4 file:py-2 file:font-semibold file:text-white"
+              />
+              {firmwareFile && <span className="mt-2 block text-xs text-sky-300">{firmwareFile.name} / {firmwareFile.size} bytes</span>}
+            </label>
+
+            <label className="block text-sm font-medium text-gray-300">
+              URL do .bin, caso ja esteja hospedado
               <input
                 value={form.binUrl}
                 onChange={(event) => setForm({ ...form, binUrl: event.target.value })}
                 className="mt-2 w-full rounded-lg border border-[#159AFD]/20 bg-black/30 p-3 text-white outline-none focus:border-[#159AFD]"
-                placeholder="/firmware/esp32-gateway-1.0.1.bin"
-                required
+                placeholder="https://.../firmware.bin"
+                required={!firmwareFile}
               />
             </label>
 

@@ -7,7 +7,8 @@ O projeto agora usa Firebase real para login, cadastro e banco.
 1. Abra o projeto `elntechnology`.
 2. Em Authentication, ative o provedor Email/Password.
 3. Em Firestore Database, crie o banco em modo production ou test.
-4. Crie as colecoes automaticamente pelo app:
+4. Em Storage, crie o bucket do projeto para fotos e arquivos `.bin`.
+5. Crie as colecoes automaticamente pelo app:
    - `users`
    - `clientes`
    - `projetos`
@@ -120,17 +121,51 @@ service cloud.firestore {
 }
 ```
 
+## Regras do Firebase Storage
+
+Cole tambem em Storage Rules para liberar upload de foto do admin e firmware `.bin`:
+
+```txt
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwnerEmail() {
+      return signedIn()
+        && request.auth.token.email in [
+          "isaqueeln11@gmail.com",
+          "elntechnologyinnovations@gmail.com"
+        ];
+    }
+
+    match /avatars/{userId}/{fileName} {
+      allow read: if true;
+      allow write: if signedIn() && request.auth.uid == userId;
+    }
+
+    match /firmware/{deviceId}/{version}/{fileName} {
+      allow read: if true;
+      allow write: if isOwnerEmail();
+    }
+  }
+}
+```
+
 ## Segurança extra ativada no app
 
 - Cadastro sempre cria `role: "client"`, exceto os emails donos configurados no app.
 - Admin e tecnico devem ser liberados manualmente no Firestore.
 - Cadastro envia verificacao de email pelo Firebase Auth.
 - Login tem recuperacao de senha por email.
-- Perfil do admin pode salvar nome, empresa e foto no documento do usuario.
+- Perfil do admin pode salvar nome, empresa e foto enviada para o Firebase Storage.
 - Clientes, tecnicos e projetos do painel admin ficam protegidos para escrita de admin.
 - Notificacoes, suporte, documentos, faturamento e pedidos tambem ficam protegidos para admin.
-- OTA grava no Firestore, mas regras recomendadas deixam escrita apenas para admin.
+- OTA envia o arquivo `.bin` para o Firebase Storage e grava URL, SHA-256, tamanho e versao no Firestore.
 
 ## Observacao sobre OTA
 
-O painel admin salva os firmwares no Firestore e gera o manifesto na tela. Para um equipamento embarcado baixar automaticamente um JSON publico e sempre atualizado, o proximo passo ideal e publicar uma API/Cloud Function que leia `firmwareReleases` e responda `/ota/manifest.json`.
+O painel admin salva os firmwares no Storage, grava os metadados no Firestore e gera o manifesto na tela. Para um equipamento embarcado baixar automaticamente um JSON publico e sempre atualizado, o proximo passo ideal e publicar uma API/Cloud Function que leia `firmwareReleases` e responda `/ota/manifest.json`.

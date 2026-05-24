@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage';
 import {
   BarChart3,
   Bell,
@@ -15,7 +16,7 @@ import {
   Users,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { db } from '../../firebase';
+import { db, storage } from '../../firebase';
 import DashboardLayout from '../../components/DashboardLayout';
 import OtaAdminPanel from '../../components/OtaAdminPanel';
 
@@ -90,20 +91,21 @@ interface NotificationRecord extends BaseRecord {
 }
 
 const tabs = [
-  { id: 'overview', label: 'Visao Geral', icon: BarChart3 },
-  { id: 'orders', label: 'Pedidos', icon: PackagePlus },
-  { id: 'clients', label: 'Clientes', icon: Users },
-  { id: 'projects', label: 'Projetos', icon: FolderOpen },
-  { id: 'technicians', label: 'Tecnicos', icon: Users },
-  { id: 'support', label: 'Suporte', icon: MessageSquare },
-  { id: 'documents', label: 'Documentos', icon: FileText },
-  { id: 'billing', label: 'Faturamento', icon: CreditCard },
-  { id: 'notifications', label: 'Notificacoes', icon: Bell },
-  { id: 'ota', label: 'Codigos OTA', icon: UploadCloud },
-  { id: 'settings', label: 'Meu Perfil', icon: Settings },
+  { id: 'overview', label: 'Visao Geral', icon: BarChart3, description: 'Resumo operacional do sistema' },
+  { id: 'orders', label: 'Pedidos', icon: PackagePlus, description: 'Novas demandas e aprovacoes' },
+  { id: 'clients', label: 'Clientes', icon: Users, description: 'Cadastro e contatos comerciais' },
+  { id: 'projects', label: 'Projetos', icon: FolderOpen, description: 'Prazos, valores e andamento' },
+  { id: 'technicians', label: 'Tecnicos', icon: Users, description: 'Equipe tecnica e especialidades' },
+  { id: 'support', label: 'Suporte', icon: MessageSquare, description: 'Tickets e atendimento' },
+  { id: 'documents', label: 'Documentos', icon: FileText, description: 'Links, contratos e arquivos' },
+  { id: 'billing', label: 'Faturamento', icon: CreditCard, description: 'Valores, vencimentos e status' },
+  { id: 'notifications', label: 'Notificacoes', icon: Bell, description: 'Avisos para clientes e equipe' },
+  { id: 'ota', label: 'Codigos OTA', icon: UploadCloud, description: 'Versoes e firmware dos equipamentos' },
+  { id: 'settings', label: 'Meu Perfil', icon: Settings, description: 'Dados do administrador' },
 ];
 
-const inputClass = 'mt-2 w-full rounded-lg border border-[#159AFD]/20 bg-black/30 p-3 text-white outline-none transition focus:border-[#159AFD]';
+const inputClass = 'mt-2 w-full rounded-md border border-white/10 bg-slate-950/70 p-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10';
+const panelClass = 'rounded-lg border border-white/10 bg-slate-950/55 shadow-xl shadow-black/10';
 
 function toMoney(value: number) {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -136,7 +138,7 @@ function Field({
   required?: boolean;
 }) {
   return (
-    <label className="block text-sm font-medium text-gray-300">
+    <label className="block text-sm font-semibold text-slate-300">
       {label}
       <input type={type} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} className={inputClass} required={required} />
     </label>
@@ -145,7 +147,7 @@ function Field({
 
 function SelectField({ label, value, onChange, options }: { label: string; value: string; onChange: (value: string) => void; options: string[] }) {
   return (
-    <label className="block text-sm font-medium text-gray-300">
+    <label className="block text-sm font-semibold text-slate-300">
       {label}
       <select value={value} onChange={(event) => onChange(event.target.value)} className={inputClass}>
         {options.map((option) => (
@@ -158,7 +160,7 @@ function SelectField({ label, value, onChange, options }: { label: string; value
 
 function TextAreaField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (value: string) => void; placeholder?: string }) {
   return (
-    <label className="block text-sm font-medium text-gray-300">
+    <label className="block text-sm font-semibold text-slate-300">
       {label}
       <textarea value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} rows={4} className={`${inputClass} resize-none`} />
     </label>
@@ -167,22 +169,23 @@ function TextAreaField({ label, value, onChange, placeholder }: { label: string;
 
 function EmptyState({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-xl border border-[#159AFD]/30 bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 p-8 text-center">
+    <div className={`${panelClass} p-8 text-center`}>
       <p className="text-lg font-semibold text-white">{title}</p>
-      <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-gray-400">{text}</p>
+      <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-400">{text}</p>
     </div>
   );
 }
 
 function StatusPill({ value }: { value?: string }) {
-  const color = value === 'Pago' || value === 'Concluido' || value === 'Resolvido' || value === 'Enviada' ? 'text-emerald-200 bg-emerald-500/15' : 'text-sky-200 bg-sky-500/15';
-  return <span className={`rounded-full px-3 py-1 text-xs font-bold ${color}`}>{value || 'Aberto'}</span>;
+  const color = value === 'Pago' || value === 'Concluido' || value === 'Resolvido' || value === 'Enviada' ? 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200' : 'border-sky-400/20 bg-sky-500/10 text-sky-200';
+  return <span className={`rounded-full border px-3 py-1 text-xs font-bold ${color}`}>{value || 'Aberto'}</span>;
 }
 
 const AdminDashboard = () => {
   const { user, updateUserProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [status, setStatus] = useState('');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const [clients, setClients] = useState<ClientRecord[]>([]);
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
@@ -245,48 +248,106 @@ const AdminDashboard = () => {
     setStatus('Status atualizado.');
   }
 
-  function handleAvatarFile(event: React.ChangeEvent<HTMLInputElement>) {
+  async function handleAvatarFile(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       setStatus('Escolha um arquivo de imagem.');
       return;
     }
-    if (file.size > 700 * 1024) {
-      setStatus('Use uma foto com ate 700 KB para salvar no perfil.');
+    if (file.size > 4 * 1024 * 1024) {
+      setStatus('Use uma foto com ate 4 MB para salvar no perfil.');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setProfileForm((current) => ({ ...current, avatar: String(reader.result) }));
-      setStatus('Foto carregada. Clique em salvar perfil para gravar.');
-    };
-    reader.readAsDataURL(file);
+    if (!user?.id) {
+      setStatus('Usuario nao autenticado.');
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    setStatus('Enviando foto para o Firebase Storage...');
+
+    try {
+      const safeFileName = file.name.replace(/[^a-zA-Z0-9.-_]/g, '-');
+      const fileRef = storageRef(storage, `avatars/${user.id}/${Date.now()}-${safeFileName}`);
+      await uploadBytes(fileRef, file, { contentType: file.type });
+      const url = await getDownloadURL(fileRef);
+      setProfileForm((current) => ({ ...current, avatar: url }));
+      setStatus('Foto enviada. Clique em salvar perfil para gravar no usuario.');
+    } catch {
+      setStatus('Nao foi possivel enviar a foto. Verifique o Firebase Storage.');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
   }
 
   const stats = [
-    { label: 'Clientes', value: String(clients.length), icon: Users },
-    { label: 'Projetos Ativos', value: String(projects.filter((project) => project.status !== 'Concluido').length), icon: FolderOpen },
-    { label: 'Tickets Abertos', value: String(totals.openTickets), icon: MessageSquare },
-    { label: 'Faturado Pago', value: toMoney(totals.invoiceRevenue), icon: CreditCard },
+    { label: 'Clientes', value: String(clients.length), icon: Users, hint: 'base cadastrada' },
+    { label: 'Projetos Ativos', value: String(projects.filter((project) => project.status !== 'Concluido').length), icon: FolderOpen, hint: 'em operacao' },
+    { label: 'Tickets Abertos', value: String(totals.openTickets), icon: MessageSquare, hint: 'precisam de resposta' },
+    { label: 'Faturado Pago', value: toMoney(totals.invoiceRevenue), icon: CreditCard, hint: 'recebido' },
   ];
+
+  const currentTab = tabs.find((tab) => tab.id === activeTab) || tabs[0];
+  const CurrentTabIcon = currentTab.icon;
 
   const renderOverview = () => (
     <div className="space-y-8">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="rounded-xl border border-[#159AFD]/30 bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 p-6">
-            <stat.icon className="mb-4 h-8 w-8 text-[#159AFD]" />
-            <p className="mb-1 text-2xl font-bold text-white">{stat.value}</p>
-            <p className="text-sm text-gray-400">{stat.label}</p>
+          <div key={stat.label} className={`${panelClass} p-5`}>
+            <div className="mb-5 flex items-center justify-between gap-4">
+              <div className="flex h-11 w-11 items-center justify-center rounded-md bg-[#159AFD]/15 text-[#159AFD]">
+                <stat.icon className="h-6 w-6" />
+              </div>
+              <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-semibold text-slate-400">{stat.hint}</span>
+            </div>
+            <p className="mb-1 truncate text-2xl font-black text-white">{stat.value}</p>
+            <p className="text-sm text-slate-400">{stat.label}</p>
           </div>
         ))}
       </div>
-      <div className="grid gap-6 lg:grid-cols-3">
-        <EmptyState title="Pedidos recentes" text={`${orders.length} pedido(s) cadastrado(s) no sistema.`} />
-        <EmptyState title="Receita de projetos" text={toMoney(totals.projectRevenue)} />
-        <EmptyState title="Notificacoes" text={`${notifications.length} notificacao(oes) criadas.`} />
+
+      <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
+        <div className={`${panelClass} p-6`}>
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-bold text-white">Operacao em tempo real</h3>
+              <p className="mt-1 text-sm text-slate-400">Resumo puxado das colecoes do Firestore.</p>
+            </div>
+            <BarChart3 className="h-6 w-6 text-[#159AFD]" />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-md bg-white/[0.04] p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Pedidos</p>
+              <p className="mt-2 text-2xl font-black text-white">{orders.length}</p>
+            </div>
+            <div className="rounded-md bg-white/[0.04] p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Receita projetos</p>
+              <p className="mt-2 text-2xl font-black text-white">{toMoney(totals.projectRevenue)}</p>
+            </div>
+            <div className="rounded-md bg-white/[0.04] p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Notificacoes</p>
+              <p className="mt-2 text-2xl font-black text-white">{notifications.length}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className={`${panelClass} p-6`}>
+          <h3 className="text-lg font-bold text-white">Proximas acoes</h3>
+          <div className="mt-5 space-y-3">
+            {[
+              `${orders.filter((order) => order.status !== 'Concluido').length} pedido(s) em aberto`,
+              `${tickets.filter((ticket) => ticket.status !== 'Resolvido').length} ticket(s) aguardando`,
+              `${invoices.filter((invoice) => invoice.status !== 'Pago').length} faturamento(s) pendente(s)`,
+            ].map((item) => (
+              <div key={item} className="rounded-md border border-white/10 bg-white/[0.03] px-4 py-3 text-sm font-semibold text-slate-300">
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -543,22 +604,23 @@ const AdminDashboard = () => {
           const result = await updateUserProfile(profileForm);
           setStatus(result.message);
         }}
-        className="rounded-xl border border-[#159AFD]/30 bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 p-6"
+        className={`${panelClass} p-6`}
       >
-        <h3 className="mb-5 text-xl font-semibold text-white">Meu perfil de admin</h3>
+        <h3 className="mb-5 text-xl font-bold text-white">Meu perfil de admin</h3>
         <div className="space-y-4">
           <Field label="Nome" value={profileForm.name} onChange={(name) => setProfileForm({ ...profileForm, name })} />
           <Field label="Empresa" value={profileForm.company} onChange={(company) => setProfileForm({ ...profileForm, company })} />
           <Field label="URL da foto" value={profileForm.avatar} onChange={(avatar) => setProfileForm({ ...profileForm, avatar })} required={false} />
-          <label className="block text-sm font-medium text-gray-300">
+          <label className="block text-sm font-semibold text-slate-300">
             Enviar foto do computador
-            <input type="file" accept="image/*" onChange={handleAvatarFile} className="mt-2 w-full rounded-lg border border-dashed border-[#159AFD]/30 bg-black/30 p-3 text-sm text-gray-300 file:mr-4 file:rounded-lg file:border-0 file:bg-[#159AFD] file:px-4 file:py-2 file:font-semibold file:text-white" />
+            <input type="file" accept="image/*" onChange={handleAvatarFile} className="mt-2 w-full rounded-md border border-dashed border-white/15 bg-slate-950/70 p-3 text-sm text-slate-300 file:mr-4 file:rounded-md file:border-0 file:bg-[#159AFD] file:px-4 file:py-2 file:font-semibold file:text-white" />
+            {isUploadingAvatar && <span className="mt-2 block text-xs text-sky-300">Enviando imagem...</span>}
           </label>
-          <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#159AFD] px-4 py-3 font-semibold text-white hover:bg-[#508AD0]">Salvar perfil</button>
+          <button disabled={isUploadingAvatar} className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 font-bold text-white transition hover:bg-[#508AD0] disabled:cursor-not-allowed disabled:bg-slate-600">Salvar perfil</button>
         </div>
       </form>
-      <div className="rounded-xl border border-[#159AFD]/30 bg-black/20 p-6">
-        <h3 className="mb-5 text-xl font-semibold text-white">Previa</h3>
+      <div className={`${panelClass} p-6`}>
+        <h3 className="mb-5 text-xl font-bold text-white">Previa</h3>
         <div className="flex items-center gap-4">
           <img src={profileForm.avatar || user?.avatar} alt={profileForm.name} className="h-20 w-20 rounded-full border-2 border-[#159AFD] object-cover" />
           <div>
@@ -573,20 +635,35 @@ const AdminDashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-white sm:text-3xl">Painel Administrativo</h1>
-            <p className="mt-1 text-gray-400">Bem-vindo, {user?.name}. Role: {user?.role}</p>
+      <div className="space-y-6">
+        <div className="overflow-hidden rounded-lg border border-white/10 bg-slate-950/70 shadow-xl shadow-black/20">
+          <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+            <div className="flex min-w-0 items-start gap-4">
+              <div className="flex h-12 w-12 flex-none items-center justify-center rounded-md bg-[#159AFD]/15 text-[#159AFD]">
+                <CurrentTabIcon className="h-6 w-6" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#159AFD]">Painel Administrativo</p>
+                <h1 className="mt-2 text-2xl font-black text-white sm:text-3xl">{currentTab.label}</h1>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">{currentTab.description}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-md border border-white/10 bg-white/[0.03] p-3">
+              <img src={user?.avatar} alt={user?.name} className="h-11 w-11 rounded-full border border-[#159AFD]/50 object-cover" />
+              <div className="min-w-0">
+                <p className="truncate text-sm font-bold text-white">{user?.name}</p>
+                <p className="text-xs uppercase tracking-wide text-slate-500">{user?.role}</p>
+              </div>
+            </div>
           </div>
-          <img src={user?.avatar} alt={user?.name} className="h-10 w-10 rounded-full border-2 border-[#159AFD] object-cover" />
         </div>
 
-        {status && <div className="rounded-lg border border-emerald-400/30 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-200">{status}</div>}
+        {status && <div className="rounded-md border border-emerald-400/25 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-200">{status}</div>}
 
-        <div className="mobile-scrollbar flex space-x-1 overflow-x-auto rounded-xl border border-[#159AFD]/30 bg-[#0D0F52]/30 p-1">
+        <div className="mobile-scrollbar flex gap-2 overflow-x-auto rounded-lg border border-white/10 bg-slate-950/55 p-2 shadow-lg shadow-black/10">
           {tabs.map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex flex-none items-center whitespace-nowrap rounded-lg px-4 py-2 transition-all ${activeTab === tab.id ? 'bg-[#159AFD] text-white' : 'text-gray-400 hover:bg-[#159AFD]/20 hover:text-white'}`}>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex flex-none items-center whitespace-nowrap rounded-md px-4 py-2.5 text-sm font-bold transition-all ${activeTab === tab.id ? 'bg-[#159AFD] text-white shadow-lg shadow-[#159AFD]/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
               <tab.icon className="mr-2 h-4 w-4" />
               {tab.label}
             </button>
@@ -632,30 +709,40 @@ function CrudPanel({
   emptyText: string;
 }) {
   return (
-    <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-      <form onSubmit={onSubmit} className="rounded-xl border border-[#159AFD]/30 bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 p-6">
-        <h3 className="mb-5 text-xl font-semibold text-white">{title}</h3>
+    <div className="grid gap-6 lg:grid-cols-[0.78fr_1.22fr]">
+      <form onSubmit={onSubmit} className={`${panelClass} p-5 sm:p-6`}>
+        <div className="mb-5 border-b border-white/10 pb-4">
+          <h3 className="text-xl font-bold text-white">{title}</h3>
+          <p className="mt-1 text-sm text-slate-500">Preencha os dados e salve no banco.</p>
+        </div>
         <div className="space-y-4">
           {form}
-          <button className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#159AFD] px-4 py-3 font-semibold text-white hover:bg-[#508AD0]">
+          <button className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 font-bold text-white shadow-lg shadow-[#159AFD]/20 transition hover:bg-[#508AD0]">
             <Plus className="h-5 w-5" />
             Salvar
           </button>
         </div>
       </form>
 
-      <div className="space-y-3">
+      <div className={`${panelClass} min-h-[360px] p-4 sm:p-5`}>
+        <div className="mb-4 flex items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div>
+            <h3 className="text-lg font-bold text-white">Registros</h3>
+            <p className="mt-1 text-sm text-slate-500">{items.length} item(ns) encontrado(s)</p>
+          </div>
+        </div>
+        <div className="space-y-3">
         {items.length === 0 && <EmptyState title={emptyText} text="Cadastre o primeiro registro pelo formulario ao lado." />}
         {items.map((item) => (
-          <article key={item.id} className="rounded-xl border border-[#159AFD]/30 bg-black/20 p-4">
+          <article key={item.id} className="rounded-md border border-white/10 bg-white/[0.035] p-4 transition hover:border-[#159AFD]/35 hover:bg-white/[0.055]">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h4 className="font-semibold text-white">{item.title}</h4>
                   {item.status && <StatusPill value={item.status} />}
                 </div>
-                <p className="mt-1 text-sm text-gray-400">{item.subtitle}</p>
-                {item.meta && <p className="mt-1 break-words text-sm text-gray-500">{item.meta}</p>}
+                <p className="mt-1 text-sm text-slate-400">{item.subtitle}</p>
+                {item.meta && <p className="mt-1 break-words text-sm text-slate-500">{item.meta}</p>}
                 {item.link && (
                   <a href={item.link} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm font-semibold text-[#159AFD] hover:text-white">
                     Abrir documento
@@ -664,11 +751,11 @@ function CrudPanel({
               </div>
               <div className="flex flex-wrap gap-2">
                 {item.actions?.map((action) => (
-                  <button key={action.label} type="button" onClick={action.onClick} className="rounded-lg border border-[#159AFD]/30 px-3 py-2 text-sm text-sky-200 hover:bg-[#159AFD]/10">
+                  <button key={action.label} type="button" onClick={action.onClick} className="rounded-md border border-[#159AFD]/25 px-3 py-2 text-sm font-semibold text-sky-200 transition hover:bg-[#159AFD]/10">
                     {action.label}
                   </button>
                 ))}
-                <button type="button" onClick={item.remove} className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-400/30 px-3 py-2 text-sm text-red-300 hover:bg-red-500/10">
+                <button type="button" onClick={item.remove} className="inline-flex items-center justify-center gap-2 rounded-md border border-red-400/25 px-3 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-500/10">
                   <Trash2 className="h-4 w-4" />
                   Remover
                 </button>
@@ -676,6 +763,7 @@ function CrudPanel({
             </div>
           </article>
         ))}
+        </div>
       </div>
     </div>
   );
