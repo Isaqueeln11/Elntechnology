@@ -34,8 +34,14 @@ const BlogPreview = () => {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-b from-gray-800/50 to-[#0D0F52]/30 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 bg-gradient-to-b from-gray-800/50 to-[#0D0F52]/30 relative overflow-hidden">
+      {/* Background pattern */}
+      <div
+        className="absolute inset-0 opacity-30 pointer-events-none"
+        style={{ backgroundImage: blogPatternBackground }}
+      ></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
           <div className="flex items-center justify-center mb-4">
             <div className="inline-block bg-[#159AFD]/10 backdrop-blur-sm px-6 py-2 rounded-full border border-[#159AFD]/30 mb-6">
@@ -103,12 +109,6 @@ const BlogPreview = () => {
             <ArrowRight className="w-5 h-5 ml-2" />
           </button>
         </div>
-        
-        {/* Background pattern */}
-        <div
-          className="absolute inset-0 opacity-30 pointer-events-none"
-          style={{ backgroundImage: blogPatternBackground }}
-        ></div>
       </div>
     </section>
   );
