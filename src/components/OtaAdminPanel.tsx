@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
-import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage';
 import { CheckCircle, Copy, Cpu, Database, Download, FileCode2, Plus, Trash2, UploadCloud } from 'lucide-react';
-import { db, storage } from '../firebase';
+import { db } from '../firebase';
 
 interface FirmwareRelease {
   id: string;
@@ -23,7 +22,7 @@ const emptyForm = {
   deviceName: 'Gateway IoT ESP32',
   board: 'esp32',
   version: '',
-  binUrl: '/firmware/esp32-gateway-1.0.1.bin',
+  binUrl: '',
   sha256: '',
   size: '',
   notes: '',
@@ -35,6 +34,24 @@ async function fileSha256(file: File) {
   return Array.from(new Uint8Array(hashBuffer))
     .map((byte) => byte.toString(16).padStart(2, '0'))
     .join('');
+}
+
+async function resolveGitHubReleaseBinUrl(url: string) {
+  const match = url.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/releases\/tag\/([^/?#]+)/i);
+
+  if (!match) return url;
+
+  const [, owner, repo, tag] = match;
+  const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases/tags/${tag}`);
+
+  if (!response.ok) return url;
+
+  const release = await response.json() as {
+    assets?: Array<{ name: string; browser_download_url: string; size?: number }>;
+  };
+  const asset = release.assets?.find((item) => item.name.toLowerCase().endsWith('.bin'));
+
+  return asset?.browser_download_url || url;
 }
 
 function makeManifest(releases: FirmwareRelease[]) {
@@ -101,28 +118,14 @@ const OtaAdminPanel = () => {
     try {
       let binUrl = form.binUrl.trim();
 
-      if (firmwareFile) {
-        const safeDeviceId = form.deviceId.trim().replace(/[^a-zA-Z0-9-_]/g, '-');
-        const safeVersion = form.version.trim().replace(/[^a-zA-Z0-9.-_]/g, '-');
-        const safeFileName = firmwareFile.name.replace(/[^a-zA-Z0-9.-_]/g, '-');
-        const fileRef = storageRef(storage, `firmware/${safeDeviceId}/${safeVersion}/${Date.now()}-${safeFileName}`);
-
-        setDatabaseStatus('Enviando arquivo .bin para o Firebase Storage...');
-        await uploadBytes(fileRef, firmwareFile, {
-          contentType: 'application/octet-stream',
-          customMetadata: {
-            deviceId: form.deviceId,
-            version: form.version,
-          },
-        });
-        binUrl = await getDownloadURL(fileRef);
-      }
-
       if (!binUrl) {
-        setDatabaseStatus('Envie um arquivo .bin ou cole uma URL valida.');
+        setDatabaseStatus('Cole o link do .bin ou o link da release do GitHub. No plano gratis, o arquivo precisa ficar hospedado fora do Firebase Storage.');
         setIsSaving(false);
         return;
       }
+
+      setDatabaseStatus('Verificando link do firmware...');
+      binUrl = await resolveGitHubReleaseBinUrl(binUrl);
 
       await addDoc(collection(db, 'firmwareReleases'), {
         ...form,
@@ -142,7 +145,7 @@ const OtaAdminPanel = () => {
       setFirmwareFile(null);
       setDatabaseStatus('Firmware salvo no Firestore.');
     } catch {
-      setDatabaseStatus('Erro ao salvar/upload do firmware. Verifique Storage, regras e conexao.');
+      setDatabaseStatus('Erro ao salvar firmware. Verifique permissao do Firestore e o link informado.');
     } finally {
       setIsSaving(false);
     }
@@ -165,11 +168,10 @@ const OtaAdminPanel = () => {
       const sha256 = await fileSha256(file);
       setForm((current) => ({
         ...current,
-        binUrl: '',
         sha256,
         size: String(file.size),
       }));
-      setDatabaseStatus(`Arquivo selecionado: ${file.name}. SHA-256 calculado.`);
+      setDatabaseStatus(`Arquivo selecionado: ${file.name}. SHA-256 calculado. Agora cole o link da release ou do .bin hospedado.`);
     } catch {
       setDatabaseStatus('Nao foi possivel calcular o SHA-256 do arquivo.');
     }
@@ -286,7 +288,7 @@ const OtaAdminPanel = () => {
             </div>
 
             <label className="block text-sm font-medium text-gray-300">
-              Arquivo .bin do firmware
+              Arquivo .bin local, para calcular SHA-256 e tamanho
               <input
                 type="file"
                 accept=".bin,application/octet-stream"
@@ -297,14 +299,15 @@ const OtaAdminPanel = () => {
             </label>
 
             <label className="block text-sm font-medium text-gray-300">
-              URL do .bin, caso ja esteja hospedado
+              Link do GitHub Release ou URL direta do .bin
               <input
                 value={form.binUrl}
                 onChange={(event) => setForm({ ...form, binUrl: event.target.value })}
                 className="mt-2 w-full rounded-lg border border-[#159AFD]/20 bg-black/30 p-3 text-white outline-none focus:border-[#159AFD]"
-                placeholder="https://.../firmware.bin"
-                required={!firmwareFile}
+                placeholder="https://github.com/Isaqueeln11/valvula-pro/releases/tag/v2.5.5"
+                required
               />
+              <span className="mt-2 block text-xs text-gray-500">Se for link de release do GitHub, o sistema tenta encontrar o primeiro asset .bin automaticamente.</span>
             </label>
 
             <label className="block text-sm font-medium text-gray-300">

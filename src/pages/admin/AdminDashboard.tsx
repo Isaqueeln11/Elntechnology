@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage';
 import {
   BarChart3,
   Bell,
@@ -16,7 +15,7 @@ import {
   Users,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { db, storage } from '../../firebase';
+import { db } from '../../firebase';
 import DashboardLayout from '../../components/DashboardLayout';
 import OtaAdminPanel from '../../components/OtaAdminPanel';
 
@@ -181,6 +180,39 @@ function StatusPill({ value }: { value?: string }) {
   return <span className={`rounded-full border px-3 py-1 text-xs font-bold ${color}`}>{value || 'Aberto'}</span>;
 }
 
+function compressImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      image.src = String(reader.result);
+    };
+
+    reader.onerror = () => reject(new Error('Nao foi possivel ler a imagem.'));
+
+    image.onload = () => {
+      const maxSize = 520;
+      const ratio = Math.min(maxSize / image.width, maxSize / image.height, 1);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(image.width * ratio);
+      canvas.height = Math.round(image.height * ratio);
+      const context = canvas.getContext('2d');
+
+      if (!context) {
+        reject(new Error('Nao foi possivel preparar a imagem.'));
+        return;
+      }
+
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', 0.82));
+    };
+
+    image.onerror = () => reject(new Error('Arquivo de imagem invalido.'));
+    reader.readAsDataURL(file);
+  });
+}
+
 const AdminDashboard = () => {
   const { user, updateUserProfile } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
@@ -266,17 +298,14 @@ const AdminDashboard = () => {
     }
 
     setIsUploadingAvatar(true);
-    setStatus('Enviando foto para o Firebase Storage...');
+    setStatus('Preparando foto para salvar no perfil...');
 
     try {
-      const safeFileName = file.name.replace(/[^a-zA-Z0-9.-_]/g, '-');
-      const fileRef = storageRef(storage, `avatars/${user.id}/${Date.now()}-${safeFileName}`);
-      await uploadBytes(fileRef, file, { contentType: file.type });
-      const url = await getDownloadURL(fileRef);
-      setProfileForm((current) => ({ ...current, avatar: url }));
-      setStatus('Foto enviada. Clique em salvar perfil para gravar no usuario.');
+      const avatar = await compressImage(file);
+      setProfileForm((current) => ({ ...current, avatar }));
+      setStatus('Foto carregada. Clique em salvar perfil para gravar no usuario.');
     } catch {
-      setStatus('Nao foi possivel enviar a foto. Verifique o Firebase Storage.');
+      setStatus('Nao foi possivel carregar a foto. Tente outra imagem.');
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -614,7 +643,7 @@ const AdminDashboard = () => {
           <label className="block text-sm font-semibold text-slate-300">
             Enviar foto do computador
             <input type="file" accept="image/*" onChange={handleAvatarFile} className="mt-2 w-full rounded-md border border-dashed border-white/15 bg-slate-950/70 p-3 text-sm text-slate-300 file:mr-4 file:rounded-md file:border-0 file:bg-[#159AFD] file:px-4 file:py-2 file:font-semibold file:text-white" />
-            {isUploadingAvatar && <span className="mt-2 block text-xs text-sky-300">Enviando imagem...</span>}
+            {isUploadingAvatar && <span className="mt-2 block text-xs text-sky-300">Preparando imagem...</span>}
           </label>
           <button disabled={isUploadingAvatar} className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 font-bold text-white transition hover:bg-[#508AD0] disabled:cursor-not-allowed disabled:bg-slate-600">Salvar perfil</button>
         </div>
@@ -661,11 +690,19 @@ const AdminDashboard = () => {
 
         {status && <div className="rounded-md border border-emerald-400/25 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-200">{status}</div>}
 
-        <div className="mobile-scrollbar flex gap-2 overflow-x-auto rounded-lg border border-white/10 bg-slate-950/55 p-2 shadow-lg shadow-black/10">
+        <div className="grid grid-cols-2 gap-2 rounded-lg border border-white/10 bg-slate-950/55 p-2 shadow-lg shadow-black/10 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
           {tabs.map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex flex-none items-center whitespace-nowrap rounded-md px-4 py-2.5 text-sm font-bold transition-all ${activeTab === tab.id ? 'bg-[#159AFD] text-white shadow-lg shadow-[#159AFD]/20' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
-              <tab.icon className="mr-2 h-4 w-4" />
-              {tab.label}
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex min-h-12 items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-bold transition-all ${
+                activeTab === tab.id
+                  ? 'bg-[#159AFD] text-white shadow-lg shadow-[#159AFD]/20'
+                  : 'text-slate-400 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              <tab.icon className="h-4 w-4 flex-none" />
+              <span className="min-w-0 truncate">{tab.label}</span>
             </button>
           ))}
         </div>
