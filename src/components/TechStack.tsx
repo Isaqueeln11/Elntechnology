@@ -1,10 +1,6 @@
 import React from 'react';
 import { Code, Cpu, Wifi, Zap, Wrench, Layers, Activity, Thermometer, Radio, Bluetooth, MessageSquare, Cable, BarChart, Box, Settings } from 'lucide-react';
 
-const techStackPatternBackground = `url("data:image/svg+xml;utf8,${encodeURIComponent(
-  '<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="#159AFD" fill-opacity="0.05"><circle cx="30" cy="30" r="1"/></g></g></svg>'
-)})`;
-
 const TechStack = () => {
   const techCategories = [
     {
@@ -65,14 +61,8 @@ const TechStack = () => {
   ];
 
   return (
-    <section id="tech-stack" className="py-20 bg-gradient-to-b from-black/50 to-[#0D0F52]/30 relative overflow-hidden">
-      {/* Background grid pattern */}
-      <div
-        className="absolute inset-0 opacity-50 pointer-events-none"
-        style={{ backgroundImage: techStackPatternBackground }}
-      ></div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <section id="tech-stack" className="py-20 bg-gradient-to-b from-black/50 to-[#0D0F52]/30 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <div className="inline-block bg-[#159AFD]/10 backdrop-blur-sm px-6 py-2 rounded-full border border-[#159AFD]/30 mb-6">
             <span className="text-[#159AFD] font-semibold text-sm uppercase tracking-wider">Tecnologia</span>
@@ -104,6 +94,9 @@ const TechStack = () => {
             </div>
           ))}
         </div>
+        
+        {/* Background grid pattern */}
+        <div className="absolute inset-0 tech-stack-pattern opacity-50 pointer-events-none"></div>
       </div>
     </section>
   );
