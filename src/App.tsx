@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { doc, onSnapshot } from 'firebase/firestore';
 import {
   ArrowRight,
   BarChart3,
@@ -45,10 +46,12 @@ import {
   DesenvolvimentosPage,
   EquipePage,
   MelhoriasPage,
+  NoticiasInovacoesPage,
   ProdutosPage,
   ProjetosDesenvolvidos,
   VideosFuturoPage,
 } from './pages/CompanyPages';
+import { db } from './firebase';
 import logoUrl from '../ELN TECHNOLOGY.svg';
 
 const navLinks = [
@@ -187,7 +190,22 @@ const siteAreas = [
     text: 'Espaco para demonstracoes, novidades, roadmap e videos futuros.',
     href: '/videos-futuro',
   },
+  {
+    icon: Sparkles,
+    title: 'Noticias e inovacoes',
+    text: 'Publique novidades, lancamentos, comunicados e evolucoes do sistema.',
+    href: '/noticias-inovacoes',
+  },
 ];
+
+const defaultAreasSection = {
+  eyebrow: 'Espacos do site',
+  title: 'Areas da ELN Technology para acompanhar projetos, equipe, produtos e novidades.',
+  description:
+    'Cada area tem sua propria pagina. Voce acompanha projetos, documentos, produtos, videos, noticias e informacoes publicadas pela ELN.',
+  buttonLabel: 'Ver noticias e inovacoes',
+  buttonHref: '/noticias-inovacoes',
+};
 
 function BrandName({ className = '' }: { className?: string }) {
   return (
@@ -201,7 +219,17 @@ function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [selectedService, setSelectedService] = React.useState('IoT e automacao');
   const [formStatus, setFormStatus] = React.useState('');
+  const [areasSection, setAreasSection] = React.useState(defaultAreasSection);
   const { isDark, toggleTheme } = useTheme();
+
+  React.useEffect(() => {
+    const unsubscribe = onSnapshot(doc(db, 'siteSettings', 'areasSection'), (snapshot) => {
+      if (!snapshot.exists()) return;
+      setAreasSection({ ...defaultAreasSection, ...snapshot.data() });
+    });
+
+    return unsubscribe;
+  }, []);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -407,19 +435,19 @@ function HomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
               <div>
-                <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Espacos do site</p>
+                <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">{areasSection.eyebrow}</p>
                 <h2 className={`mt-3 max-w-4xl text-3xl font-black leading-tight sm:text-5xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
-                  Subpaginas prontas para organizar conteudo, equipe, produtos e evolucao.
+                  {areasSection.title}
                 </h2>
                 <p className={`mt-5 max-w-3xl text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                  Cada area agora tem sua propria pagina, com espaco para fotos, videos, status, arquivos, valores e informacoes que voce for cadastrando.
+                  {areasSection.description}
                 </p>
               </div>
               <Link
-                to="/dashboard?tab=sitePages"
+                to={areasSection.buttonHref || '/noticias-inovacoes'}
                 className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 font-black text-white transition hover:bg-[#0D0F52]"
               >
-                Abrir admin
+                {areasSection.buttonLabel || 'Ver novidades'}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -708,6 +736,7 @@ function App() {
             <Route path="/desenvolvimentos" element={<DesenvolvimentosPage />} />
             <Route path="/produtos" element={<ProdutosPage />} />
             <Route path="/videos-futuro" element={<VideosFuturoPage />} />
+            <Route path="/noticias-inovacoes" element={<NoticiasInovacoesPage />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route path="/dashboard/paginas" element={<Navigate to="/dashboard?tab=sitePages" replace />} />
             <Route

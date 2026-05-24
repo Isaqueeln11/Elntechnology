@@ -238,6 +238,33 @@ const pages: Record<string, PageData> = {
     ],
     workflow: ['Gravar conteudo', 'Adicionar link', 'Publicar destaque', 'Atualizar roadmap'],
   },
+  noticias: {
+    key: 'noticias',
+    eyebrow: 'Noticias e inovacoes',
+    title: 'Novidades, lancamentos e melhorias publicadas pela ELN Technology.',
+    description:
+      'Aqui voce acompanha comunicados, atualizacoes do sistema, videos, lancamentos, evolucoes de produtos e noticias importantes.',
+    icon: Rocket,
+    highlight: 'Espaco para publicar novidades pelo admin sem mexer no codigo do site.',
+    sections: [
+      {
+        title: 'Noticias',
+        text: 'Comunicados oficiais sobre a empresa, projetos, eventos e novidades.',
+        items: ['Titulo', 'Resumo', 'Data', 'Link'],
+      },
+      {
+        title: 'Inovacoes',
+        text: 'Atualizacoes de sistema, novas funcoes, produtos e tecnologias em teste.',
+        items: ['Melhoria', 'Produto', 'Versao', 'Resultado'],
+      },
+      {
+        title: 'Conteudos futuros',
+        text: 'Espaco para videos, artigos, demonstracoes e materiais de divulgacao.',
+        items: ['Video', 'Imagem', 'Documento', 'Publicacao'],
+      },
+    ],
+    workflow: ['Criar novidade', 'Adicionar midia', 'Publicar no site', 'Atualizar quando evoluir'],
+  },
 };
 
 const quickLinks = [
@@ -247,6 +274,7 @@ const quickLinks = [
   { label: 'Analise', to: '/atividades-analise', icon: BarChart3 },
   { label: 'Produtos', to: '/produtos', icon: Package },
   { label: 'Videos', to: '/videos-futuro', icon: MonitorPlay },
+  { label: 'Noticias', to: '/noticias-inovacoes', icon: Rocket },
 ];
 
 function CompanyPage({ data }: { data: PageData }) {
@@ -308,13 +336,13 @@ function CompanyPage({ data }: { data: PageData }) {
               <p className={`mt-5 max-w-3xl text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{data.description}</p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                  to="/dashboard?tab=sitePages"
+                <a
+                  href="#conteudos"
                   className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 font-black text-white transition hover:bg-[#0D0F52]"
                 >
-                  Abrir dashboard
+                  Ver conteudos publicados
                   <ArrowRight className="h-4 w-4" />
-                </Link>
+                </a>
                 <Link
                   to="/#contato"
                   className={`inline-flex items-center justify-center gap-2 rounded-md border px-5 py-3 font-black transition ${isDark ? 'border-white/15 text-white hover:bg-white/10' : 'border-sky-200 text-[#0D0F52] hover:bg-sky-50'}`}
@@ -359,7 +387,7 @@ function CompanyPage({ data }: { data: PageData }) {
           </div>
         </section>
 
-        <section className="pb-16">
+        <section id="conteudos" className="pb-16">
           <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
             {data.sections.map((section) => (
               <article key={section.title} className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
@@ -393,8 +421,8 @@ function CompanyPage({ data }: { data: PageData }) {
                   Conteudos adicionados pelo painel
                 </h2>
               </div>
-              <Link to="/dashboard?tab=sitePages" className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
-                Adicionar conteudo
+              <Link to="/noticias-inovacoes" className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
+                Ver noticias
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -403,7 +431,7 @@ function CompanyPage({ data }: { data: PageData }) {
               <div className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
                 <p className="font-black">Nenhum conteudo publicado ainda.</p>
                 <p className={`mt-2 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                  Abra o dashboard, entre em Paginas do site e publique documentos, videos, produtos, projetos ou melhorias para aparecer aqui.
+                  Esta area vai mostrar os documentos, videos, produtos e novidades publicados pela ELN Technology.
                 </p>
               </div>
             ) : (
@@ -479,4 +507,8 @@ export function ProdutosPage() {
 
 export function VideosFuturoPage() {
   return <CompanyPage data={pages.videos} />;
+}
+
+export function NoticiasInovacoesPage() {
+  return <CompanyPage data={pages.noticias} />;
 }

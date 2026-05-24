@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, onSnapshot, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { useSearchParams } from 'react-router-dom';
 import {
   Activity,
@@ -141,6 +141,13 @@ const tabs = [
 
 const inputClass = 'mt-2 w-full rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10 dark:border-white/10 dark:bg-slate-950/70 dark:text-white dark:placeholder:text-slate-500';
 const panelClass = 'rounded-lg border border-slate-200 bg-white shadow-xl shadow-slate-200/60 dark:border-white/10 dark:bg-slate-950/55 dark:shadow-black/10';
+const defaultAreasSectionForm = {
+  eyebrow: 'Espacos do site',
+  title: 'Areas da ELN Technology para acompanhar projetos, equipe, produtos e novidades.',
+  description: 'Cada area tem sua propria pagina. Voce acompanha projetos, documentos, produtos, videos, noticias e informacoes publicadas pela ELN.',
+  buttonLabel: 'Ver noticias e inovacoes',
+  buttonHref: '/noticias-inovacoes',
+};
 
 function toMoney(value: number) {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -269,6 +276,7 @@ const AdminDashboard = () => {
   const [registeredUsers, setRegisteredUsers] = useState<UserRecord[]>([]);
   const [systemEvents, setSystemEvents] = useState<SystemEventRecord[]>([]);
   const [siteContent, setSiteContent] = useState<SiteContentRecord[]>([]);
+  const [areasSectionForm, setAreasSectionForm] = useState(defaultAreasSectionForm);
 
   const [clientForm, setClientForm] = useState({ name: '', email: '', phone: '', company: '' });
   const [projectForm, setProjectForm] = useState({ name: '', client: '', status: 'Planejamento', budget: '', deadline: '', technician: '', progress: '0', description: '' });
@@ -327,6 +335,11 @@ const AdminDashboard = () => {
       onSnapshot(collection(db, 'users'), (snapshot) => setRegisteredUsers(asList<UserRecord>(snapshot))),
       onSnapshot(collection(db, 'systemEvents'), (snapshot) => setSystemEvents(asList<SystemEventRecord>(snapshot))),
       onSnapshot(collection(db, 'siteContent'), (snapshot) => setSiteContent(asList<SiteContentRecord>(snapshot))),
+      onSnapshot(doc(db, 'siteSettings', 'areasSection'), (snapshot) => {
+        if (snapshot.exists()) {
+          setAreasSectionForm({ ...defaultAreasSectionForm, ...snapshot.data() });
+        }
+      }),
     ];
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
@@ -682,52 +695,85 @@ const AdminDashboard = () => {
   );
 
   const renderSitePages = () => (
-    <CrudPanel
-      title="Publicar nas subpaginas"
-      onSubmit={(event) => {
-        event.preventDefault();
-        createRecord(
-          'siteContent',
-          siteContentForm,
-          () => setSiteContentForm({ page: 'projetos', type: 'Projeto', title: '', description: '', url: '', status: 'Publicado' }),
-          'Conteudo publicado na subpagina.',
-        );
-      }}
-      form={
-        <>
-          <SelectField
-            label="Subpagina"
-            value={siteContentForm.page}
-            onChange={(page) => setSiteContentForm({ ...siteContentForm, page })}
-            options={['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'produtos', 'videos']}
-          />
-          <SelectField
-            label="Tipo de conteudo"
-            value={siteContentForm.type}
-            onChange={(type) => setSiteContentForm({ ...siteContentForm, type })}
-            options={['Projeto', 'Documento', 'Video', 'Produto', 'Melhoria', 'Equipe', 'Atividade', 'Link']}
-          />
-          <Field label="Titulo" value={siteContentForm.title} onChange={(title) => setSiteContentForm({ ...siteContentForm, title })} />
-          <Field label="Link, documento, imagem ou video" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="https://..." required={false} />
-          <SelectField label="Status" value={siteContentForm.status} onChange={(statusValue) => setSiteContentForm({ ...siteContentForm, status: statusValue })} options={['Publicado', 'Rascunho']} />
-          <TextAreaField label="Descricao" value={siteContentForm.description} onChange={(description) => setSiteContentForm({ ...siteContentForm, description })} />
-        </>
-      }
-      emptyText="Nenhum conteudo publicado nas subpaginas."
-      items={siteContent.map((item) => ({
-        id: item.id,
-        title: item.title || 'Conteudo sem titulo',
-        subtitle: `${item.page || 'sem pagina'} - ${item.type || 'Conteudo'} - ${item.status || 'Publicado'}`,
-        meta: item.description || item.url || '',
-        status: item.status,
-        link: item.url,
-        actions: [
-          { label: 'Publicar', onClick: () => changeStatus('siteContent', item.id, 'Publicado') },
-          { label: 'Rascunho', onClick: () => changeStatus('siteContent', item.id, 'Rascunho') },
-        ],
-        remove: () => removeRecord('siteContent', item.id),
-      }))}
-    />
+    <div className="space-y-6">
+      <form
+        onSubmit={async (event) => {
+          event.preventDefault();
+          await setDoc(doc(db, 'siteSettings', 'areasSection'), {
+            ...areasSectionForm,
+            updatedAt: serverTimestamp(),
+            updatedBy: user?.id || '',
+          });
+          setStatus('Secao publica atualizada no site.');
+        }}
+        className={`${panelClass} p-5 sm:p-6`}
+      >
+        <div className="mb-5 border-b border-slate-200 pb-4 dark:border-white/10">
+          <h3 className="text-xl font-bold text-slate-950 dark:text-white">Editar secao publica de areas</h3>
+          <p className="mt-1 text-sm text-slate-500">Altere o titulo, texto e botao que aparecem na pagina inicial.</p>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Field label="Texto pequeno" value={areasSectionForm.eyebrow} onChange={(eyebrow) => setAreasSectionForm({ ...areasSectionForm, eyebrow })} />
+          <Field label="Texto do botao" value={areasSectionForm.buttonLabel} onChange={(buttonLabel) => setAreasSectionForm({ ...areasSectionForm, buttonLabel })} />
+          <Field label="Link do botao" value={areasSectionForm.buttonHref} onChange={(buttonHref) => setAreasSectionForm({ ...areasSectionForm, buttonHref })} />
+          <Field label="Titulo principal" value={areasSectionForm.title} onChange={(title) => setAreasSectionForm({ ...areasSectionForm, title })} />
+          <div className="lg:col-span-2">
+            <TextAreaField label="Descricao" value={areasSectionForm.description} onChange={(description) => setAreasSectionForm({ ...areasSectionForm, description })} />
+          </div>
+        </div>
+        <button className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 font-bold text-white shadow-lg shadow-[#159AFD]/20 transition hover:bg-[#508AD0]">
+          <Plus className="h-5 w-5" />
+          Salvar texto da secao
+        </button>
+      </form>
+
+      <CrudPanel
+        title="Publicar nas subpaginas"
+        onSubmit={(event) => {
+          event.preventDefault();
+          createRecord(
+            'siteContent',
+            siteContentForm,
+            () => setSiteContentForm({ page: 'projetos', type: 'Projeto', title: '', description: '', url: '', status: 'Publicado' }),
+            'Conteudo publicado na subpagina.',
+          );
+        }}
+        form={
+          <>
+            <SelectField
+              label="Subpagina"
+              value={siteContentForm.page}
+              onChange={(page) => setSiteContentForm({ ...siteContentForm, page })}
+              options={['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'produtos', 'videos', 'noticias']}
+            />
+            <SelectField
+              label="Tipo de conteudo"
+              value={siteContentForm.type}
+              onChange={(type) => setSiteContentForm({ ...siteContentForm, type })}
+              options={['Projeto', 'Documento', 'Video', 'Produto', 'Melhoria', 'Equipe', 'Atividade', 'Noticia', 'Inovacao', 'Link']}
+            />
+            <Field label="Titulo" value={siteContentForm.title} onChange={(title) => setSiteContentForm({ ...siteContentForm, title })} />
+            <Field label="Link, documento, imagem ou video" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="https://..." required={false} />
+            <SelectField label="Status" value={siteContentForm.status} onChange={(statusValue) => setSiteContentForm({ ...siteContentForm, status: statusValue })} options={['Publicado', 'Rascunho']} />
+            <TextAreaField label="Descricao" value={siteContentForm.description} onChange={(description) => setSiteContentForm({ ...siteContentForm, description })} />
+          </>
+        }
+        emptyText="Nenhum conteudo publicado nas subpaginas."
+        items={siteContent.map((item) => ({
+          id: item.id,
+          title: item.title || 'Conteudo sem titulo',
+          subtitle: `${item.page || 'sem pagina'} - ${item.type || 'Conteudo'} - ${item.status || 'Publicado'}`,
+          meta: item.description || item.url || '',
+          status: item.status,
+          link: item.url,
+          actions: [
+            { label: 'Publicar', onClick: () => changeStatus('siteContent', item.id, 'Publicado') },
+            { label: 'Rascunho', onClick: () => changeStatus('siteContent', item.id, 'Rascunho') },
+          ],
+          remove: () => removeRecord('siteContent', item.id),
+        }))}
+      />
+    </div>
   );
 
   const renderBilling = () => (
