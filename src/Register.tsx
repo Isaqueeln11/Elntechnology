@@ -60,7 +60,7 @@ const Register = () => {
             Crie uma conta real no Firebase.
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
-            O cadastro agora usa Firebase Authentication e salva o perfil do usuario no Firestore.
+            O cadastro agora usa Firebase Authentication e salva o perfil do usuário no Firestore.
           </p>
           <div className="mt-8 rounded-md border border-sky-100 bg-white p-5 shadow-sm">
             <div className="flex items-center gap-3">
@@ -68,7 +68,7 @@ const Register = () => {
               <span className="font-black text-[#0D0F52]">Senhas ocultas na interface</span>
             </div>
             <p className="mt-3 text-sm leading-6 text-slate-600">
-              A senha fica protegida pelo Firebase Auth. Toda conta nova entra como cliente; permissao de admin deve ser liberada no Firestore.
+              A senha fica protegida pelo Firebase Auth. Toda conta nova entra como cliente; permissão de admin deve ser liberada no Firestore.
             </p>
           </div>
         </section>
@@ -140,7 +140,7 @@ const Register = () => {
             </div>
 
             <div className="rounded-md border border-sky-100 bg-[#F7FBFF] p-4 text-sm font-semibold text-slate-600">
-              Por seguranca, novas contas entram como cliente. Para liberar admin ou tecnico, altere o campo <span className="font-black text-[#0D0F52]">role</span> no Firestore.
+              Por segurança, novas contas entram como cliente. Para liberar admin ou técnico, altere o campo <span className="font-black text-[#0D0F52]">role</span> no Firestore.
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -186,11 +186,11 @@ const Register = () => {
           </form>
 
           <p className="mt-6 text-center text-sm text-slate-500">
-            Ao criar a conta, o Firebase envia um email de verificacao para aumentar a seguranca.
+            Ao criar a conta, o Firebase envia um email de verificacao para aumentar a segurança.
           </p>
 
           <p className="mt-3 text-center text-sm text-slate-500">
-            Ja tem uma conta?{' '}
+            Já tem uma conta?{' '}
             <Link to="/login" className="font-black text-[#159AFD] transition hover:text-[#0D0F52]">
               Fazer login
             </Link>

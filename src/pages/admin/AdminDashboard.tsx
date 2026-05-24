@@ -125,28 +125,28 @@ interface SiteContentRecord extends BaseRecord {
 }
 
 const tabs = [
-  { id: 'overview', label: 'Visao Geral', icon: BarChart3, description: 'Resumo operacional do sistema' },
+  { id: 'overview', label: 'Visão Geral', icon: BarChart3, description: 'Resumo operacional do sistema' },
   { id: 'orders', label: 'Pedidos', icon: PackagePlus, description: 'Novas demandas e aprovacoes' },
   { id: 'clients', label: 'Clientes', icon: Users, description: 'Cadastro e contatos comerciais' },
   { id: 'projects', label: 'Projetos', icon: FolderOpen, description: 'Prazos, valores e andamento' },
-  { id: 'technicians', label: 'Tecnicos', icon: Users, description: 'Equipe tecnica e especialidades' },
+  { id: 'technicians', label: 'Técnicos', icon: Users, description: 'Equipe técnica e especialidades' },
   { id: 'support', label: 'Suporte', icon: MessageSquare, description: 'Tickets e atendimento' },
   { id: 'documents', label: 'Documentos', icon: FileText, description: 'Links, contratos e arquivos' },
-  { id: 'sitePages', label: 'Paginas do site', icon: MonitorPlay, description: 'Conteudo publicado nas subpaginas' },
+  { id: 'sitePages', label: 'Páginas do site', icon: MonitorPlay, description: 'Conteúdo publicado nas subpáginas' },
   { id: 'billing', label: 'Faturamento', icon: CreditCard, description: 'Valores, vencimentos e status' },
-  { id: 'notifications', label: 'Notificacoes', icon: Bell, description: 'Avisos para clientes e equipe' },
-  { id: 'ota', label: 'Codigos OTA', icon: UploadCloud, description: 'Versoes e firmware dos equipamentos' },
+  { id: 'notifications', label: 'Notificações', icon: Bell, description: 'Avisos para clientes e equipe' },
+  { id: 'ota', label: 'Códigos OTA', icon: UploadCloud, description: 'Versões e firmware dos equipamentos' },
   { id: 'settings', label: 'Meu Perfil', icon: Settings, description: 'Dados do administrador' },
 ];
 
 const inputClass = 'mt-2 w-full rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10 dark:border-white/10 dark:bg-slate-950/70 dark:text-white dark:placeholder:text-slate-500';
 const panelClass = 'rounded-lg border border-slate-200 bg-white shadow-xl shadow-slate-200/60 dark:border-white/10 dark:bg-slate-950/55 dark:shadow-black/10';
 const defaultAreasSectionForm = {
-  eyebrow: 'Espacos do site',
-  title: 'Areas da ELN Technology para acompanhar projetos, equipe, produtos e novidades.',
-  description: 'Cada area tem sua propria pagina. Voce acompanha projetos, documentos, produtos, videos, noticias e informacoes publicadas pela ELN.',
-  buttonLabel: 'Ver noticias e inovacoes',
-  buttonHref: '/noticias-inovacoes',
+  eyebrow: 'Espaços do site',
+  title: 'Áreas da ELN Technology para acompanhar projetos, equipe, produtos e novidades.',
+  description: 'Cada área tem sua própria página. Você acompanha projetos, documentos, produtos, vídeos, notícias e informações publicadas pela ELN.',
+  buttonLabel: 'Ver notícias e inovações',
+  buttonHref: '/notícias-inovações',
 };
 
 function toMoney(value: number) {
@@ -219,7 +219,7 @@ function EmptyState({ title, text }: { title: string; text: string }) {
 }
 
 function StatusPill({ value }: { value?: string }) {
-  const color = value === 'Pago' || value === 'Concluido' || value === 'Resolvido' || value === 'Enviada' ? 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200' : 'border-sky-400/20 bg-sky-500/10 text-sky-200';
+  const color = value === 'Pago' || value === 'Concluído' || value === 'Resolvido' || value === 'Enviada' ? 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200' : 'border-sky-400/20 bg-sky-500/10 text-sky-200';
   return <span className={`rounded-full border px-3 py-1 text-xs font-bold ${color}`}>{value || 'Aberto'}</span>;
 }
 
@@ -351,7 +351,7 @@ const AdminDashboard = () => {
     const openTickets = tickets.filter((ticket) => ticket.status !== 'Resolvido').length;
     const newUsers = notifications.filter((notification) => notification.type === 'new-user' && notification.status !== 'Lida').length;
     const pendingInvoices = invoices.filter((invoice) => invoice.status !== 'Pago').length;
-    const openOrders = orders.filter((order) => order.status !== 'Concluido').length;
+    const openOrders = orders.filter((order) => order.status !== 'Concluído').length;
     return { projectRevenue, invoiceRevenue, openTickets, newUsers, pendingInvoices, openOrders };
   }, [invoices, notifications, orders, projects, tickets]);
 
@@ -403,7 +403,7 @@ const AdminDashboard = () => {
     }
 
     if (!user?.id) {
-      setStatus('Usuario nao autenticado.');
+      setStatus('Usuário nao autenticado.');
       return;
     }
 
@@ -413,7 +413,7 @@ const AdminDashboard = () => {
     try {
       const avatar = await compressImage(file);
       setProfileForm((current) => ({ ...current, avatar }));
-      setStatus('Foto carregada. Clique em salvar perfil para gravar no usuario.');
+      setStatus('Foto carregada. Clique em salvar perfil para gravar no usuário.');
     } catch {
       setStatus('Nao foi possivel carregar a foto. Tente outra imagem.');
     } finally {
@@ -423,8 +423,8 @@ const AdminDashboard = () => {
 
   const stats = [
     { label: 'Clientes', value: String(clients.length), icon: Users, hint: 'base cadastrada' },
-    { label: 'Usuarios', value: String(registeredUsers.length), icon: UserPlus, hint: totals.newUsers ? `${totals.newUsers} novo(s)` : 'contas reais' },
-    { label: 'Projetos Ativos', value: String(projects.filter((project) => project.status !== 'Concluido').length), icon: FolderOpen, hint: 'em operacao' },
+    { label: 'Usuários', value: String(registeredUsers.length), icon: UserPlus, hint: totals.newUsers ? `${totals.newUsers} novo(s)` : 'contas reais' },
+    { label: 'Projetos ativos', value: String(projects.filter((project) => project.status !== 'Concluído').length), icon: FolderOpen, hint: 'em operação' },
     { label: 'Tickets Abertos', value: String(totals.openTickets), icon: MessageSquare, hint: 'precisam de resposta' },
     { label: 'Faturado Pago', value: toMoney(totals.invoiceRevenue), icon: CreditCard, hint: 'recebido' },
   ];
@@ -459,7 +459,7 @@ const AdminDashboard = () => {
           <span>
             <span className="block font-black text-slate-950 dark:text-white">Novo cadastro no sistema</span>
             <span className="mt-1 block text-sm leading-6 text-slate-600 dark:text-slate-300">
-              Existem {totals.newUsers} notificacao(oes) de novo usuario aguardando leitura.
+              Existem {totals.newUsers} notificações de novo usuário aguardando leitura.
             </span>
           </span>
         </button>
@@ -484,7 +484,7 @@ const AdminDashboard = () => {
         <div className={`${panelClass} p-6`}>
           <div className="mb-5 flex items-center justify-between gap-4">
             <div>
-              <h3 className="text-lg font-bold text-slate-950 dark:text-white">Operacao em tempo real</h3>
+              <h3 className="text-lg font-bold text-slate-950 dark:text-white">Operação em tempo real</h3>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Resumo puxado das colecoes do Firestore.</p>
             </div>
             <BarChart3 className="h-6 w-6 text-[#159AFD]" />
@@ -499,7 +499,7 @@ const AdminDashboard = () => {
               <p className="mt-2 text-2xl font-black text-slate-950 dark:text-white">{toMoney(totals.projectRevenue)}</p>
             </div>
             <div className="rounded-md bg-slate-50 p-4 dark:bg-white/[0.04]">
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Notificacoes</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Notificações</p>
               <p className="mt-2 text-2xl font-black text-slate-950 dark:text-white">{notifications.length}</p>
             </div>
           </div>
@@ -512,7 +512,7 @@ const AdminDashboard = () => {
               `${totals.openOrders} pedido(s) em aberto`,
               `${tickets.filter((ticket) => ticket.status !== 'Resolvido').length} ticket(s) aguardando`,
               `${totals.pendingInvoices} faturamento(s) pendente(s)`,
-              `${registeredUsers.length} usuario(s) com acesso criado`,
+              `${registeredUsers.length} usuário(s) com acesso criado`,
             ].map((item) => (
               <div key={item} className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-300">
                 {item}
@@ -531,7 +531,7 @@ const AdminDashboard = () => {
           <Activity className="h-6 w-6 text-[#159AFD]" />
         </div>
         <div className="grid gap-3">
-          {systemEvents.length === 0 && <EmptyState title="Sem atividades ainda" text="Quando usuarios, clientes, projetos e pedidos forem criados, eles aparecem aqui." />}
+          {systemEvents.length === 0 && <EmptyState title="Sem atividades ainda" text="Quando usuários, clientes, projetos e pedidos forem criados, eles aparecem aqui." />}
           {systemEvents.slice(0, 6).map((event) => (
             <div key={event.id} className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 dark:border-white/10 dark:bg-white/[0.03]">
               <p className="font-bold text-slate-950 dark:text-white">{event.title || 'Atividade'}</p>
@@ -585,23 +585,23 @@ const AdminDashboard = () => {
         <>
           <Field label="Nome do projeto" value={projectForm.name} onChange={(name) => setProjectForm({ ...projectForm, name })} />
           <Field label="Cliente" value={projectForm.client} onChange={(client) => setProjectForm({ ...projectForm, client })} />
-          <SelectField label="Status" value={projectForm.status} onChange={(statusValue) => setProjectForm({ ...projectForm, status: statusValue })} options={['Planejamento', 'Em andamento', 'Aguardando cliente', 'Concluido']} />
+          <SelectField label="Status" value={projectForm.status} onChange={(statusValue) => setProjectForm({ ...projectForm, status: statusValue })} options={['Planejamento', 'Em andamento', 'Aguardando cliente', 'Concluído']} />
           <Field label="Valor" placeholder="R$ 0,00" value={projectForm.budget} onChange={(budget) => setProjectForm({ ...projectForm, budget })} />
           <Field label="Prazo" type="date" value={projectForm.deadline} onChange={(deadline) => setProjectForm({ ...projectForm, deadline })} required={false} />
-          <Field label="Tecnico responsavel" value={projectForm.technician} onChange={(technician) => setProjectForm({ ...projectForm, technician })} required={false} />
+          <Field label="Técnico responsável" value={projectForm.technician} onChange={(technician) => setProjectForm({ ...projectForm, technician })} required={false} />
           <Field label="Progresso (%)" type="number" value={projectForm.progress} onChange={(progress) => setProjectForm({ ...projectForm, progress })} />
-          <TextAreaField label="Descricao" value={projectForm.description} onChange={(description) => setProjectForm({ ...projectForm, description })} />
+          <TextAreaField label="Descrição" value={projectForm.description} onChange={(description) => setProjectForm({ ...projectForm, description })} />
         </>
       }
       emptyText="Nenhum projeto cadastrado."
       items={projects.map((project) => ({
         id: project.id,
         title: project.name || 'Projeto sem nome',
-        subtitle: `${project.client || 'Cliente nao informado'} - ${project.status || 'Planejamento'}`,
+        subtitle: `${project.client || 'Cliente não informado'} - ${project.status || 'Planejamento'}`,
         meta: `${project.budget || 'R$ 0'} / ${project.progress || '0'}%`,
         status: project.status,
         actions: [
-          { label: 'Concluir', onClick: () => changeStatus('projetos', project.id, 'Concluido') },
+          { label: 'Concluir', onClick: () => changeStatus('projetos', project.id, 'Concluído') },
           { label: 'Andamento', onClick: () => changeStatus('projetos', project.id, 'Em andamento') },
         ],
         remove: () => removeRecord('projetos', project.id),
@@ -611,10 +611,10 @@ const AdminDashboard = () => {
 
   const renderTechnicians = () => (
     <CrudPanel
-      title="Adicionar tecnico"
+      title="Adicionar técnico"
       onSubmit={(event) => {
         event.preventDefault();
-        createRecord('technicians', technicianForm, () => setTechnicianForm({ name: '', email: '', specialty: '', phone: '' }), 'Tecnico cadastrado.');
+        createRecord('technicians', technicianForm, () => setTechnicianForm({ name: '', email: '', specialty: '', phone: '' }), 'Técnico cadastrado.');
       }}
       form={
         <>
@@ -624,10 +624,10 @@ const AdminDashboard = () => {
           <Field label="Telefone" value={technicianForm.phone} onChange={(phone) => setTechnicianForm({ ...technicianForm, phone })} />
         </>
       }
-      emptyText="Nenhum tecnico cadastrado."
+      emptyText="Nenhum técnico cadastrado."
       items={technicians.map((technician) => ({
         id: technician.id,
-        title: technician.name || 'Tecnico sem nome',
+        title: technician.name || 'Técnico sem nome',
         subtitle: `${technician.specialty || 'Sem especialidade'} - ${technician.email || 'sem email'}`,
         meta: technician.phone || '',
         remove: () => removeRecord('technicians', technician.id),
@@ -644,7 +644,7 @@ const AdminDashboard = () => {
       }}
       form={
         <>
-          <Field label="Titulo" value={ticketForm.title} onChange={(title) => setTicketForm({ ...ticketForm, title })} />
+          <Field label="Título" value={ticketForm.title} onChange={(title) => setTicketForm({ ...ticketForm, title })} />
           <Field label="Cliente" value={ticketForm.client} onChange={(client) => setTicketForm({ ...ticketForm, client })} />
           <SelectField label="Prioridade" value={ticketForm.priority} onChange={(priority) => setTicketForm({ ...ticketForm, priority })} options={['Baixa', 'Media', 'Alta', 'Urgente']} />
           <SelectField label="Status" value={ticketForm.status} onChange={(statusValue) => setTicketForm({ ...ticketForm, status: statusValue })} options={['Aberto', 'Em atendimento', 'Aguardando cliente', 'Resolvido']} />
@@ -654,7 +654,7 @@ const AdminDashboard = () => {
       emptyText="Nenhum ticket de suporte."
       items={tickets.map((ticket) => ({
         id: ticket.id,
-        title: ticket.title || 'Ticket sem titulo',
+        title: ticket.title || 'Ticket sem título',
         subtitle: `${ticket.client || 'Sem cliente'} - ${ticket.priority || 'Media'}`,
         meta: ticket.message || '',
         status: ticket.status,
@@ -676,16 +676,16 @@ const AdminDashboard = () => {
       }}
       form={
         <>
-          <Field label="Titulo" value={documentForm.title} onChange={(title) => setDocumentForm({ ...documentForm, title })} />
+          <Field label="Título" value={documentForm.title} onChange={(title) => setDocumentForm({ ...documentForm, title })} />
           <Field label="Cliente/Projeto" value={documentForm.client} onChange={(client) => setDocumentForm({ ...documentForm, client })} />
-          <SelectField label="Categoria" value={documentForm.category} onChange={(category) => setDocumentForm({ ...documentForm, category })} options={['Contrato', 'Manual', 'Nota tecnica', 'Arquivo do projeto', 'Outro']} />
+          <SelectField label="Categoria" value={documentForm.category} onChange={(category) => setDocumentForm({ ...documentForm, category })} options={['Contrato', 'Manual', 'Nota técnica', 'Arquivo do projeto', 'Outro']} />
           <Field label="Link do arquivo" value={documentForm.url} onChange={(url) => setDocumentForm({ ...documentForm, url })} placeholder="https://..." />
         </>
       }
       emptyText="Nenhum documento cadastrado."
       items={documents.map((documentItem) => ({
         id: documentItem.id,
-        title: documentItem.title || 'Documento sem titulo',
+        title: documentItem.title || 'Documento sem título',
         subtitle: `${documentItem.client || 'Geral'} - ${documentItem.category || 'Outro'}`,
         meta: documentItem.url || 'Sem link',
         link: documentItem.url,
@@ -704,65 +704,65 @@ const AdminDashboard = () => {
             updatedAt: serverTimestamp(),
             updatedBy: user?.id || '',
           });
-          setStatus('Secao publica atualizada no site.');
+          setStatus('Seção pública atualizada no site.');
         }}
         className={`${panelClass} p-5 sm:p-6`}
       >
         <div className="mb-5 border-b border-slate-200 pb-4 dark:border-white/10">
-          <h3 className="text-xl font-bold text-slate-950 dark:text-white">Editar secao publica de areas</h3>
-          <p className="mt-1 text-sm text-slate-500">Altere o titulo, texto e botao que aparecem na pagina inicial.</p>
+          <h3 className="text-xl font-bold text-slate-950 dark:text-white">Editar seção pública de áreas</h3>
+          <p className="mt-1 text-sm text-slate-500">Altere o título, texto e botão que aparecem na página inicial.</p>
         </div>
         <div className="grid gap-4 lg:grid-cols-2">
           <Field label="Texto pequeno" value={areasSectionForm.eyebrow} onChange={(eyebrow) => setAreasSectionForm({ ...areasSectionForm, eyebrow })} />
-          <Field label="Texto do botao" value={areasSectionForm.buttonLabel} onChange={(buttonLabel) => setAreasSectionForm({ ...areasSectionForm, buttonLabel })} />
-          <Field label="Link do botao" value={areasSectionForm.buttonHref} onChange={(buttonHref) => setAreasSectionForm({ ...areasSectionForm, buttonHref })} />
-          <Field label="Titulo principal" value={areasSectionForm.title} onChange={(title) => setAreasSectionForm({ ...areasSectionForm, title })} />
+          <Field label="Texto do botão" value={areasSectionForm.buttonLabel} onChange={(buttonLabel) => setAreasSectionForm({ ...areasSectionForm, buttonLabel })} />
+          <Field label="Link do botão" value={areasSectionForm.buttonHref} onChange={(buttonHref) => setAreasSectionForm({ ...areasSectionForm, buttonHref })} />
+          <Field label="Título principal" value={areasSectionForm.title} onChange={(title) => setAreasSectionForm({ ...areasSectionForm, title })} />
           <div className="lg:col-span-2">
-            <TextAreaField label="Descricao" value={areasSectionForm.description} onChange={(description) => setAreasSectionForm({ ...areasSectionForm, description })} />
+            <TextAreaField label="Descrição" value={areasSectionForm.description} onChange={(description) => setAreasSectionForm({ ...areasSectionForm, description })} />
           </div>
         </div>
         <button className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 font-bold text-white shadow-lg shadow-[#159AFD]/20 transition hover:bg-[#508AD0]">
           <Plus className="h-5 w-5" />
-          Salvar texto da secao
+          Salvar texto da seção
         </button>
       </form>
 
       <CrudPanel
-        title="Publicar nas subpaginas"
+        title="Publicar nas subpáginas"
         onSubmit={(event) => {
           event.preventDefault();
           createRecord(
             'siteContent',
             siteContentForm,
             () => setSiteContentForm({ page: 'projetos', type: 'Projeto', title: '', description: '', url: '', status: 'Publicado' }),
-            'Conteudo publicado na subpagina.',
+            'Conteúdo publicado na subpágina.',
           );
         }}
         form={
           <>
             <SelectField
-              label="Subpagina"
+              label="Subpágina"
               value={siteContentForm.page}
               onChange={(page) => setSiteContentForm({ ...siteContentForm, page })}
               options={['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'produtos', 'videos', 'noticias']}
             />
             <SelectField
-              label="Tipo de conteudo"
+              label="Tipo de conteúdo"
               value={siteContentForm.type}
               onChange={(type) => setSiteContentForm({ ...siteContentForm, type })}
-              options={['Projeto', 'Documento', 'Video', 'Produto', 'Melhoria', 'Equipe', 'Atividade', 'Noticia', 'Inovacao', 'Link']}
+              options={['Projeto', 'Documento', 'Vídeo', 'Produto', 'Melhoria', 'Equipe', 'Atividade', 'Notícia', 'Inovação', 'Link']}
             />
-            <Field label="Titulo" value={siteContentForm.title} onChange={(title) => setSiteContentForm({ ...siteContentForm, title })} />
-            <Field label="Link, documento, imagem ou video" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="https://..." required={false} />
+            <Field label="Título" value={siteContentForm.title} onChange={(title) => setSiteContentForm({ ...siteContentForm, title })} />
+            <Field label="Link, documento, imagem ou vídeo" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="https://..." required={false} />
             <SelectField label="Status" value={siteContentForm.status} onChange={(statusValue) => setSiteContentForm({ ...siteContentForm, status: statusValue })} options={['Publicado', 'Rascunho']} />
-            <TextAreaField label="Descricao" value={siteContentForm.description} onChange={(description) => setSiteContentForm({ ...siteContentForm, description })} />
+            <TextAreaField label="Descrição" value={siteContentForm.description} onChange={(description) => setSiteContentForm({ ...siteContentForm, description })} />
           </>
         }
-        emptyText="Nenhum conteudo publicado nas subpaginas."
+        emptyText="Nenhum conteúdo publicado nas subpáginas."
         items={siteContent.map((item) => ({
           id: item.id,
-          title: item.title || 'Conteudo sem titulo',
-          subtitle: `${item.page || 'sem pagina'} - ${item.type || 'Conteudo'} - ${item.status || 'Publicado'}`,
+          title: item.title || 'Conteúdo sem título',
+          subtitle: `${item.page || 'sem página'} - ${item.type || 'Conteúdo'} - ${item.status || 'Publicado'}`,
           meta: item.description || item.url || '',
           status: item.status,
           link: item.url,
@@ -785,7 +785,7 @@ const AdminDashboard = () => {
       }}
       form={
         <>
-          <Field label="Titulo" value={invoiceForm.title} onChange={(title) => setInvoiceForm({ ...invoiceForm, title })} />
+          <Field label="Título" value={invoiceForm.title} onChange={(title) => setInvoiceForm({ ...invoiceForm, title })} />
           <Field label="Cliente" value={invoiceForm.client} onChange={(client) => setInvoiceForm({ ...invoiceForm, client })} />
           <Field label="Valor" value={invoiceForm.amount} onChange={(amount) => setInvoiceForm({ ...invoiceForm, amount })} placeholder="R$ 0,00" />
           <Field label="Vencimento" type="date" value={invoiceForm.dueDate} onChange={(dueDate) => setInvoiceForm({ ...invoiceForm, dueDate })} required={false} />
@@ -795,7 +795,7 @@ const AdminDashboard = () => {
       emptyText="Nenhum faturamento cadastrado."
       items={invoices.map((invoice) => ({
         id: invoice.id,
-        title: invoice.title || 'Fatura sem titulo',
+        title: invoice.title || 'Fatura sem título',
         subtitle: `${invoice.client || 'Sem cliente'} - vence ${invoice.dueDate || 'sem data'}`,
         meta: invoice.amount || 'R$ 0,00',
         status: invoice.status,
@@ -817,24 +817,24 @@ const AdminDashboard = () => {
       }}
       form={
         <>
-          <Field label="Titulo" value={orderForm.title} onChange={(title) => setOrderForm({ ...orderForm, title })} />
+          <Field label="Título" value={orderForm.title} onChange={(title) => setOrderForm({ ...orderForm, title })} />
           <Field label="Cliente" value={orderForm.client} onChange={(client) => setOrderForm({ ...orderForm, client })} />
-          <SelectField label="Tipo" value={orderForm.type} onChange={(type) => setOrderForm({ ...orderForm, type })} options={['Novo projeto', 'Manutencao', 'Atualizacao OTA', 'Documento', 'Suporte']} />
+          <SelectField label="Tipo" value={orderForm.type} onChange={(type) => setOrderForm({ ...orderForm, type })} options={['Novo projeto', 'Manutenção', 'Atualização OTA', 'Documento', 'Suporte']} />
           <Field label="Valor previsto" value={orderForm.budget} onChange={(budget) => setOrderForm({ ...orderForm, budget })} placeholder="R$ 0,00" />
-          <SelectField label="Status" value={orderForm.status} onChange={(statusValue) => setOrderForm({ ...orderForm, status: statusValue })} options={['Novo', 'Em analise', 'Aprovado', 'Recusado', 'Concluido']} />
-          <TextAreaField label="Observacoes" value={orderForm.notes} onChange={(notes) => setOrderForm({ ...orderForm, notes })} />
+          <SelectField label="Status" value={orderForm.status} onChange={(statusValue) => setOrderForm({ ...orderForm, status: statusValue })} options={['Novo', 'Em análise', 'Aprovado', 'Recusado', 'Concluído']} />
+          <TextAreaField label="Observações" value={orderForm.notes} onChange={(notes) => setOrderForm({ ...orderForm, notes })} />
         </>
       }
       emptyText="Nenhum pedido cadastrado."
       items={orders.map((order) => ({
         id: order.id,
-        title: order.title || 'Pedido sem titulo',
+        title: order.title || 'Pedido sem título',
         subtitle: `${order.client || 'Sem cliente'} - ${order.type || 'Novo projeto'}`,
         meta: order.budget || 'R$ 0,00',
         status: order.status,
         actions: [
           { label: 'Aprovar', onClick: () => changeStatus('orders', order.id, 'Aprovado') },
-          { label: 'Concluir', onClick: () => changeStatus('orders', order.id, 'Concluido') },
+          { label: 'Concluir', onClick: () => changeStatus('orders', order.id, 'Concluído') },
         ],
         remove: () => removeRecord('orders', order.id),
       }))}
@@ -843,23 +843,23 @@ const AdminDashboard = () => {
 
   const renderNotifications = () => (
     <CrudPanel
-      title="Criar notificacao"
+      title="Criar notificação"
       onSubmit={(event) => {
         event.preventDefault();
-        createRecord('notifications', notificationForm, () => setNotificationForm({ title: '', message: '', target: 'Todos', status: 'Rascunho' }), 'Notificacao criada.');
+        createRecord('notifications', notificationForm, () => setNotificationForm({ title: '', message: '', target: 'Todos', status: 'Rascunho' }), 'Notificação criada.');
       }}
       form={
         <>
-          <Field label="Titulo" value={notificationForm.title} onChange={(title) => setNotificationForm({ ...notificationForm, title })} />
-          <SelectField label="Destino" value={notificationForm.target} onChange={(target) => setNotificationForm({ ...notificationForm, target })} options={['Todos', 'Clientes', 'Tecnicos', 'Admin']} />
+          <Field label="Título" value={notificationForm.title} onChange={(title) => setNotificationForm({ ...notificationForm, title })} />
+          <SelectField label="Destino" value={notificationForm.target} onChange={(target) => setNotificationForm({ ...notificationForm, target })} options={['Todos', 'Clientes', 'Técnicos', 'Admin']} />
           <SelectField label="Status" value={notificationForm.status} onChange={(statusValue) => setNotificationForm({ ...notificationForm, status: statusValue })} options={['Rascunho', 'Nova', 'Enviada', 'Lida']} />
           <TextAreaField label="Mensagem" value={notificationForm.message} onChange={(message) => setNotificationForm({ ...notificationForm, message })} />
         </>
       }
-      emptyText="Nenhuma notificacao criada."
+      emptyText="Nenhuma notificação criada."
       items={notifications.map((notification) => ({
         id: notification.id,
-        title: notification.title || 'Notificacao sem titulo',
+        title: notification.title || 'Notificação sem título',
         subtitle: `${notification.target || 'Todos'} - ${notification.status || 'Rascunho'}`,
         meta: notification.message || '',
         status: notification.status,
@@ -903,7 +903,7 @@ const AdminDashboard = () => {
           <SelectField label="Tela inicial do painel" value={profileForm.dashboardStartPage} onChange={(dashboardStartPage) => setProfileForm({ ...profileForm, dashboardStartPage })} options={tabs.map((tab) => tab.id)} />
           <SelectField label="Densidade da interface" value={profileForm.dashboardDensity} onChange={(dashboardDensity) => setProfileForm({ ...profileForm, dashboardDensity: dashboardDensity as UserPreferences['dashboardDensity'] })} options={['comfortable', 'compact']} />
           <label className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm font-semibold text-slate-700 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-300">
-            Avisar novos usuarios
+            Avisar novos usuários
             <input type="checkbox" checked={profileForm.notifyNewUsers} onChange={(event) => setProfileForm({ ...profileForm, notifyNewUsers: event.target.checked })} className="h-5 w-5 accent-[#159AFD]" />
           </label>
           <label className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm font-semibold text-slate-700 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-300">

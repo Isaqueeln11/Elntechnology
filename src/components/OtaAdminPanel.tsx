@@ -145,7 +145,7 @@ const OtaAdminPanel = () => {
       setFirmwareFile(null);
       setDatabaseStatus('Firmware salvo no Firestore.');
     } catch {
-      setDatabaseStatus('Erro ao salvar firmware. Verifique permissao do Firestore e o link informado.');
+      setDatabaseStatus('Erro ao salvar firmware. Verifique permissão do Firestore e o link informado.');
     } finally {
       setIsSaving(false);
     }
@@ -266,7 +266,7 @@ const OtaAdminPanel = () => {
               </label>
 
               <label className="text-sm font-medium text-gray-300">
-                Versao
+                Versão
                 <input
                   value={form.version}
                   onChange={(event) => setForm({ ...form, version: event.target.value })}
@@ -327,7 +327,7 @@ const OtaAdminPanel = () => {
                 value={form.notes}
                 onChange={(event) => setForm({ ...form, notes: event.target.value })}
                 className="mt-2 h-24 w-full resize-none rounded-lg border border-[#159AFD]/20 bg-black/30 p-3 text-white outline-none focus:border-[#159AFD]"
-                placeholder="Correcoes, melhorias e observacoes da versao"
+                placeholder="Correções, melhorias e observacoes da versao"
               />
             </label>
 
@@ -387,8 +387,8 @@ const OtaAdminPanel = () => {
             <Cpu className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white">Versoes cadastradas</h3>
-            <p className="text-sm text-gray-400">Somente versoes ativas entram no manifesto.</p>
+            <h3 className="text-xl font-semibold text-white">Versões cadastradas</h3>
+            <p className="text-sm text-gray-400">Somente versões ativas entram no manifesto.</p>
           </div>
         </div>
 

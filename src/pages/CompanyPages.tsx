@@ -54,50 +54,50 @@ const pages: Record<string, PageData> = {
     eyebrow: 'Projetos desenvolvidos',
     title: 'Galeria organizada para publicar os projetos reais da ELN Technology.',
     description:
-      'Aqui ficam os projetos finalizados, prototipos, fotos, status, componentes usados, videos e links de entrega. A pagina ja esta pronta para receber os conteudos oficiais.',
+      'Aqui ficam os projetos finalizados, protótipos, fotos, status, componentes usados, vídeos e links de entrega. A página já está pronta para receber os conteúdos oficiais.',
     icon: CircuitBoard,
-    highlight: 'Espaco para cadastrar nome, cliente, status, imagens, codigo, firmware e resultado final.',
+    highlight: 'Espaço para cadastrar nome, cliente, status, imagens, código, firmware e resultado final.',
     sections: [
       {
         title: 'Projetos finalizados',
-        text: 'Area para listar projetos entregues com resumo tecnico, fotos e data de conclusao.',
+        text: 'Área para listar projetos entregues com resumo técnico, fotos e data de conclusão.',
         items: ['Nome do projeto', 'Cliente ou aplicacao', 'Componentes usados', 'Resultado entregue'],
       },
       {
-        title: 'Prototipos em teste',
-        text: 'Organizacao dos prototipos que ainda estao em validacao antes da entrega.',
-        items: ['Versao atual', 'Pendencias', 'Testes realizados', 'Proximo ajuste'],
+        title: 'Protótipos em teste',
+        text: 'Organização dos protótipos que ainda estão em validação antes da entrega.',
+        items: ['Versão atual', 'Pendências', 'Testes realizados', 'Próximo ajuste'],
       },
       {
-        title: 'Arquivos e codigos',
-        text: 'Referencia para guardar links de repositorio, firmware, manual e arquivos de apoio.',
-        items: ['GitHub', 'Arquivo .bin', 'Manual tecnico', 'Historico de versoes'],
+        title: 'Arquivos e códigos',
+        text: 'Referência para guardar links de repositório, firmware, manual e arquivos de apoio.',
+        items: ['GitHub', 'Arquivo .bin', 'Manual técnico', 'Histórico de versões'],
       },
     ],
-    workflow: ['Cadastrar projeto', 'Adicionar fotos e descricao', 'Vincular arquivos', 'Publicar como concluido'],
+    workflow: ['Cadastrar projeto', 'Adicionar fotos e descrição', 'Vincular arquivos', 'Publicar como concluído'],
   },
   melhorias: {
     key: 'melhorias',
     eyebrow: 'Melhorias',
     title: 'Controle claro das melhorias que entram no site, no painel e nos equipamentos.',
     description:
-      'Uma pagina para registrar o que precisa melhorar, o que ja foi corrigido e o que vai entrar em futuras versoes.',
+      'Uma página para registrar o que precisa melhorar, o que já foi corrigido e o que vai entrar em futuras versões.',
     icon: Wrench,
-    highlight: 'Ideal para acompanhar bugs, ajustes visuais, seguranca, responsividade e novas funcoes.',
+    highlight: 'Ideal para acompanhar bugs, ajustes visuais, segurança, responsividade e novas funções.',
     sections: [
       {
-        title: 'Correcoes',
+        title: 'Correções',
         text: 'Lista de problemas encontrados e resolvidos no sistema.',
-        items: ['Tela corrigida', 'Data da correcao', 'Responsavel', 'Como validar'],
+        items: ['Tela corrigida', 'Data da correcao', 'Responsável', 'Como validar'],
       },
       {
         title: 'Melhorias futuras',
-        text: 'Ideias que ainda vao entrar no roadmap da ELN Technology.',
-        items: ['Prioridade', 'Impacto', 'Prazo previsto', 'Dependencias'],
+        text: 'Ideias que ainda vão entrar no roadmap da ELN Technology.',
+        items: ['Prioridade', 'Impacto', 'Prazo previsto', 'Dependências'],
       },
       {
-        title: 'Seguranca',
-        text: 'Area para registrar regras, ajustes de acesso e protecoes extras.',
+        title: 'Segurança',
+        text: 'Área para registrar regras, ajustes de acesso e proteções extras.',
         items: ['Firebase Rules', 'Acesso admin', 'Login seguro', 'Auditoria'],
       },
     ],
@@ -106,164 +106,164 @@ const pages: Record<string, PageData> = {
   equipe: {
     key: 'equipe',
     eyebrow: 'Equipe',
-    title: 'Pagina para apresentar quem faz parte da ELN Technology.',
+    title: 'Página para apresentar quem faz parte da ELN Technology.',
     description:
-      'Aqui voce pode mostrar administrador, tecnicos, parceiros e funcoes de cada pessoa no sistema.',
+      'Aqui você pode mostrar administrador, técnicos, parceiros e funções de cada pessoa no sistema.',
     icon: Users,
-    highlight: 'Espaco para foto, cargo, especialidade, contato interno e atividades de cada tecnico.',
+    highlight: 'Espaço para foto, cargo, especialidade, contato interno e atividades de cada técnico.',
     sections: [
       {
-        title: 'Administracao',
-        text: 'Informacoes do responsavel pelo painel, clientes, projetos e configuracoes.',
-        items: ['Nome', 'Foto', 'Contato', 'Permissoes'],
+        title: 'Administração',
+        text: 'Informações do responsável pelo painel, clientes, projetos e configurações.',
+        items: ['Nome', 'Foto', 'Contato', 'Permissões'],
       },
       {
-        title: 'Tecnicos',
+        title: 'Técnicos',
         text: 'Lista de profissionais que podem receber chamados, tarefas e projetos.',
-        items: ['Especialidade', 'Status', 'Projetos ativos', 'Historico'],
+        items: ['Especialidade', 'Status', 'Projetos ativos', 'Histórico'],
       },
       {
         title: 'Parceiros',
-        text: 'Espaco para colaboradores externos, fornecedores e apoio tecnico.',
-        items: ['Empresa', 'Servico', 'Contato', 'Observacoes'],
+        text: 'Espaço para colaboradores externos, fornecedores e apoio técnico.',
+        items: ['Empresa', 'Serviço', 'Contato', 'Observações'],
       },
     ],
     workflow: ['Cadastrar membro', 'Definir cargo', 'Vincular atividades', 'Atualizar perfil'],
   },
   atividades: {
     key: 'atividades',
-    eyebrow: 'Atividades e analise',
-    title: 'Painel publico para organizar atividades, indicadores e analises.',
+    eyebrow: 'Atividades e análise',
+    title: 'Painel público para organizar atividades, indicadores e análises.',
     description:
-      'Essa pagina centraliza movimentos do projeto, atividades recentes, dados importantes e leitura do que esta acontecendo.',
+      'Essa página centraliza movimentos do projeto, atividades recentes, dados importantes e leitura do que está acontecendo.',
     icon: BarChart3,
-    highlight: 'Base pronta para evoluir com graficos, historico de eventos e indicadores reais do dashboard.',
+    highlight: 'Base pronta para evoluir com gráficos, histórico de eventos e indicadores reais do dashboard.',
     sections: [
       {
         title: 'Atividades recentes',
         text: 'Linha do tempo com criacao de cliente, projeto, pedido, documento e suporte.',
-        items: ['Evento', 'Usuario', 'Data', 'Status'],
+        items: ['Evento', 'Usuário', 'Data', 'Status'],
       },
       {
-        title: 'Analise operacional',
-        text: 'Espaco para visualizar quantidade de projetos, valores, tecnicos e chamados.',
+        title: 'Análise operacional',
+        text: 'Espaço para visualizar quantidade de projetos, valores, técnicos e chamados.',
         items: ['Clientes', 'Projetos', 'Faturamento', 'Tickets'],
       },
       {
-        title: 'Relatorios',
-        text: 'Base para mostrar relatorios por periodo e exportacoes futuras.',
-        items: ['Mensal', 'Semanal', 'Por cliente', 'Por tecnico'],
+        title: 'Relatórios',
+        text: 'Base para mostrar relatórios por periodo e exportacoes futuras.',
+        items: ['Mensal', 'Semanal', 'Por cliente', 'Por técnico'],
       },
     ],
-    workflow: ['Coletar dados', 'Analisar status', 'Gerar relatorio', 'Tomar decisao'],
+    workflow: ['Coletar dados', 'Analisar status', 'Gerar relatório', 'Tomar decisão'],
   },
   desenvolvimentos: {
     key: 'desenvolvimentos',
     eyebrow: 'Desenvolvimentos',
-    title: 'Area para mostrar o que esta em desenvolvimento agora.',
+    title: 'Área para mostrar o que está em desenvolvimento agora.',
     description:
-      'Use esta pagina para organizar sistemas web, firmware, placas, automacoes, app, testes e novas funcionalidades.',
+      'Use está página para organizar sistemas web, firmware, placas, automações, app, testes e novas funcionalidades.',
     icon: Hammer,
-    highlight: 'Cada desenvolvimento pode ter etapa, prioridade, responsavel, versao e data prevista.',
+    highlight: 'Cada desenvolvimento pode ter etapa, prioridade, responsável, versao e data prevista.',
     sections: [
       {
         title: 'Firmware e OTA',
-        text: 'Controle das versoes dos equipamentos, arquivos .bin e historico de atualizacao.',
-        items: ['Versao', 'Link do release', 'SHA-256', 'Equipamento alvo'],
+        text: 'Controle das versões dos equipamentos, arquivos .bin e histórico de atualizacao.',
+        items: ['Versão', 'Link do release', 'SHA-256', 'Equipamento alvo'],
       },
       {
         title: 'Sistema web',
-        text: 'Melhorias no dashboard, login, cadastro, perfil, documentos e notificacoes.',
-        items: ['Tela', 'Funcao', 'Status', 'Validacao'],
+        text: 'Melhorias no dashboard, login, cadastro, perfil, documentos e notificações.',
+        items: ['Tela', 'Função', 'Status', 'Validação'],
       },
       {
         title: 'Hardware',
-        text: 'Projetos de placas, sensores, gabinetes e prototipos fisicos.',
-        items: ['PCB', 'Sensores', 'Impressao 3D', 'Testes'],
+        text: 'Projetos de placas, sensores, gabinetes e protótipos fisicos.',
+        items: ['PCB', 'Sensores', 'Impressão 3D', 'Testes'],
       },
     ],
-    workflow: ['Planejar', 'Construir', 'Testar', 'Lancar versao'],
+    workflow: ['Planejar', 'Construir', 'Testar', 'Lançar versão'],
   },
   produtos: {
     key: 'produtos',
     eyebrow: 'Produtos',
-    title: 'Catalogo para exibir produtos, equipamentos e solucoes da ELN Technology.',
+    title: 'Catálogo para exibir produtos, equipamentos e soluções da ELN Technology.',
     description:
-      'Pagina para organizar produtos prontos, kits, servicos recorrentes, placas, automacoes e equipamentos com OTA.',
+      'Página para organizar produtos prontos, kits, serviços recorrentes, placas, automações e equipamentos com OTA.',
     icon: Package,
-    highlight: 'Cada produto pode ter foto, preco, descricao, especificacao, manual e botao de contato.',
+    highlight: 'Cada produto pode ter foto, preço, descrição, especificacao, manual e botão de contato.',
     sections: [
       {
         title: 'Equipamentos',
-        text: 'Produtos fisicos como controladores, placas, sensores e automacoes.',
+        text: 'Produtos fisicos como controladores, placas, sensores e automações.',
         items: ['Foto', 'Modelo', 'Estoque', 'Manual'],
       },
       {
-        title: 'Servicos',
-        text: 'Servicos de desenvolvimento, suporte, instalacao, impressao 3D e manutencao.',
-        items: ['Descricao', 'Valor', 'Prazo', 'Garantia'],
+        title: 'Serviços',
+        text: 'Serviços de desenvolvimento, suporte, instalação, impressão 3D e manutenção.',
+        items: ['Descrição', 'Valor', 'Prazo', 'Garantia'],
       },
       {
-        title: 'Kits e prototipos',
-        text: 'Kits personalizados para estudo, teste ou demonstracao tecnica.',
-        items: ['Itens inclusos', 'Aplicacao', 'Nivel tecnico', 'Entrega'],
+        title: 'Kits e protótipos',
+        text: 'Kits personalizados para estudo, teste ou demonstração técnica.',
+        items: ['Itens inclusos', 'Aplicação', 'Nível técnico', 'Entrega'],
       },
     ],
     workflow: ['Cadastrar produto', 'Adicionar foto', 'Definir valor', 'Publicar no site'],
   },
   videos: {
     key: 'videos',
-    eyebrow: 'Videos e futuro',
-    title: 'Espaco para publicar videos, novidades e proximos lancamentos.',
+    eyebrow: 'Vídeos e futuro',
+    title: 'Espaço para publicar vídeos, novidades e proximos lançamentos.',
     description:
-      'Uma pagina preparada para demonstracoes, videos do YouTube, bastidores, roadmap e apresentacoes futuras.',
+      'Uma página preparada para demonstrações, vídeos do YouTube, bastidores, roadmap e apresentacoes futuras.',
     icon: MonitorPlay,
-    highlight: 'Pronto para receber links de video, thumbnails, descricao e chamadas para novos produtos.',
+    highlight: 'Pronto para receber links de vídeo, thumbnails, descrição e chamadas para novos produtos.',
     sections: [
       {
-        title: 'Videos demonstrativos',
+        title: 'Vídeos demonstrativos',
         text: 'Mostre equipamentos funcionando, testes, montagem e resultados.',
-        items: ['YouTube', 'Instagram', 'Thumbnail', 'Descricao'],
+        items: ['YouTube', 'Instagram', 'Thumbnail', 'Descrição'],
       },
       {
         title: 'Roadmap',
         text: 'Organize o que vem depois: app, novos produtos, melhorias e integracoes.',
-        items: ['Proximo lancamento', 'Meta', 'Status', 'Data prevista'],
+        items: ['Próximo lançamento', 'Meta', 'Status', 'Data prevista'],
       },
       {
         title: 'Novidades',
-        text: 'Area para comunicados, atualizacoes e conteudos futuros da marca.',
-        items: ['Titulo', 'Resumo', 'Link', 'Publicacao'],
+        text: 'Área para comunicados, atualizações e conteúdos futuros da marca.',
+        items: ['Título', 'Resumo', 'Link', 'Publicação'],
       },
     ],
-    workflow: ['Gravar conteudo', 'Adicionar link', 'Publicar destaque', 'Atualizar roadmap'],
+    workflow: ['Gravar conteúdo', 'Adicionar link', 'Publicar destaque', 'Atualizar roadmap'],
   },
   noticias: {
     key: 'noticias',
-    eyebrow: 'Noticias e inovacoes',
-    title: 'Novidades, lancamentos e melhorias publicadas pela ELN Technology.',
+    eyebrow: 'Notícias e inovações',
+    title: 'Novidades, lançamentos e melhorias publicadas pela ELN Technology.',
     description:
-      'Aqui voce acompanha comunicados, atualizacoes do sistema, videos, lancamentos, evolucoes de produtos e noticias importantes.',
+      'Aqui você acompanha comunicados, atualizações do sistema, vídeos, lançamentos, evoluções de produtos e notícias importantes.',
     icon: Rocket,
-    highlight: 'Espaco para publicar novidades pelo admin sem mexer no codigo do site.',
+    highlight: 'Espaço para publicar novidades pelo admin sem mexer no código do site.',
     sections: [
       {
-        title: 'Noticias',
+        title: 'Notícias',
         text: 'Comunicados oficiais sobre a empresa, projetos, eventos e novidades.',
-        items: ['Titulo', 'Resumo', 'Data', 'Link'],
+        items: ['Título', 'Resumo', 'Data', 'Link'],
       },
       {
-        title: 'Inovacoes',
-        text: 'Atualizacoes de sistema, novas funcoes, produtos e tecnologias em teste.',
-        items: ['Melhoria', 'Produto', 'Versao', 'Resultado'],
+        title: 'Inovações',
+        text: 'Atualizacoes de sistema, novas funções, produtos e tecnologias em teste.',
+        items: ['Melhoria', 'Produto', 'Versão', 'Resultado'],
       },
       {
-        title: 'Conteudos futuros',
-        text: 'Espaco para videos, artigos, demonstracoes e materiais de divulgacao.',
-        items: ['Video', 'Imagem', 'Documento', 'Publicacao'],
+        title: 'Conteúdos futuros',
+        text: 'Espaço para vídeos, artigos, demonstrações e materiais de divulgação.',
+        items: ['Vídeo', 'Imagem', 'Documento', 'Publicação'],
       },
     ],
-    workflow: ['Criar novidade', 'Adicionar midia', 'Publicar no site', 'Atualizar quando evoluir'],
+    workflow: ['Criar novidade', 'Adicionar mídia', 'Publicar no site', 'Atualizar quando evoluir'],
   },
 };
 
@@ -271,10 +271,10 @@ const quickLinks = [
   { label: 'Projetos', to: '/projetos-desenvolvidos', icon: CircuitBoard },
   { label: 'Melhorias', to: '/melhorias', icon: Wrench },
   { label: 'Equipe', to: '/equipe', icon: Users },
-  { label: 'Analise', to: '/atividades-analise', icon: BarChart3 },
+  { label: 'Análise', to: '/atividades-análise', icon: BarChart3 },
   { label: 'Produtos', to: '/produtos', icon: Package },
-  { label: 'Videos', to: '/videos-futuro', icon: MonitorPlay },
-  { label: 'Noticias', to: '/noticias-inovacoes', icon: Rocket },
+  { label: 'Vídeos', to: '/videos-futuro', icon: MonitorPlay },
+  { label: 'Notícias', to: '/notícias-inovações', icon: Rocket },
 ];
 
 function CompanyPage({ data }: { data: PageData }) {
@@ -337,10 +337,10 @@ function CompanyPage({ data }: { data: PageData }) {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a
-                  href="#conteudos"
+                  href="#conteúdos"
                   className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 font-black text-white transition hover:bg-[#0D0F52]"
                 >
-                  Ver conteudos publicados
+                  Ver conteúdos publicados
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <Link
@@ -387,7 +387,7 @@ function CompanyPage({ data }: { data: PageData }) {
           </div>
         </section>
 
-        <section id="conteudos" className="pb-16">
+        <section id="conteúdos" className="pb-16">
           <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
             {data.sections.map((section) => (
               <article key={section.title} className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
@@ -418,20 +418,20 @@ function CompanyPage({ data }: { data: PageData }) {
               <div>
                 <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Publicado pelo admin</p>
                 <h2 className={`mt-2 text-2xl font-black sm:text-3xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
-                  Conteudos adicionados pelo painel
+                  Conteúdos adicionados pelo painel
                 </h2>
               </div>
-              <Link to="/noticias-inovacoes" className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
-                Ver noticias
+              <Link to="/notícias-inovações" className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
+                Ver notícias
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
             {publishedItems.length === 0 ? (
               <div className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
-                <p className="font-black">Nenhum conteudo publicado ainda.</p>
+                <p className="font-black">Nenhum conteúdo publicado ainda.</p>
                 <p className={`mt-2 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                  Esta area vai mostrar os documentos, videos, produtos e novidades publicados pela ELN Technology.
+                  Esta área vai mostrar os documentos, vídeos, produtos e novidades publicados pela ELN Technology.
                 </p>
               </div>
             ) : (
@@ -440,14 +440,14 @@ function CompanyPage({ data }: { data: PageData }) {
                   <article key={item.id} className={`rounded-md border p-5 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
                     <div className="flex items-start justify-between gap-3">
                       <span className="rounded-md bg-[#159AFD]/15 px-3 py-1 text-xs font-black uppercase text-[#159AFD]">
-                        {item.type || 'Conteudo'}
+                        {item.type || 'Conteúdo'}
                       </span>
                       <span className={`rounded-md px-2 py-1 text-xs font-bold ${isDark ? 'bg-[#070A1F] text-slate-300' : 'bg-[#EEF7FF] text-[#0D0F52]'}`}>
                         {item.status || 'Publicado'}
                       </span>
                     </div>
-                    <h3 className="mt-4 text-xl font-black">{item.title || 'Sem titulo'}</h3>
-                    <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.description || 'Sem descricao.'}</p>
+                    <h3 className="mt-4 text-xl font-black">{item.title || 'Sem título'}</h3>
+                    <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.description || 'Sem descrição.'}</p>
                     {item.url && (
                       <a href={item.url} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-black text-[#159AFD] hover:underline">
                         Abrir link
@@ -464,8 +464,8 @@ function CompanyPage({ data }: { data: PageData }) {
         <section className={`border-t py-16 ${isDark ? 'border-white/10 bg-[#080B24]' : 'border-sky-100 bg-white'}`}>
           <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
             {[
-              { icon: Clock3, label: 'Historico organizado' },
-              { icon: Boxes, label: 'Espaco para anexos' },
+              { icon: Clock3, label: 'Histórico organizado' },
+              { icon: Boxes, label: 'Espaço para anexos' },
               { icon: Activity, label: 'Status por etapa' },
               { icon: Rocket, label: 'Pronto para crescer' },
             ].map(({ icon: FooterIcon, label }) => (
