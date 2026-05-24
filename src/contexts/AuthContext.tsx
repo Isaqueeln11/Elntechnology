@@ -29,7 +29,7 @@ interface RegisterUserInput {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   register: (data: RegisterUserInput) => Promise<{ success: boolean; message?: string }>;
   resetPassword: (email: string) => Promise<{ success: boolean; message: string }>;
   updateUserProfile: (data: Partial<Pick<User, 'name' | 'company' | 'avatar'>>) => Promise<{ success: boolean; message: string }>;
@@ -56,7 +56,7 @@ function firebaseMessage(error: unknown) {
     case 'auth/invalid-credential':
     case 'auth/user-not-found':
     case 'auth/wrong-password':
-      return 'Email ou senha incorretos.';
+      return 'Email ou senha incorretos. Se ainda nao criou essa conta, use Criar conta primeiro.';
     case 'auth/network-request-failed':
       return 'Falha de rede ao conectar com o Firebase.';
     default:
@@ -138,20 +138,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return unsubscribe;
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
 
     try {
-      const credential = await signInWithEmailAndPassword(auth, email, password);
+      const credential = await signInWithEmailAndPassword(auth, email.trim(), password);
       const profile = await readUserProfile(
         credential.user.uid,
         credential.user.email,
         credential.user.displayName,
       );
       setUser(profile);
-      return true;
-    } catch {
-      return false;
+      return { success: true };
+    } catch (error) {
+      return { success: false, message: firebaseMessage(error) };
     } finally {
       setIsLoading(false);
     }
@@ -161,7 +161,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
 
     try {
-      const credential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const credential = await createUserWithEmailAndPassword(auth, data.email.trim(), data.password);
       const avatar = avatarUrl(data.name);
 
       await updateProfile(credential.user, {
@@ -173,7 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const profile: User = {
         id: credential.user.uid,
         name: data.name,
-        email: data.email,
+        email: data.email.trim(),
         role: 'client',
         company: data.company || 'ELN Technology',
         avatar,
@@ -201,7 +201,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string) => {
     try {
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordResetEmail(auth, email.trim());
       return { success: true, message: 'Enviamos um email para redefinir sua senha.' };
     } catch (error) {
       return { success: false, message: firebaseMessage(error) };

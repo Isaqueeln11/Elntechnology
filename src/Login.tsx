@@ -19,11 +19,11 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      const success = await login(email, password);
-      if (success) {
+      const result = await login(email, password);
+      if (result.success) {
         navigate('/dashboard');
       } else {
-        setError('Email ou senha incorretos.');
+        setError(result.message || 'Nao foi possivel entrar.');
       }
     } catch {
       setError('Erro ao fazer login. Tente novamente.');
