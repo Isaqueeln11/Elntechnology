@@ -16,11 +16,15 @@ import {
   Users,
   Wrench,
 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { useTheme } from '../contexts/ThemeContext';
+import { db } from '../firebase';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
 
 type PageData = {
+  key: string;
   eyebrow: string;
   title: string;
   description: string;
@@ -34,8 +38,19 @@ type PageData = {
   workflow: string[];
 };
 
+type SiteContentItem = {
+  id: string;
+  page?: string;
+  type?: string;
+  title?: string;
+  description?: string;
+  url?: string;
+  status?: string;
+};
+
 const pages: Record<string, PageData> = {
   projetos: {
+    key: 'projetos',
     eyebrow: 'Projetos desenvolvidos',
     title: 'Galeria organizada para publicar os projetos reais da ELN Technology.',
     description:
@@ -62,6 +77,7 @@ const pages: Record<string, PageData> = {
     workflow: ['Cadastrar projeto', 'Adicionar fotos e descricao', 'Vincular arquivos', 'Publicar como concluido'],
   },
   melhorias: {
+    key: 'melhorias',
     eyebrow: 'Melhorias',
     title: 'Controle claro das melhorias que entram no site, no painel e nos equipamentos.',
     description:
@@ -88,6 +104,7 @@ const pages: Record<string, PageData> = {
     workflow: ['Registrar melhoria', 'Definir prioridade', 'Implementar', 'Testar e publicar'],
   },
   equipe: {
+    key: 'equipe',
     eyebrow: 'Equipe',
     title: 'Pagina para apresentar quem faz parte da ELN Technology.',
     description:
@@ -114,6 +131,7 @@ const pages: Record<string, PageData> = {
     workflow: ['Cadastrar membro', 'Definir cargo', 'Vincular atividades', 'Atualizar perfil'],
   },
   atividades: {
+    key: 'atividades',
     eyebrow: 'Atividades e analise',
     title: 'Painel publico para organizar atividades, indicadores e analises.',
     description:
@@ -140,6 +158,7 @@ const pages: Record<string, PageData> = {
     workflow: ['Coletar dados', 'Analisar status', 'Gerar relatorio', 'Tomar decisao'],
   },
   desenvolvimentos: {
+    key: 'desenvolvimentos',
     eyebrow: 'Desenvolvimentos',
     title: 'Area para mostrar o que esta em desenvolvimento agora.',
     description:
@@ -166,6 +185,7 @@ const pages: Record<string, PageData> = {
     workflow: ['Planejar', 'Construir', 'Testar', 'Lancar versao'],
   },
   produtos: {
+    key: 'produtos',
     eyebrow: 'Produtos',
     title: 'Catalogo para exibir produtos, equipamentos e solucoes da ELN Technology.',
     description:
@@ -192,6 +212,7 @@ const pages: Record<string, PageData> = {
     workflow: ['Cadastrar produto', 'Adicionar foto', 'Definir valor', 'Publicar no site'],
   },
   videos: {
+    key: 'videos',
     eyebrow: 'Videos e futuro',
     title: 'Espaco para publicar videos, novidades e proximos lancamentos.',
     description:
@@ -230,7 +251,20 @@ const quickLinks = [
 
 function CompanyPage({ data }: { data: PageData }) {
   const { isDark, toggleTheme } = useTheme();
+  const [contentItems, setContentItems] = useState<SiteContentItem[]>([]);
   const Icon = data.icon;
+  const publishedItems = useMemo(
+    () => contentItems.filter((item) => item.page === data.key && item.status !== 'Rascunho'),
+    [contentItems, data.key],
+  );
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'siteContent'), (snapshot) => {
+      setContentItems(snapshot.docs.map((item) => ({ id: item.id, ...item.data() }) as SiteContentItem));
+    });
+
+    return unsubscribe;
+  }, []);
 
   return (
     <div className={`min-h-screen transition-colors ${isDark ? 'bg-[#070A1F] text-white' : 'bg-[#F7FBFF] text-slate-950'}`}>
@@ -347,6 +381,55 @@ function CompanyPage({ data }: { data: PageData }) {
                 </div>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className="pb-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Publicado pelo admin</p>
+                <h2 className={`mt-2 text-2xl font-black sm:text-3xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
+                  Conteudos adicionados pelo painel
+                </h2>
+              </div>
+              <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
+                Adicionar conteudo
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            {publishedItems.length === 0 ? (
+              <div className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
+                <p className="font-black">Nenhum conteudo publicado ainda.</p>
+                <p className={`mt-2 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                  Abra o dashboard, entre em Paginas do site e publique documentos, videos, produtos, projetos ou melhorias para aparecer aqui.
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                {publishedItems.map((item) => (
+                  <article key={item.id} className={`rounded-md border p-5 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="rounded-md bg-[#159AFD]/15 px-3 py-1 text-xs font-black uppercase text-[#159AFD]">
+                        {item.type || 'Conteudo'}
+                      </span>
+                      <span className={`rounded-md px-2 py-1 text-xs font-bold ${isDark ? 'bg-[#070A1F] text-slate-300' : 'bg-[#EEF7FF] text-[#0D0F52]'}`}>
+                        {item.status || 'Publicado'}
+                      </span>
+                    </div>
+                    <h3 className="mt-4 text-xl font-black">{item.title || 'Sem titulo'}</h3>
+                    <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.description || 'Sem descricao.'}</p>
+                    {item.url && (
+                      <a href={item.url} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-black text-[#159AFD] hover:underline">
+                        Abrir link
+                        <ArrowRight className="h-4 w-4" />
+                      </a>
+                    )}
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

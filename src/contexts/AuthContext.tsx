@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -20,6 +20,15 @@ export interface User {
   company?: string;
   avatar?: string;
   theme?: ThemeMode;
+  preferences?: UserPreferences;
+}
+
+export interface UserPreferences {
+  theme: ThemeMode;
+  dashboardDensity: 'comfortable' | 'compact';
+  dashboardStartPage: string;
+  notifyNewUsers: boolean;
+  notifyStatusChanges: boolean;
 }
 
 interface RegisterUserInput {
@@ -34,7 +43,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   register: (data: RegisterUserInput) => Promise<{ success: boolean; message?: string }>;
   resetPassword: (email: string) => Promise<{ success: boolean; message: string }>;
-  updateUserProfile: (data: Partial<Pick<User, 'name' | 'company' | 'avatar' | 'theme'>>) => Promise<{ success: boolean; message: string }>;
+  updateUserProfile: (data: Partial<Pick<User, 'name' | 'company' | 'avatar' | 'theme' | 'preferences'>>) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -49,6 +58,31 @@ function isOwnerEmail(email?: string | null) {
 
 function avatarUrl(name: string) {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=159AFD&color=fff`;
+}
+
+const defaultPreferences: UserPreferences = {
+  theme: 'dark',
+  dashboardDensity: 'comfortable',
+  dashboardStartPage: 'overview',
+  notifyNewUsers: true,
+  notifyStatusChanges: true,
+};
+
+function readPreferences(data: Record<string, unknown>, fallbackTheme: ThemeMode = 'dark'): UserPreferences {
+  const preferences = typeof data.preferences === 'object' && data.preferences ? data.preferences as Partial<UserPreferences> : {};
+  const theme = preferences.theme === 'light' || data.theme === 'light' || fallbackTheme === 'light' ? 'light' : 'dark';
+  const dashboardDensity = preferences.dashboardDensity === 'compact' ? 'compact' : 'comfortable';
+  const dashboardStartPage = typeof preferences.dashboardStartPage === 'string' && preferences.dashboardStartPage ? preferences.dashboardStartPage : 'overview';
+
+  return {
+    ...defaultPreferences,
+    ...preferences,
+    theme,
+    dashboardDensity,
+    dashboardStartPage,
+    notifyNewUsers: preferences.notifyNewUsers !== false,
+    notifyStatusChanges: preferences.notifyStatusChanges !== false,
+  };
 }
 
 function firebaseMessage(error: unknown) {
@@ -79,6 +113,7 @@ async function readUserProfile(uid: string, fallbackEmail: string | null, fallba
   if (profile.exists()) {
     const data = profile.data();
     const role = isOwnerEmail(fallbackEmail) ? 'admin' : (data.role || 'client');
+    const preferences = readPreferences(data, data.theme === 'light' ? 'light' : 'dark');
     const userProfile = {
       id: uid,
       name: String(data.name || fallbackName || 'Usuario'),
@@ -86,7 +121,8 @@ async function readUserProfile(uid: string, fallbackEmail: string | null, fallba
       role: role as User['role'],
       company: data.company ? String(data.company) : undefined,
       avatar: data.avatar ? String(data.avatar) : avatarUrl(String(data.name || fallbackName || 'Usuario')),
-      theme: data.theme === 'light' ? 'light' : 'dark',
+      theme: preferences.theme,
+      preferences,
     };
 
     if (role === 'admin' && data.role !== 'admin') {
@@ -112,6 +148,7 @@ async function readUserProfile(uid: string, fallbackEmail: string | null, fallba
     company: 'ELN Technology',
     avatar: avatarUrl(fallbackName || fallbackEmail || 'Usuario'),
     theme: 'dark',
+    preferences: defaultPreferences,
   };
 
   await setDoc(profileRef, {
@@ -135,6 +172,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { theme, setTheme } = useTheme();
+  const themeRef = useRef(theme);
+
+  useEffect(() => {
+    themeRef.current = theme;
+  }, [theme]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -146,7 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       try {
         const profile = await readUserProfile(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName);
-        if (profile.theme) setTheme(profile.theme);
+        if (profile.preferences?.theme || profile.theme) setTheme(profile.preferences?.theme || profile.theme || 'dark');
         setUser(profile);
       } catch {
         setUser({
@@ -156,7 +198,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           role: isOwnerEmail(firebaseUser.email) ? 'admin' : 'client',
           company: 'ELN Technology',
           avatar: avatarUrl(firebaseUser.displayName || firebaseUser.email || 'Usuario'),
-          theme,
+          theme: themeRef.current,
+          preferences: { ...defaultPreferences, theme: themeRef.current },
         });
       } finally {
         setIsLoading(false);
@@ -164,7 +207,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return unsubscribe;
-  }, []);
+  }, [setTheme]);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
@@ -176,7 +219,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         credential.user.email,
         credential.user.displayName,
       );
-      if (profile.theme) setTheme(profile.theme);
+      if (profile.preferences?.theme || profile.theme) setTheme(profile.preferences?.theme || profile.theme || 'dark');
       setUser(profile);
       return { success: true };
     } catch (error) {
@@ -207,6 +250,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         company: data.company || 'ELN Technology',
         avatar,
         theme,
+        preferences: { ...defaultPreferences, theme },
       };
 
       await setDoc(doc(db, 'users', credential.user.uid), {
@@ -257,18 +301,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateUserProfile = async (data: Partial<Pick<User, 'name' | 'company' | 'avatar' | 'theme'>>) => {
+  const updateUserProfile = async (data: Partial<Pick<User, 'name' | 'company' | 'avatar' | 'theme' | 'preferences'>>) => {
     if (!auth.currentUser || !user) {
       return { success: false, message: 'Usuario nao autenticado.' };
     }
 
     try {
+      const nextPreferences: UserPreferences = {
+        ...defaultPreferences,
+        ...(user.preferences || {}),
+        ...(data.preferences || {}),
+        theme: data.preferences?.theme || data.theme || user.preferences?.theme || user.theme || theme,
+      };
       const nextUser: User = {
         ...user,
         name: data.name?.trim() || user.name,
         company: data.company?.trim() || user.company,
         avatar: data.avatar?.trim() || user.avatar,
-        theme: data.theme || user.theme || theme,
+        theme: nextPreferences.theme,
+        preferences: nextPreferences,
       };
 
       await updateProfile(auth.currentUser, {
@@ -283,6 +334,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           company: nextUser.company || '',
           avatar: nextUser.avatar || '',
           theme: nextUser.theme || 'dark',
+          preferences: nextPreferences,
           updatedAt: serverTimestamp(),
         },
         { merge: true },

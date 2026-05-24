@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
@@ -12,6 +12,8 @@ import {
   Sun
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -21,6 +23,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const { user, logout, updateUserProfile } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
+  const [newNotifications, setNewNotifications] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'notifications'), (snapshot) => {
+      const count = snapshot.docs.filter((item) => {
+        const data = item.data();
+        return data.target === 'Admin' && data.status !== 'Lida';
+      }).length;
+      setNewNotifications(user?.preferences?.notifyNewUsers === false ? 0 : count);
+    });
+
+    return unsubscribe;
+  }, [user?.preferences?.notifyNewUsers]);
 
   const handleLogout = () => {
     logout();
@@ -64,7 +79,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <div className="flex flex-none items-center space-x-2 sm:space-x-4">
               <button className={`relative rounded-md p-2 transition-colors ${isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}>
                 <Bell className="w-6 h-6" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                {newNotifications > 0 && (
+                  <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-black text-white">
+                    {newNotifications > 9 ? '9+' : newNotifications}
+                  </span>
+                )}
               </button>
               <button
                 type="button"
@@ -100,7 +119,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       </nav>
 
       {/* Main Content */}
-      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <main className={`mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 ${user?.preferences?.dashboardDensity === 'compact' ? 'py-4 sm:py-5' : 'py-6 sm:py-8'}`}>
         {children}
       </main>
 

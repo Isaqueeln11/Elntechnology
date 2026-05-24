@@ -8,6 +8,7 @@ import {
   FileText,
   FolderOpen,
   MessageSquare,
+  MonitorPlay,
   PackagePlus,
   Plus,
   Settings,
@@ -18,12 +19,13 @@ import {
 } from 'lucide-react';
 import type { ThemeMode } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
+import type { UserPreferences } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { db } from '../../firebase';
 import DashboardLayout from '../../components/DashboardLayout';
 import OtaAdminPanel from '../../components/OtaAdminPanel';
 
-type CollectionName = 'clientes' | 'projetos' | 'technicians' | 'supportTickets' | 'documents' | 'invoices' | 'orders' | 'notifications';
+type CollectionName = 'clientes' | 'projetos' | 'technicians' | 'supportTickets' | 'documents' | 'invoices' | 'orders' | 'notifications' | 'siteContent';
 
 interface BaseRecord {
   id: string;
@@ -101,6 +103,7 @@ interface UserRecord extends BaseRecord {
   role?: string;
   company?: string;
   theme?: ThemeMode;
+  preferences?: UserPreferences;
   createdAt?: unknown;
 }
 
@@ -111,6 +114,15 @@ interface SystemEventRecord extends BaseRecord {
   createdAt?: unknown;
 }
 
+interface SiteContentRecord extends BaseRecord {
+  page?: string;
+  type?: string;
+  title?: string;
+  description?: string;
+  url?: string;
+  status?: string;
+}
+
 const tabs = [
   { id: 'overview', label: 'Visao Geral', icon: BarChart3, description: 'Resumo operacional do sistema' },
   { id: 'orders', label: 'Pedidos', icon: PackagePlus, description: 'Novas demandas e aprovacoes' },
@@ -119,6 +131,7 @@ const tabs = [
   { id: 'technicians', label: 'Tecnicos', icon: Users, description: 'Equipe tecnica e especialidades' },
   { id: 'support', label: 'Suporte', icon: MessageSquare, description: 'Tickets e atendimento' },
   { id: 'documents', label: 'Documentos', icon: FileText, description: 'Links, contratos e arquivos' },
+  { id: 'sitePages', label: 'Paginas do site', icon: MonitorPlay, description: 'Conteudo publicado nas subpaginas' },
   { id: 'billing', label: 'Faturamento', icon: CreditCard, description: 'Valores, vencimentos e status' },
   { id: 'notifications', label: 'Notificacoes', icon: Bell, description: 'Avisos para clientes e equipe' },
   { id: 'ota', label: 'Codigos OTA', icon: UploadCloud, description: 'Versoes e firmware dos equipamentos' },
@@ -252,6 +265,7 @@ const AdminDashboard = () => {
   const [notifications, setNotifications] = useState<NotificationRecord[]>([]);
   const [registeredUsers, setRegisteredUsers] = useState<UserRecord[]>([]);
   const [systemEvents, setSystemEvents] = useState<SystemEventRecord[]>([]);
+  const [siteContent, setSiteContent] = useState<SiteContentRecord[]>([]);
 
   const [clientForm, setClientForm] = useState({ name: '', email: '', phone: '', company: '' });
   const [projectForm, setProjectForm] = useState({ name: '', client: '', status: 'Planejamento', budget: '', deadline: '', technician: '', progress: '0', description: '' });
@@ -261,11 +275,36 @@ const AdminDashboard = () => {
   const [invoiceForm, setInvoiceForm] = useState({ title: '', client: '', amount: '', dueDate: '', status: 'Pendente' });
   const [orderForm, setOrderForm] = useState({ title: '', client: '', type: 'Novo projeto', budget: '', status: 'Novo', notes: '' });
   const [notificationForm, setNotificationForm] = useState({ title: '', message: '', target: 'Todos', status: 'Rascunho' });
-  const [profileForm, setProfileForm] = useState({ name: user?.name || '', company: user?.company || '', avatar: user?.avatar || '', theme: user?.theme || 'dark' as ThemeMode });
+  const [siteContentForm, setSiteContentForm] = useState({ page: 'projetos', type: 'Projeto', title: '', description: '', url: '', status: 'Publicado' });
+  const [profileForm, setProfileForm] = useState({
+    name: user?.name || '',
+    company: user?.company || '',
+    avatar: user?.avatar || '',
+    theme: user?.preferences?.theme || user?.theme || 'dark' as ThemeMode,
+    dashboardDensity: user?.preferences?.dashboardDensity || 'comfortable',
+    dashboardStartPage: user?.preferences?.dashboardStartPage || 'overview',
+    notifyNewUsers: user?.preferences?.notifyNewUsers !== false,
+    notifyStatusChanges: user?.preferences?.notifyStatusChanges !== false,
+  });
 
   useEffect(() => {
-    setProfileForm({ name: user?.name || '', company: user?.company || '', avatar: user?.avatar || '', theme: user?.theme || 'dark' });
+    setProfileForm({
+      name: user?.name || '',
+      company: user?.company || '',
+      avatar: user?.avatar || '',
+      theme: user?.preferences?.theme || user?.theme || 'dark',
+      dashboardDensity: user?.preferences?.dashboardDensity || 'comfortable',
+      dashboardStartPage: user?.preferences?.dashboardStartPage || 'overview',
+      notifyNewUsers: user?.preferences?.notifyNewUsers !== false,
+      notifyStatusChanges: user?.preferences?.notifyStatusChanges !== false,
+    });
   }, [user]);
+
+  useEffect(() => {
+    if (user?.preferences?.dashboardStartPage) {
+      setActiveTab(user.preferences.dashboardStartPage);
+    }
+  }, [user?.preferences?.dashboardStartPage]);
 
   useEffect(() => {
     const subscriptions = [
@@ -279,6 +318,7 @@ const AdminDashboard = () => {
       onSnapshot(collection(db, 'notifications'), (snapshot) => setNotifications(asList<NotificationRecord>(snapshot))),
       onSnapshot(collection(db, 'users'), (snapshot) => setRegisteredUsers(asList<UserRecord>(snapshot))),
       onSnapshot(collection(db, 'systemEvents'), (snapshot) => setSystemEvents(asList<SystemEventRecord>(snapshot))),
+      onSnapshot(collection(db, 'siteContent'), (snapshot) => setSiteContent(asList<SiteContentRecord>(snapshot))),
     ];
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
@@ -314,6 +354,18 @@ const AdminDashboard = () => {
 
   async function changeStatus(collectionName: CollectionName, id: string, nextStatus: string) {
     await updateDoc(doc(db, collectionName, id), { status: nextStatus, updatedAt: serverTimestamp() });
+    if (user?.preferences?.notifyStatusChanges !== false) {
+      await addDoc(collection(db, 'notifications'), {
+        title: 'Status atualizado',
+        message: `Um registro em ${collectionName} mudou para ${nextStatus}.`,
+        target: 'Admin',
+        status: 'Nova',
+        type: 'status-change',
+        createdBy: user?.id || '',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+    }
     setStatus('Status atualizado.');
   }
 
@@ -366,6 +418,7 @@ const AdminDashboard = () => {
     if (activeTab === 'technicians') return renderTechnicians();
     if (activeTab === 'support') return renderTickets();
     if (activeTab === 'documents') return renderDocuments();
+    if (activeTab === 'sitePages') return renderSitePages();
     if (activeTab === 'billing') return renderBilling();
     if (activeTab === 'notifications') return renderNotifications();
     if (activeTab === 'ota') return <OtaAdminPanel />;
@@ -620,6 +673,55 @@ const AdminDashboard = () => {
     />
   );
 
+  const renderSitePages = () => (
+    <CrudPanel
+      title="Publicar nas subpaginas"
+      onSubmit={(event) => {
+        event.preventDefault();
+        createRecord(
+          'siteContent',
+          siteContentForm,
+          () => setSiteContentForm({ page: 'projetos', type: 'Projeto', title: '', description: '', url: '', status: 'Publicado' }),
+          'Conteudo publicado na subpagina.',
+        );
+      }}
+      form={
+        <>
+          <SelectField
+            label="Subpagina"
+            value={siteContentForm.page}
+            onChange={(page) => setSiteContentForm({ ...siteContentForm, page })}
+            options={['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'produtos', 'videos']}
+          />
+          <SelectField
+            label="Tipo de conteudo"
+            value={siteContentForm.type}
+            onChange={(type) => setSiteContentForm({ ...siteContentForm, type })}
+            options={['Projeto', 'Documento', 'Video', 'Produto', 'Melhoria', 'Equipe', 'Atividade', 'Link']}
+          />
+          <Field label="Titulo" value={siteContentForm.title} onChange={(title) => setSiteContentForm({ ...siteContentForm, title })} />
+          <Field label="Link, documento, imagem ou video" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="https://..." required={false} />
+          <SelectField label="Status" value={siteContentForm.status} onChange={(statusValue) => setSiteContentForm({ ...siteContentForm, status: statusValue })} options={['Publicado', 'Rascunho']} />
+          <TextAreaField label="Descricao" value={siteContentForm.description} onChange={(description) => setSiteContentForm({ ...siteContentForm, description })} />
+        </>
+      }
+      emptyText="Nenhum conteudo publicado nas subpaginas."
+      items={siteContent.map((item) => ({
+        id: item.id,
+        title: item.title || 'Conteudo sem titulo',
+        subtitle: `${item.page || 'sem pagina'} - ${item.type || 'Conteudo'} - ${item.status || 'Publicado'}`,
+        meta: item.description || item.url || '',
+        status: item.status,
+        link: item.url,
+        actions: [
+          { label: 'Publicar', onClick: () => changeStatus('siteContent', item.id, 'Publicado') },
+          { label: 'Rascunho', onClick: () => changeStatus('siteContent', item.id, 'Rascunho') },
+        ],
+        remove: () => removeRecord('siteContent', item.id),
+      }))}
+    />
+  );
+
   const renderBilling = () => (
     <CrudPanel
       title="Adicionar faturamento"
@@ -721,32 +823,58 @@ const AdminDashboard = () => {
       <form
         onSubmit={async (event) => {
           event.preventDefault();
-          const result = await updateUserProfile(profileForm);
+          const result = await updateUserProfile({
+            name: profileForm.name,
+            company: profileForm.company,
+            avatar: profileForm.avatar,
+            theme: profileForm.theme as ThemeMode,
+            preferences: {
+              theme: profileForm.theme as ThemeMode,
+              dashboardDensity: profileForm.dashboardDensity as UserPreferences['dashboardDensity'],
+              dashboardStartPage: profileForm.dashboardStartPage,
+              notifyNewUsers: profileForm.notifyNewUsers,
+              notifyStatusChanges: profileForm.notifyStatusChanges,
+            },
+          });
           setStatus(result.message);
         }}
         className={`${panelClass} p-6`}
       >
-        <h3 className="mb-5 text-xl font-bold text-white">Meu perfil de admin</h3>
+        <h3 className="mb-5 text-xl font-bold text-slate-950 dark:text-white">Meu perfil de admin</h3>
         <div className="space-y-4">
           <Field label="Nome" value={profileForm.name} onChange={(name) => setProfileForm({ ...profileForm, name })} />
           <Field label="Empresa" value={profileForm.company} onChange={(company) => setProfileForm({ ...profileForm, company })} />
           <Field label="URL da foto" value={profileForm.avatar} onChange={(avatar) => setProfileForm({ ...profileForm, avatar })} required={false} />
-          <label className="block text-sm font-semibold text-slate-300">
+          <SelectField label="Tema do meu acesso" value={profileForm.theme} onChange={(themeValue) => setProfileForm({ ...profileForm, theme: themeValue as ThemeMode })} options={['dark', 'light']} />
+          <SelectField label="Tela inicial do painel" value={profileForm.dashboardStartPage} onChange={(dashboardStartPage) => setProfileForm({ ...profileForm, dashboardStartPage })} options={tabs.map((tab) => tab.id)} />
+          <SelectField label="Densidade da interface" value={profileForm.dashboardDensity} onChange={(dashboardDensity) => setProfileForm({ ...profileForm, dashboardDensity: dashboardDensity as UserPreferences['dashboardDensity'] })} options={['comfortable', 'compact']} />
+          <label className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm font-semibold text-slate-700 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-300">
+            Avisar novos usuarios
+            <input type="checkbox" checked={profileForm.notifyNewUsers} onChange={(event) => setProfileForm({ ...profileForm, notifyNewUsers: event.target.checked })} className="h-5 w-5 accent-[#159AFD]" />
+          </label>
+          <label className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm font-semibold text-slate-700 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-300">
+            Avisar mudancas de status
+            <input type="checkbox" checked={profileForm.notifyStatusChanges} onChange={(event) => setProfileForm({ ...profileForm, notifyStatusChanges: event.target.checked })} className="h-5 w-5 accent-[#159AFD]" />
+          </label>
+          <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
             Enviar foto do computador
-            <input type="file" accept="image/*" onChange={handleAvatarFile} className="mt-2 w-full rounded-md border border-dashed border-white/15 bg-slate-950/70 p-3 text-sm text-slate-300 file:mr-4 file:rounded-md file:border-0 file:bg-[#159AFD] file:px-4 file:py-2 file:font-semibold file:text-white" />
+            <input type="file" accept="image/*" onChange={handleAvatarFile} className="mt-2 w-full rounded-md border border-dashed border-slate-200 bg-white p-3 text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-[#159AFD] file:px-4 file:py-2 file:font-semibold file:text-white dark:border-white/15 dark:bg-slate-950/70 dark:text-slate-300" />
             {isUploadingAvatar && <span className="mt-2 block text-xs text-sky-300">Preparando imagem...</span>}
           </label>
           <button disabled={isUploadingAvatar} className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 font-bold text-white transition hover:bg-[#508AD0] disabled:cursor-not-allowed disabled:bg-slate-600">Salvar perfil</button>
         </div>
       </form>
       <div className={`${panelClass} p-6`}>
-        <h3 className="mb-5 text-xl font-bold text-white">Previa</h3>
+        <h3 className="mb-5 text-xl font-bold text-slate-950 dark:text-white">Previa</h3>
         <div className="flex items-center gap-4">
           <img src={profileForm.avatar || user?.avatar} alt={profileForm.name} className="h-20 w-20 rounded-full border-2 border-[#159AFD] object-cover" />
           <div>
-            <p className="text-lg font-semibold text-white">{profileForm.name || user?.name}</p>
-            <p className="text-sm text-gray-400">{user?.email}</p>
-            <p className="text-sm text-gray-500">{profileForm.company || user?.company}</p>
+            <p className="text-lg font-semibold text-slate-950 dark:text-white">{profileForm.name || user?.name}</p>
+            <p className="text-sm text-slate-500 dark:text-gray-400">{user?.email}</p>
+            <p className="text-sm text-slate-500 dark:text-gray-500">{profileForm.company || user?.company}</p>
+            <p className="mt-2 text-sm font-semibold text-[#159AFD]">Tema salvo: {profileForm.theme === 'dark' ? 'noturno' : 'claro'}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Tela inicial: {profileForm.dashboardStartPage}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Interface: {profileForm.dashboardDensity === 'compact' ? 'compacta' : 'confortavel'}</p>
           </div>
         </div>
       </div>
@@ -837,8 +965,8 @@ function CrudPanel({
   return (
     <div className="grid gap-6 lg:grid-cols-[0.78fr_1.22fr]">
       <form onSubmit={onSubmit} className={`${panelClass} p-5 sm:p-6`}>
-        <div className="mb-5 border-b border-white/10 pb-4">
-          <h3 className="text-xl font-bold text-white">{title}</h3>
+        <div className="mb-5 border-b border-slate-200 pb-4 dark:border-white/10">
+          <h3 className="text-xl font-bold text-slate-950 dark:text-white">{title}</h3>
           <p className="mt-1 text-sm text-slate-500">Preencha os dados e salve no banco.</p>
         </div>
         <div className="space-y-4">
@@ -851,23 +979,23 @@ function CrudPanel({
       </form>
 
       <div className={`${panelClass} min-h-[360px] p-4 sm:p-5`}>
-        <div className="mb-4 flex items-center justify-between gap-3 border-b border-white/10 pb-4">
+        <div className="mb-4 flex items-center justify-between gap-3 border-b border-slate-200 pb-4 dark:border-white/10">
           <div>
-            <h3 className="text-lg font-bold text-white">Registros</h3>
+            <h3 className="text-lg font-bold text-slate-950 dark:text-white">Registros</h3>
             <p className="mt-1 text-sm text-slate-500">{items.length} item(ns) encontrado(s)</p>
           </div>
         </div>
         <div className="space-y-3">
         {items.length === 0 && <EmptyState title={emptyText} text="Cadastre o primeiro registro pelo formulario ao lado." />}
         {items.map((item) => (
-          <article key={item.id} className="rounded-md border border-white/10 bg-white/[0.035] p-4 transition hover:border-[#159AFD]/35 hover:bg-white/[0.055]">
+          <article key={item.id} className="rounded-md border border-slate-200 bg-slate-50 p-4 transition hover:border-[#159AFD]/35 hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.055]">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h4 className="font-semibold text-white">{item.title}</h4>
+                  <h4 className="font-semibold text-slate-950 dark:text-white">{item.title}</h4>
                   {item.status && <StatusPill value={item.status} />}
                 </div>
-                <p className="mt-1 text-sm text-slate-400">{item.subtitle}</p>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{item.subtitle}</p>
                 {item.meta && <p className="mt-1 break-words text-sm text-slate-500">{item.meta}</p>}
                 {item.link && (
                   <a href={item.link} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm font-semibold text-[#159AFD] hover:text-white">
@@ -877,7 +1005,7 @@ function CrudPanel({
               </div>
               <div className="flex flex-wrap gap-2">
                 {item.actions?.map((action) => (
-                  <button key={action.label} type="button" onClick={action.onClick} className="rounded-md border border-[#159AFD]/25 px-3 py-2 text-sm font-semibold text-sky-200 transition hover:bg-[#159AFD]/10">
+                  <button key={action.label} type="button" onClick={action.onClick} className="rounded-md border border-[#159AFD]/25 px-3 py-2 text-sm font-semibold text-[#0D0F52] transition hover:bg-[#159AFD]/10 dark:text-sky-200">
                     {action.label}
                   </button>
                 ))}

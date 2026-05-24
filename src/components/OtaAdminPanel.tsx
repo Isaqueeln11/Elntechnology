@@ -216,7 +216,7 @@ const OtaAdminPanel = () => {
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+      <div className="grid gap-6 2xl:grid-cols-[0.9fr_1.1fr]">
         <section className="rounded-xl border border-[#159AFD]/30 bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 p-5 backdrop-blur-sm sm:p-6">
           <div className="mb-5 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#159AFD]/20 text-[#159AFD]">
@@ -229,7 +229,7 @@ const OtaAdminPanel = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2">
               <label className="text-sm font-medium text-gray-300">
                 ID do equipamento
                 <input
@@ -253,7 +253,7 @@ const OtaAdminPanel = () => {
               </label>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-3">
               <label className="text-sm font-medium text-gray-300">
                 Placa
                 <input
@@ -375,7 +375,7 @@ const OtaAdminPanel = () => {
 
           {copyStatus && <p className="mb-3 rounded-lg bg-emerald-500/10 p-3 text-sm text-emerald-300">{copyStatus}</p>}
 
-          <pre className="max-h-[520px] overflow-auto rounded-lg border border-[#159AFD]/20 bg-black/40 p-4 text-xs leading-6 text-sky-100">
+          <pre className="max-h-[520px] w-full overflow-auto rounded-lg border border-[#159AFD]/20 bg-black/40 p-4 text-xs leading-6 text-sky-100">
             {manifestJson}
           </pre>
         </section>
