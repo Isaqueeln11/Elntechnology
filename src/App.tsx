@@ -8,6 +8,7 @@ import {
   ChevronRight,
   CircuitBoard,
   Cpu,
+  Instagram,
   Mail,
   Menu,
   Microscope,
@@ -406,13 +407,22 @@ function HomePage() {
                 Use o formulario para organizar o pedido. Ele funciona na pagina e deixa a solicitacao pronta para retorno.
               </p>
               <div className="mt-8 space-y-4">
-                <a href="mailto:contato@elntechnology.com" className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]">
+                <a href="mailto:elntechnologyinnovations@gmail.com" className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]">
                   <Mail className="h-5 w-5" />
-                  contato@elntechnology.com
+                  elntechnologyinnovations@gmail.com
                 </a>
-                <a href="tel:+5585999999999" className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]">
+                <a href="tel:+5581997092380" className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]">
                   <Phone className="h-5 w-5" />
-                  +55 (85) 99999-9999
+                  +55 (81) 99709-2380
+                </a>
+                <a
+                  href="https://instagram.com/eln_technology"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]"
+                >
+                  <Instagram className="h-5 w-5" />
+                  @eln_technology
                 </a>
               </div>
             </div>
