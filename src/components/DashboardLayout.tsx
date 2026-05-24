@@ -31,9 +31,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-[#159AFD] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">E</span>
-              </div>
+              <img
+                src="/Eln technology.png"
+                alt="ELN Technology Logo"
+                className="w-10 h-10 object-contain"
+              />
               <span className="text-xl font-bold text-white">ELN Technology</span>
             </Link>
 
