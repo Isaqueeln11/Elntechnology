@@ -94,7 +94,9 @@ const FAQ = () => {
             Não encontrou a resposta que procurava?
           </p>
           <a
-            href="mailto:elntechnologyinnovations@gmail.com"
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=elntechnologyinnovations@gmail.com"
+            target="_blank"
+            rel="noreferrer"
             className="inline-block bg-[#159AFD] hover:bg-[#508AD0] text-white px-6 py-3 rounded-lg font-semibold transition-colors"
           >
             Entre em Contato

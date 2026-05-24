@@ -407,13 +407,23 @@ function HomePage() {
                 Use o formulario para organizar o pedido. Ele funciona na pagina e deixa a solicitacao pronta para retorno.
               </p>
               <div className="mt-8 space-y-4">
-                <a href="mailto:elntechnologyinnovations@gmail.com" className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]">
+                <a
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=elntechnologyinnovations@gmail.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]"
+                >
                   <Mail className="h-5 w-5" />
                   elntechnologyinnovations@gmail.com
                 </a>
-                <a href="tel:+5581997092380" className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]">
+                <a
+                  href="https://wa.me/5581997092380"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]"
+                >
                   <Phone className="h-5 w-5" />
-                  +55 (81) 99709-2380
+                  WhatsApp: +55 (81) 99709-2380
                 </a>
                 <a
                   href="https://instagram.com/eln_technology"
@@ -475,7 +485,7 @@ function HomePage() {
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 px-4 text-sm text-slate-500 sm:px-6 lg:flex-row lg:items-center lg:px-8">
           <div className="flex items-center gap-3">
             <img src={logoUrl} alt="" className="h-10 w-24 object-contain" />
-            <span className="font-semibold">ELN Technology - Inovacao em Tecnologia</span>
+            <span className="font-semibold">ELN Technology</span>
           </div>
           <span>(c) 2026 ELN Technology. Todos os direitos reservados.</span>
         </div>
