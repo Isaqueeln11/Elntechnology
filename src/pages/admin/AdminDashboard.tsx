@@ -126,7 +126,7 @@ interface SiteContentRecord extends BaseRecord {
 
 const tabs = [
   { id: 'overview', label: 'Visão Geral', icon: BarChart3, description: 'Resumo operacional do sistema' },
-  { id: 'orders', label: 'Pedidos', icon: PackagePlus, description: 'Novas demandas e aprovacoes' },
+  { id: 'orders', label: 'Pedidos', icon: PackagePlus, description: 'Novas demandas e aprovações' },
   { id: 'clients', label: 'Clientes', icon: Users, description: 'Cadastro e contatos comerciais' },
   { id: 'projects', label: 'Projetos', icon: FolderOpen, description: 'Prazos, valores e andamento' },
   { id: 'technicians', label: 'Técnicos', icon: Users, description: 'Equipe técnica e especialidades' },
@@ -146,7 +146,7 @@ const defaultAreasSectionForm = {
   title: 'Áreas da ELN Technology para acompanhar projetos, equipe, produtos e novidades.',
   description: 'Cada área tem sua própria página. Você acompanha projetos, documentos, produtos, vídeos, notícias e informações publicadas pela ELN.',
   buttonLabel: 'Ver notícias e inovações',
-  buttonHref: '/notícias-inovações',
+  buttonHref: '/noticias-inovacoes',
 };
 
 function toMoney(value: number) {

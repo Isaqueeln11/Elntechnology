@@ -56,10 +56,8 @@ import logoUrl from '../ELN TECHNOLOGY.svg';
 
 const navLinks = [
   { label: 'Sobre', href: '#sobre' },
-  { label: 'Areas', href: '#areas' },
-  { label: 'Serviços', href: '#servicos' },
-  { label: 'Processo', href: '#processo' },
-  { label: 'Projetos', href: '#projetos' },
+  { label: 'Áreas', href: '#areas' },
+  { label: 'Soluções', href: '#servicos' },
   { label: 'Contato', href: '#contato' },
 ];
 
@@ -67,30 +65,26 @@ const services = [
   {
     icon: Wifi,
     title: 'IoT e automação',
-    description:
-      'Sensores, dashboards, comunicação wireless e monitoramento em tempo real para casas, empresas e indústrias.',
-    items: ['ESP32, Arduino e Raspberry Pi', 'Controle por app ou painel web', 'Alertas e relatórios inteligentes'],
+    description: 'Sensores, dashboards e automação conectada para acompanhar tudo pelo painel.',
+    items: ['ESP32 e Arduino', 'Painel web', 'Alertas e relatórios'],
   },
   {
     icon: Printer,
     title: 'Impressão 3D',
-    description:
-      'Protótipos, peças sob medida, suportes, caixas para placas e modelos funcionais para validar ideias rápido.',
-    items: ['Modelagem para fabricação', 'Prototipagem rápida', 'Acabamento e ajustes técnicos'],
+    description: 'Protótipos, suportes, caixas e peças sob medida para validar ideias rápido.',
+    items: ['Modelagem', 'Protótipo', 'Ajuste técnico'],
   },
   {
     icon: Bot,
     title: 'Robôs e sistemas inteligentes',
-    description:
-      'Projetos de robótica educacional, assistiva e industrial com controle, sensores, motores e programação.',
-    items: ['Robôs móveis e braços robóticos', 'Controle de motores', 'Visão e automação de tarefas'],
+    description: 'Robótica educacional, assistiva ou operacional com sensores, motores e controle.',
+    items: ['Robôs móveis', 'Motores', 'Automação'],
   },
   {
     icon: CircuitBoard,
     title: 'Eletrônica e PCBs',
-    description:
-      'Desenvolvimento de circuitos, placas, firmware e integração completa entre hardware e software.',
-    items: ['Esquemático e layout PCB', 'Firmware embarcado', 'Montagem e testes'],
+    description: 'Circuitos, placas, firmware e integração entre hardware e software.',
+    items: ['PCB', 'Firmware', 'Testes'],
   },
 ];
 
@@ -98,35 +92,28 @@ const projectCards = [
   {
     title: 'Casa conectada',
     tag: 'IoT',
-    text: 'Automacao de iluminacao, sensores de presenca, temperatura e controle remoto seguro.',
+    text: 'Automação de iluminação, sensores de presença, temperatura e controle remoto seguro.',
     icon: Cpu,
   },
   {
-    title: 'Prototipo funcional',
+    title: 'Protótipo funcional',
     tag: '3D + eletrônica',
     text: 'Da ideia ao produto: desenho técnico, impressão 3D, circuito e testes em bancada.',
     icon: Box,
   },
   {
-    title: 'Robo personalizado',
+    title: 'Robô personalizado',
     tag: 'Robótica',
-    text: 'Robo para estudo, apresentacao, rotina operacional ou prova de conceito.',
+    text: 'Robô para estudo, apresentação, rotina operacional ou prova de conceito.',
     icon: Bot,
   },
 ];
 
 const process = [
   'Entendimento da ideia e objetivo',
-  'Desenho da solucao e escolha dos componentes',
-  'Prototipo, testes e ajustes',
-  'Entrega organizada com orientacao de uso',
-];
-
-const featureItems = [
-  { icon: ShieldCheck, label: 'Projeto com testes' },
-  { icon: Wrench, label: 'Montagem organizada' },
-  { icon: Microscope, label: 'Detalhe técnico' },
-  { icon: Rocket, label: 'Ideia pronta para crescer' },
+  'Desenho da solução e escolha dos componentes',
+  'Protótipo, testes e ajustes',
+  'Entrega organizada com orientação de uso',
 ];
 
 const aboutItems = [
@@ -200,9 +187,8 @@ const siteAreas = [
 
 const defaultAreasSection = {
   eyebrow: 'Espaços do site',
-  title: 'Areas da ELN Technology para acompanhar projetos, equipe, produtos e novidades.',
-  description:
-    'Cada área tem sua própria página. Você acompanha projetos, documentos, produtos, vídeos, notícias e informações publicadas pela ELN.',
+  title: 'Áreas para acompanhar projetos, equipe, produtos e novidades.',
+  description: 'Conteúdo organizado em páginas separadas, com informações publicadas pela administração.',
   buttonLabel: 'Ver notícias e inovações',
   buttonHref: '/noticias-inovacoes',
 };
@@ -218,9 +204,12 @@ function BrandName({ className = '' }: { className?: string }) {
 function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [selectedService, setSelectedService] = React.useState('IoT e automação');
+  const [showAllAreas, setShowAllAreas] = React.useState(false);
   const [formStatus, setFormStatus] = React.useState('');
   const [areasSection, setAreasSection] = React.useState(defaultAreasSection);
   const { isDark, toggleTheme } = useTheme();
+  const activeService = services.find((service) => service.title === selectedService) || services[0];
+  const visibleAreas = showAllAreas ? siteAreas : siteAreas.slice(0, 4);
 
   React.useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'siteSettings', 'areasSection'), (snapshot) => {
@@ -338,8 +327,7 @@ function HomePage() {
               </h1>
 
               <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-                Criamos soluções sob medida para automação, protótipos, sistemas embarcados e projetos inteligentes.
-                Tudo organizado, testado e pensado para funcionar no mundo real.
+                Automação, protótipos, sistemas embarcados e soluções inteligentes em um site mais direto, organizado e fácil de navegar.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -359,12 +347,11 @@ function HomePage() {
                 </a>
               </div>
 
-              <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
-                {['IoT', 'Robôs', '3D'].map((item, index) => (
-                  <div key={item} className="rounded-md border border-sky-100 bg-white/90 p-4 shadow-sm">
-                    <div className="text-2xl font-black text-[#159AFD]">{index + 1}+</div>
-                    <div className="mt-1 text-xs font-bold uppercase text-slate-500">{item}</div>
-                  </div>
+              <div className="mt-10 flex flex-wrap gap-3 text-sm font-bold text-slate-600">
+                {['Projetos sob medida', 'Painel web', 'OTA e firmware'].map((item) => (
+                  <span key={item} className="rounded-md border border-sky-100 bg-white/90 px-4 py-3 shadow-sm">
+                    {item}
+                  </span>
                 ))}
               </div>
             </div>
@@ -396,13 +383,12 @@ function HomePage() {
         <section id="sobre" className="bg-[#F7FBFF] py-20">
           <div className="mx-auto grid max-w-7xl items-start gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
             <div>
-              <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Sobre nos</p>
+              <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Sobre nós</p>
               <h2 className="mt-3 text-3xl font-black leading-tight text-[#0D0F52] sm:text-5xl">
                 Uma equipe focada em transformar ideia em sistema funcionando.
               </h2>
               <p className="mt-5 text-lg leading-8 text-slate-600">
-                A <BrandName /> nasceu para unir eletrônica, impressão 3D, automação, robótica e desenvolvimento web em projetos prontos para uso.
-                O trabalho é conduzido por Isaque Domingos Santana Silva, fundador e administrador da ELN, com apoio técnico conforme a necessidade de cada solução.
+                A <BrandName /> une eletrônica, impressão 3D, automação, robótica e desenvolvimento web em projetos prontos para uso.
               </p>
               <div className="mt-8 rounded-md border border-sky-100 bg-white p-5 shadow-sm">
                 <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Administrador</p>
@@ -454,7 +440,7 @@ function HomePage() {
             </div>
 
             <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {siteAreas.map(({ icon: Icon, title, text, href }) => (
+              {visibleAreas.map(({ icon: Icon, title, text, href }) => (
                 <Link
                   key={href}
                   to={href}
@@ -474,6 +460,18 @@ function HomePage() {
                 </Link>
               ))}
             </div>
+            <div className="mt-8 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowAllAreas((value) => !value)}
+                className={`inline-flex items-center justify-center gap-2 rounded-md border px-5 py-3 font-black transition ${
+                  isDark ? 'border-white/10 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52] hover:border-[#159AFD] hover:text-[#159AFD]'
+                }`}
+              >
+                {showAllAreas ? 'Mostrar menos' : 'Ver todas as áreas'}
+                <ChevronRight className={`h-4 w-4 transition ${showAllAreas ? '-rotate-90' : 'rotate-90'}`} />
+              </button>
+            </div>
             </div>
           </div>
         </section>
@@ -483,9 +481,9 @@ function HomePage() {
             <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
               <div>
                 <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Serviços</p>
-                <h2 className="mt-3 text-3xl font-black text-[#0D0F52] sm:text-5xl">Tudo separado, claro e pronto para evoluir.</h2>
+                <h2 className="mt-3 text-3xl font-black text-[#0D0F52] sm:text-5xl">Soluções principais, sem excesso de informação.</h2>
                 <p className="mt-5 text-lg leading-8 text-slate-600">
-                  Escolha uma área para ver como a <BrandName /> pode estruturar seu projeto com tecnologia, design técnico e testes.
+                  Escolha uma área e veja só o necessário para entender o serviço.
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -506,33 +504,22 @@ function HomePage() {
                 </div>
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                {services.map((service) => {
-                  const Icon = service.icon;
-                  const isActive = selectedService === service.title;
-                  return (
-                    <article
-                      key={service.title}
-                      className={`rounded-md border bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl ${
-                        isActive ? 'border-[#159AFD] ring-4 ring-sky-100' : 'border-sky-100'
-                      }`}
-                    >
-                      <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
-                        <Icon className="h-7 w-7" />
-                      </div>
-                      <h3 className="mt-5 text-xl font-black text-[#0D0F52]">{service.title}</h3>
-                      <p className="mt-3 leading-7 text-slate-600">{service.description}</p>
-                      <ul className="mt-5 space-y-3">
-                        {service.items.map((item) => (
-                          <li key={item} className="flex gap-3 text-sm font-semibold text-slate-700">
-                            <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-[#159AFD]" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </article>
-                  );
-                })}
+              <div>
+                <article className="rounded-md border border-[#159AFD] bg-white p-7 shadow-xl shadow-sky-900/10">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
+                    {React.createElement(activeService.icon, { className: 'h-7 w-7' })}
+                  </div>
+                  <h3 className="mt-5 text-2xl font-black text-[#0D0F52]">{activeService.title}</h3>
+                  <p className="mt-3 leading-7 text-slate-600">{activeService.description}</p>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    {activeService.items.map((item) => (
+                      <span key={item} className="inline-flex items-center gap-2 rounded-md bg-sky-50 px-3 py-2 text-sm font-bold text-[#0D0F52]">
+                        <CheckCircle2 className="h-4 w-4 text-[#159AFD]" />
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </article>
               </div>
             </div>
           </div>
@@ -543,7 +530,7 @@ function HomePage() {
             <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.1fr]">
               <div>
                 <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Processo</p>
-                <h2 className="mt-3 text-3xl font-black text-[#0D0F52] sm:text-5xl">Da ideia ao prototipo funcionando.</h2>
+                <h2 className="mt-3 text-3xl font-black text-[#0D0F52] sm:text-5xl">Da ideia ao protótipo funcionando.</h2>
                 <p className="mt-5 text-lg leading-8 text-slate-600">
                   A entrega fica organizada em etapas para você acompanhar o andamento e entender cada decisão técnica.
                 </p>
@@ -560,10 +547,10 @@ function HomePage() {
                       <div>
                         <h3 className="text-lg font-black text-[#0D0F52]">{step}</h3>
                         <p className="mt-2 text-slate-600">
-                          {index === 0 && 'Voce explica a necessidade, o uso esperado e o tipo de resultado desejado.'}
-                          {index === 1 && 'Definimos arquitetura, componentes, materiais, custo e tempo de producao.'}
-                          {index === 2 && 'Montamos a primeira versao, medimos, corrigimos e melhoramos a solucao.'}
-                          {index === 3 && 'Voce recebe o projeto de forma limpa, com funcionamento validado e proximo passo claro.'}
+                          {index === 0 && 'Você explica a necessidade, o uso esperado e o tipo de resultado desejado.'}
+                          {index === 1 && 'Definimos arquitetura, componentes, materiais, custo e tempo de produção.'}
+                          {index === 2 && 'Montamos a primeira versão, medimos, corrigimos e melhoramos a solução.'}
+                          {index === 3 && 'Você recebe o projeto de forma limpa, com funcionamento validado e próximo passo claro.'}
                         </p>
                       </div>
                     </div>
@@ -578,8 +565,8 @@ function HomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
               <div>
-                <p className="text-sm font-black uppercase tracking-widest text-sky-300">Aplicacoes</p>
-                <h2 className="mt-3 text-3xl font-black sm:text-5xl">Projetos que o site ja apresenta com clareza.</h2>
+                <p className="text-sm font-black uppercase tracking-widest text-sky-300">Aplicações</p>
+                <h2 className="mt-3 text-3xl font-black sm:text-5xl">Exemplos simples do que pode ser desenvolvido.</h2>
               </div>
               <a href="#contato" className="inline-flex items-center gap-2 rounded-md bg-white px-5 py-3 font-bold text-[#0D0F52] transition hover:bg-sky-100">
                 Conversar sobre projeto
@@ -604,19 +591,6 @@ function HomePage() {
                 );
               })}
             </div>
-          </div>
-        </section>
-
-        <section className="bg-white py-16">
-          <div className="mx-auto grid max-w-7xl gap-4 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4 lg:px-8">
-            {featureItems.map(({ icon: Icon, label }) => {
-              return (
-                <div key={label} className="flex items-center gap-4 rounded-md border border-sky-100 bg-[#F7FBFF] p-5">
-                  <Icon className="h-7 w-7 text-[#159AFD]" />
-                  <span className="font-black text-[#0D0F52]">{label}</span>
-                </div>
-              );
-            })}
           </div>
         </section>
 
