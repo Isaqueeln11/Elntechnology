@@ -312,21 +312,23 @@ function HomePage() {
       </header>
 
       <main id="inicio">
-        <section className="relative overflow-hidden bg-white pt-28">
-          <div className="absolute inset-0 circuit-grid opacity-70" />
+        <section className={`relative overflow-hidden pt-28 ${isDark ? 'bg-[#070A1F]' : 'bg-white'}`}>
+          <div className={`absolute inset-0 circuit-grid ${isDark ? 'opacity-25' : 'opacity-70'}`} />
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 pb-20 pt-10 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:pb-24">
             <div className="relative z-10">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-md border border-sky-100 bg-sky-50 px-4 py-2 text-sm font-bold text-[#0D0F52]">
+              <div className={`mb-6 inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-bold ${
+                isDark ? 'border-white/10 bg-white/5 text-sky-100' : 'border-sky-100 bg-sky-50 text-[#0D0F52]'
+              }`}>
                 <Sparkles className="h-4 w-4 text-[#159AFD]" />
                 Inovação em tecnologia para tirar ideias do papel
               </div>
 
-              <h1 className="max-w-4xl text-4xl font-black leading-tight text-[#0D0F52] sm:text-5xl lg:text-7xl">
+              <h1 className={`max-w-4xl text-4xl font-black leading-tight sm:text-5xl lg:text-7xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
                 <BrandName />
                 <span className="mt-3 block text-[#159AFD]">IoT, impressão 3D, robôs e eletrônica.</span>
               </h1>
 
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+              <p className={`mt-6 max-w-2xl text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                 Automação, protótipos, sistemas embarcados e soluções inteligentes em um site mais direto, organizado e fácil de navegar.
               </p>
 
@@ -340,16 +342,18 @@ function HomePage() {
                 </a>
                 <a
                   href="#servicos"
-                  className="inline-flex items-center justify-center gap-2 rounded-md border border-sky-200 bg-white px-6 py-4 font-bold text-[#0D0F52] transition hover:-translate-y-0.5 hover:border-[#159AFD] hover:text-[#159AFD]"
+                  className={`inline-flex items-center justify-center gap-2 rounded-md border px-6 py-4 font-bold transition hover:-translate-y-0.5 hover:border-[#159AFD] hover:text-[#159AFD] ${
+                    isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52]'
+                  }`}
                 >
                   Ver soluções
                   <ChevronRight className="h-5 w-5" />
                 </a>
               </div>
 
-              <div className="mt-10 flex flex-wrap gap-3 text-sm font-bold text-slate-600">
+              <div className={`mt-10 flex flex-wrap gap-3 text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-600'}`}>
                 {['Projetos sob medida', 'Painel web', 'OTA e firmware'].map((item) => (
-                  <span key={item} className="rounded-md border border-sky-100 bg-white/90 px-4 py-3 shadow-sm">
+                  <span key={item} className={`rounded-md border px-4 py-3 shadow-sm ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white/90'}`}>
                     {item}
                   </span>
                 ))}
@@ -358,8 +362,10 @@ function HomePage() {
 
             <div className="relative z-10">
               <div className="relative mx-auto max-w-xl">
-                <div className="absolute -inset-6 rounded-full border border-sky-100 hero-spin" />
-                <div className="relative overflow-hidden rounded-md border border-sky-100 bg-white p-5 shadow-2xl shadow-sky-900/10">
+                <div className={`absolute -inset-6 rounded-full border hero-spin ${isDark ? 'border-sky-400/20' : 'border-sky-100'}`} />
+                <div className={`relative overflow-hidden rounded-md border p-5 shadow-2xl ${
+                  isDark ? 'border-white/10 bg-white/[0.04] shadow-black/20' : 'border-sky-100 bg-white shadow-sky-900/10'
+                }`}>
                   <img src={logoUrl} alt="Logo ELN Technology" className="w-full object-contain" />
                   <div className="mt-5 grid grid-cols-2 gap-3">
                     {[
@@ -368,7 +374,7 @@ function HomePage() {
                       ['Hardware', 'sob medida'],
                       ['Entrega', 'organizada'],
                     ].map(([top, bottom]) => (
-                      <div key={top} className="rounded-md bg-slate-950 px-4 py-3 text-white">
+                      <div key={top} className={`rounded-md px-4 py-3 text-white ${isDark ? 'bg-sky-500/15 ring-1 ring-sky-400/20' : 'bg-slate-950'}`}>
                         <div className="text-sm font-bold">{top}</div>
                         <div className="text-xs text-sky-200">{bottom}</div>
                       </div>
@@ -380,20 +386,20 @@ function HomePage() {
           </div>
         </section>
 
-        <section id="sobre" className="bg-[#F7FBFF] py-20">
+        <section id="sobre" className={`${isDark ? 'bg-[#0B102C]' : 'bg-[#F7FBFF]'} py-20`}>
           <div className="mx-auto grid max-w-7xl items-start gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
             <div>
               <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Sobre nós</p>
-              <h2 className="mt-3 text-3xl font-black leading-tight text-[#0D0F52] sm:text-5xl">
+              <h2 className={`mt-3 text-3xl font-black leading-tight sm:text-5xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
                 Uma equipe focada em transformar ideia em sistema funcionando.
               </h2>
-              <p className="mt-5 text-lg leading-8 text-slate-600">
+              <p className={`mt-5 text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                 A <BrandName /> une eletrônica, impressão 3D, automação, robótica e desenvolvimento web em projetos prontos para uso.
               </p>
-              <div className="mt-8 rounded-md border border-sky-100 bg-white p-5 shadow-sm">
+              <div className={`mt-8 rounded-md border p-5 shadow-sm ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white'}`}>
                 <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Administrador</p>
-                <h3 className="mt-2 text-2xl font-black text-[#0D0F52]">Isaque Domingos Santana Silva</h3>
-                <p className="mt-3 leading-7 text-slate-600">
+                <h3 className={`mt-2 text-2xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>Isaque Domingos Santana Silva</h3>
+                <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                   Responsável por organizar clientes, projetos, valores, técnicos, atualizações OTA e entregas dentro do painel administrativo.
                 </p>
               </div>
@@ -401,14 +407,14 @@ function HomePage() {
 
             <div className="grid gap-5">
               {aboutItems.map(({ icon: Icon, title, text }) => (
-                <article key={title} className="rounded-md border border-sky-100 bg-white p-6 shadow-sm">
+                <article key={title} className={`rounded-md border p-6 shadow-sm ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white'}`}>
                   <div className="flex items-start gap-4">
                     <div className="flex h-12 w-12 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
                       <Icon className="h-6 w-6" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-[#0D0F52]">{title}</h3>
-                      <p className="mt-2 leading-7 text-slate-600">{text}</p>
+                      <h3 className={`text-xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{title}</h3>
+                      <p className={`mt-2 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{text}</p>
                     </div>
                   </div>
                 </article>
@@ -476,13 +482,13 @@ function HomePage() {
           </div>
         </section>
 
-        <section id="servicos" className="bg-[#EEF7FF] py-20">
+        <section id="servicos" className={`${isDark ? 'bg-[#0B102C]' : 'bg-[#EEF7FF]'} py-20`}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
               <div>
                 <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Serviços</p>
-                <h2 className="mt-3 text-3xl font-black text-[#0D0F52] sm:text-5xl">Soluções principais, sem excesso de informação.</h2>
-                <p className="mt-5 text-lg leading-8 text-slate-600">
+                <h2 className={`mt-3 text-3xl font-black sm:text-5xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>Soluções principais, sem excesso de informação.</h2>
+                <p className={`mt-5 text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                   Escolha uma área e veja só o necessário para entender o serviço.
                 </p>
 
@@ -495,7 +501,9 @@ function HomePage() {
                       className={`rounded-md px-4 py-3 text-sm font-bold transition ${
                         selectedService === service.title
                           ? 'bg-[#0D0F52] text-white shadow-lg shadow-slate-900/15'
-                          : 'bg-white text-slate-700 hover:bg-sky-100'
+                          : isDark
+                            ? 'bg-white/5 text-slate-200 hover:bg-white/10'
+                            : 'bg-white text-slate-700 hover:bg-sky-100'
                       }`}
                     >
                       {service.title}
@@ -505,15 +513,19 @@ function HomePage() {
               </div>
 
               <div>
-                <article className="rounded-md border border-[#159AFD] bg-white p-7 shadow-xl shadow-sky-900/10">
+                <article className={`rounded-md border border-[#159AFD] p-7 shadow-xl ${
+                  isDark ? 'bg-white/[0.04] shadow-black/20' : 'bg-white shadow-sky-900/10'
+                }`}>
                   <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
                     {React.createElement(activeService.icon, { className: 'h-7 w-7' })}
                   </div>
-                  <h3 className="mt-5 text-2xl font-black text-[#0D0F52]">{activeService.title}</h3>
-                  <p className="mt-3 leading-7 text-slate-600">{activeService.description}</p>
+                  <h3 className={`mt-5 text-2xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{activeService.title}</h3>
+                  <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{activeService.description}</p>
                   <div className="mt-6 flex flex-wrap gap-3">
                     {activeService.items.map((item) => (
-                      <span key={item} className="inline-flex items-center gap-2 rounded-md bg-sky-50 px-3 py-2 text-sm font-bold text-[#0D0F52]">
+                      <span key={item} className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-bold ${
+                        isDark ? 'bg-sky-400/10 text-sky-100' : 'bg-sky-50 text-[#0D0F52]'
+                      }`}>
                         <CheckCircle2 className="h-4 w-4 text-[#159AFD]" />
                         {item}
                       </span>
@@ -525,28 +537,30 @@ function HomePage() {
           </div>
         </section>
 
-        <section id="processo" className="bg-white py-20">
+        <section id="processo" className={`${isDark ? 'bg-[#070A1F]' : 'bg-white'} py-20`}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.1fr]">
               <div>
                 <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Processo</p>
-                <h2 className="mt-3 text-3xl font-black text-[#0D0F52] sm:text-5xl">Da ideia ao protótipo funcionando.</h2>
-                <p className="mt-5 text-lg leading-8 text-slate-600">
+                <h2 className={`mt-3 text-3xl font-black sm:text-5xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>Da ideia ao protótipo funcionando.</h2>
+                <p className={`mt-5 text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                   A entrega fica organizada em etapas para você acompanhar o andamento e entender cada decisão técnica.
                 </p>
               </div>
 
               <div className="relative">
-                <div className="absolute left-6 top-6 hidden h-[calc(100%-3rem)] w-px bg-sky-200 sm:block" />
+                <div className={`absolute left-6 top-6 hidden h-[calc(100%-3rem)] w-px sm:block ${isDark ? 'bg-sky-400/20' : 'bg-sky-200'}`} />
                 <div className="space-y-5">
                   {process.map((step, index) => (
-                    <div key={step} className="relative flex gap-5 rounded-md border border-sky-100 bg-[#F7FBFF] p-5">
+                    <div key={step} className={`relative flex gap-5 rounded-md border p-5 ${
+                      isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-[#F7FBFF]'
+                    }`}>
                       <div className="z-10 flex h-12 w-12 flex-none items-center justify-center rounded-md bg-[#0D0F52] font-black text-white">
                         {index + 1}
                       </div>
                       <div>
-                        <h3 className="text-lg font-black text-[#0D0F52]">{step}</h3>
-                        <p className="mt-2 text-slate-600">
+                        <h3 className={`text-lg font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{step}</h3>
+                        <p className={`mt-2 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                           {index === 0 && 'Você explica a necessidade, o uso esperado e o tipo de resultado desejado.'}
                           {index === 1 && 'Definimos arquitetura, componentes, materiais, custo e tempo de produção.'}
                           {index === 2 && 'Montamos a primeira versão, medimos, corrigimos e melhoramos a solução.'}
