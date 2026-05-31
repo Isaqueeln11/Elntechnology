@@ -48,10 +48,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className={`min-h-screen transition-colors ${isDark ? 'bg-[#070A1F]' : 'bg-[#F4F8FC]'}`}>
+    <div className={`min-h-screen transition-colors ${isDark ? 'bg-[#070A1F] text-white' : 'bg-[#F7FBFF] text-slate-950'}`}>
       {/* Top Navigation */}
-      <nav className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/95' : 'border-slate-200 bg-white/95'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className={`sticky top-0 z-40 border-b shadow-sm backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/92' : 'border-sky-100/70 bg-white/90'}`}>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex min-h-16 items-center justify-between gap-3 py-3">
             {/* Logo */}
             <Link to="/" className="flex min-w-0 items-center space-x-2">
@@ -70,7 +70,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 <input
                   type="text"
                   placeholder="Buscar projetos, clientes, tickets..."
-                  className={`w-full rounded-md border py-2 pl-10 pr-4 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10 ${isDark ? 'border-white/10 bg-white/[0.04] text-white placeholder-gray-500' : 'border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400'}`}
+                  className={`w-full rounded-md border py-2.5 pl-10 pr-4 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10 ${isDark ? 'border-white/10 bg-white/[0.045] text-white placeholder-gray-500' : 'border-sky-100 bg-[#F7FBFF] text-slate-900 placeholder-slate-400'}`}
                 />
               </div>
             </div>
@@ -98,7 +98,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 <img
                   src={user?.avatar}
                   alt={user?.name}
-                  className="h-9 w-9 rounded-full border border-[#159AFD]/50 object-cover"
+                  className="h-9 w-9 rounded-md border border-[#159AFD]/50 object-cover"
                 />
                 <div className="hidden md:block">
                   <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-slate-900'}`}>{user?.name}</p>
@@ -126,25 +126,25 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       {/* Quick Actions Floating Button */}
       <div className="fixed bottom-4 right-4 z-30 sm:bottom-6 sm:right-6">
         <div className="relative group">
-          <button className="flex h-12 w-12 items-center justify-center rounded-md bg-[#159AFD] shadow-lg shadow-[#159AFD]/20 transition-all duration-300 hover:bg-[#508AD0] sm:h-14 sm:w-14">
+          <button className="flex h-12 w-12 items-center justify-center rounded-md bg-[#159AFD] shadow-lg shadow-[#159AFD]/20 transition-all duration-300 hover:bg-[#0D0F52] sm:h-14 sm:w-14">
             <Settings className="w-6 h-6 text-white" />
           </button>
           
           {/* Quick Actions Menu */}
-          <div className="pointer-events-none absolute bottom-16 right-0 rounded-lg border border-white/10 bg-[#080B24]/95 p-2 opacity-0 shadow-xl shadow-black/25 backdrop-blur-sm transition-opacity duration-300 group-hover:pointer-events-auto group-hover:opacity-100">
+          <div className={`pointer-events-none absolute bottom-16 right-0 rounded-md border p-2 opacity-0 shadow-lg backdrop-blur-sm transition-opacity duration-300 group-hover:pointer-events-auto group-hover:opacity-100 ${isDark ? 'border-white/10 bg-[#080B24]/95 shadow-black/25' : 'border-sky-100 bg-white shadow-slate-200/80'}`}>
             <div className="space-y-1 w-48">
               <Link
                 to="/"
-                className="flex items-center px-3 py-2 text-gray-300 hover:text-white hover:bg-[#159AFD]/20 rounded transition-colors"
+                className={`flex items-center rounded-md px-3 py-2 transition-colors ${isDark ? 'text-gray-300 hover:bg-[#159AFD]/20 hover:text-white' : 'text-slate-600 hover:bg-sky-50 hover:text-[#0D0F52]'}`}
               >
                 <Home className="w-4 h-4 mr-2" />
                 Voltar ao Site
               </Link>
-              <button className="w-full flex items-center px-3 py-2 text-gray-300 hover:text-white hover:bg-[#159AFD]/20 rounded transition-colors">
+              <button className={`flex w-full items-center rounded-md px-3 py-2 transition-colors ${isDark ? 'text-gray-300 hover:bg-[#159AFD]/20 hover:text-white' : 'text-slate-600 hover:bg-sky-50 hover:text-[#0D0F52]'}`}>
                 <User className="w-4 h-4 mr-2" />
                 Meu Perfil
               </button>
-              <button className="w-full flex items-center px-3 py-2 text-gray-300 hover:text-white hover:bg-[#159AFD]/20 rounded transition-colors">
+              <button className={`flex w-full items-center rounded-md px-3 py-2 transition-colors ${isDark ? 'text-gray-300 hover:bg-[#159AFD]/20 hover:text-white' : 'text-slate-600 hover:bg-sky-50 hover:text-[#0D0F52]'}`}>
                 <Settings className="w-4 h-4 mr-2" />
                 Configurações
               </button>
