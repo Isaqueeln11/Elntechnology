@@ -9,6 +9,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const navigate = useNavigate();
   const { login, resetPassword } = useAuth();
 
@@ -36,16 +37,29 @@ const Login = () => {
     setError('');
     setStatus('');
 
-    if (!email) {
+    const normalizedEmail = email.trim();
+
+    if (!normalizedEmail) {
       setError('Digite seu email para receber a recuperação de senha.');
       return;
     }
 
-    const result = await resetPassword(email);
-    if (result.success) {
-      setStatus(result.message);
-    } else {
-      setError(result.message);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      setError('Digite um email válido para recuperar a senha.');
+      return;
+    }
+
+    setIsResetting(true);
+
+    try {
+      const result = await resetPassword(normalizedEmail);
+      if (result.success) {
+        setStatus(result.message);
+      } else {
+        setError(result.message);
+      }
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -143,9 +157,10 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={handlePasswordReset}
-                  className="text-xs font-black text-[#159AFD] transition hover:text-[#0D0F52]"
+                  disabled={isResetting}
+                  className="text-xs font-black text-[#159AFD] transition hover:text-[#0D0F52] disabled:cursor-not-allowed disabled:text-slate-400"
                 >
-                  Esqueci minha senha
+                  {isResetting ? 'Enviando...' : 'Esqueci minha senha'}
                 </button>
               </span>
               <span className="relative mt-2 block">

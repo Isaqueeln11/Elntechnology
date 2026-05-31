@@ -13,6 +13,7 @@ import {
   PackagePlus,
   Plus,
   Settings,
+  Store,
   Trash2,
   UploadCloud,
   UserPlus,
@@ -147,6 +148,21 @@ const defaultAreasSectionForm = {
   description: 'Cada área tem sua própria página. Você acompanha projetos, documentos, produtos, vídeos, notícias e informações publicadas pela ELN.',
   buttonLabel: 'Ver notícias e inovações',
   buttonHref: '/noticias-inovacoes',
+};
+
+const sitePageOptions = ['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'produtos', 'lojas', 'videos', 'noticias'];
+const siteContentTypeOptions = ['Projeto', 'Documento', 'Vídeo', 'Produto', 'Loja', 'Melhoria', 'Equipe', 'Atividade', 'Notícia', 'Inovação', 'Link'];
+
+const pageLinks: Record<string, string> = {
+  projetos: '/projetos-desenvolvidos',
+  melhorias: '/melhorias',
+  equipe: '/equipe',
+  atividades: '/atividades-analise',
+  desenvolvimentos: '/desenvolvimentos',
+  produtos: '/produtos',
+  lojas: '/lojas',
+  videos: '/videos-futuro',
+  noticias: '/noticias-inovacoes',
 };
 
 function toMoney(value: number) {
@@ -696,6 +712,56 @@ const AdminDashboard = () => {
 
   const renderSitePages = () => (
     <div className="space-y-6">
+      <div className={`${panelClass} p-5 sm:p-6`}>
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#159AFD]">Produtos, lojas e conteúdos do site</p>
+            <h3 className="mt-2 text-xl font-black text-slate-950 dark:text-white">Cadastre aqui o que deve aparecer nas páginas públicas.</h3>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500 dark:text-slate-400">
+              Para aparecer em /produtos, escolha a página produtos. Para aparecer em /lojas, escolha a página lojas. O status precisa ficar como Publicado.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <a href="/produtos" target="_blank" rel="noreferrer" className="rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200">
+              Ver produtos
+            </a>
+            <a href="/lojas" target="_blank" rel="noreferrer" className="rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200">
+              Ver lojas
+            </a>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => setSiteContentForm({ page: 'produtos', type: 'Produto', title: '', description: '', url: '', status: 'Publicado' })}
+            className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
+          >
+            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
+              <PackagePlus className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block font-black text-slate-950 dark:text-white">Adicionar produto</span>
+              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Prepara o formulário para publicar na página /produtos.</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSiteContentForm({ page: 'lojas', type: 'Loja', title: '', description: '', url: '', status: 'Publicado' })}
+            className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
+          >
+            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
+              <Store className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block font-black text-slate-950 dark:text-white">Adicionar loja</span>
+              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Prepara o formulário para publicar na página /lojas.</span>
+            </span>
+          </button>
+        </div>
+      </div>
+
       <form
         onSubmit={async (event) => {
           event.preventDefault();
@@ -728,7 +794,7 @@ const AdminDashboard = () => {
       </form>
 
       <CrudPanel
-        title="Publicar nas subpáginas"
+        title="Adicionar conteúdo público"
         onSubmit={(event) => {
           event.preventDefault();
           createRecord(
@@ -744,13 +810,13 @@ const AdminDashboard = () => {
               label="Subpágina"
               value={siteContentForm.page}
               onChange={(page) => setSiteContentForm({ ...siteContentForm, page })}
-              options={['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'produtos', 'lojas', 'videos', 'noticias']}
+              options={sitePageOptions}
             />
             <SelectField
               label="Tipo de conteúdo"
               value={siteContentForm.type}
               onChange={(type) => setSiteContentForm({ ...siteContentForm, type })}
-              options={['Projeto', 'Documento', 'Vídeo', 'Produto', 'Loja', 'Melhoria', 'Equipe', 'Atividade', 'Notícia', 'Inovação', 'Link']}
+              options={siteContentTypeOptions}
             />
             <Field label="Título" value={siteContentForm.title} onChange={(title) => setSiteContentForm({ ...siteContentForm, title })} />
             <Field label="Link, documento, imagem ou vídeo" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="https://..." required={false} />
@@ -767,6 +833,7 @@ const AdminDashboard = () => {
           status: item.status,
           link: item.url,
           actions: [
+            ...(item.page && pageLinks[item.page] ? [{ label: 'Ver página', onClick: () => window.open(pageLinks[item.page], '_blank', 'noopener,noreferrer') }] : []),
             { label: 'Publicar', onClick: () => changeStatus('siteContent', item.id, 'Publicado') },
             { label: 'Rascunho', onClick: () => changeStatus('siteContent', item.id, 'Rascunho') },
           ],

@@ -101,6 +101,11 @@ function firebaseMessage(error: unknown) {
       return 'Email ou senha incorretos. Se ainda não criou essa conta, use Criar conta primeiro.';
     case 'auth/network-request-failed':
       return 'Falha de rede ao conectar com o Firebase.';
+    case 'auth/too-many-requests':
+      return 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.';
+    case 'auth/unauthorized-continue-uri':
+    case 'auth/invalid-continue-uri':
+      return 'O domínio do site ainda não está autorizado no Firebase Authentication.';
     default:
       return 'Não foi possível concluir a operação.';
   }
@@ -294,8 +299,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string) => {
     try {
-      await sendPasswordResetEmail(auth, email.trim());
-      return { success: true, message: 'Enviamos um email para redefinir sua senha.' };
+      const normalizedEmail = email.trim().toLowerCase();
+
+      await sendPasswordResetEmail(auth, normalizedEmail, {
+        url: `${window.location.origin}/login`,
+        handleCodeInApp: false,
+      });
+
+      return {
+        success: true,
+        message: `Enviamos o link de redefinição para ${normalizedEmail}. Verifique também spam e lixo eletrônico.`,
+      };
     } catch (error) {
       return { success: false, message: firebaseMessage(error) };
     }
