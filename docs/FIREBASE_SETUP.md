@@ -78,6 +78,20 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /siteContent/{contentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /siteSettings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /systemEvents/{eventId} {
+      allow read, write: if isAdmin();
+    }
+
     match /clientes/{clientId} {
       allow read, write: if isAdmin();
     }

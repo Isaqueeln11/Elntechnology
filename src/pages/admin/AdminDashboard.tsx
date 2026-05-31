@@ -239,6 +239,20 @@ function StatusPill({ value }: { value?: string }) {
   return <span className={`rounded-full border px-3 py-1 text-xs font-bold ${color}`}>{value || 'Aberto'}</span>;
 }
 
+function firestoreErrorMessage(error: unknown, action = 'salvar') {
+  const code = typeof error === 'object' && error && 'code' in error ? String(error.code) : '';
+
+  if (code === 'permission-denied') {
+    return `Sem permissão para ${action}. Confira se sua conta está como admin e se as regras do Firestore liberam siteContent, siteSettings e systemEvents.`;
+  }
+
+  if (code === 'unavailable' || code === 'deadline-exceeded') {
+    return `Não foi possível ${action} agora. Verifique sua internet e tente novamente.`;
+  }
+
+  return `Erro ao ${action}. Tente novamente e confira o Firebase.`;
+}
+
 function compressImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const image = new Image();
@@ -350,7 +364,11 @@ const AdminDashboard = () => {
       onSnapshot(collection(db, 'notifications'), (snapshot) => setNotifications(asList<NotificationRecord>(snapshot))),
       onSnapshot(collection(db, 'users'), (snapshot) => setRegisteredUsers(asList<UserRecord>(snapshot))),
       onSnapshot(collection(db, 'systemEvents'), (snapshot) => setSystemEvents(asList<SystemEventRecord>(snapshot))),
-      onSnapshot(collection(db, 'siteContent'), (snapshot) => setSiteContent(asList<SiteContentRecord>(snapshot))),
+      onSnapshot(
+        collection(db, 'siteContent'),
+        (snapshot) => setSiteContent(asList<SiteContentRecord>(snapshot)),
+        (error) => setStatus(firestoreErrorMessage(error, 'carregar conteúdos do site')),
+      ),
       onSnapshot(doc(db, 'siteSettings', 'areasSection'), (snapshot) => {
         if (snapshot.exists()) {
           setAreasSectionForm({ ...defaultAreasSectionForm, ...snapshot.data() });
@@ -372,38 +390,62 @@ const AdminDashboard = () => {
   }, [invoices, notifications, orders, projects, tickets]);
 
   async function createRecord<T extends object>(collectionName: CollectionName, data: T, reset: () => void, message: string) {
-    await addDoc(collection(db, collectionName), { ...data, createdBy: user?.id || '', createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-    await addDoc(collection(db, 'systemEvents'), {
-      title: message,
-      message: `Registro salvo em ${collectionName}.`,
-      type: collectionName,
-      createdBy: user?.id || '',
-      createdAt: serverTimestamp(),
-    });
-    reset();
-    setStatus(message);
+    setStatus('Salvando registro...');
+
+    try {
+      await addDoc(collection(db, collectionName), { ...data, createdBy: user?.id || '', createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
+
+      try {
+        await addDoc(collection(db, 'systemEvents'), {
+          title: message,
+          message: `Registro salvo em ${collectionName}.`,
+          type: collectionName,
+          createdBy: user?.id || '',
+          createdAt: serverTimestamp(),
+        });
+      } catch {
+        // O registro principal já foi salvo. O evento é apenas histórico.
+      }
+
+      reset();
+      setStatus(message);
+    } catch (error) {
+      setStatus(firestoreErrorMessage(error, 'salvar registro'));
+    }
   }
 
   async function removeRecord(collectionName: CollectionName, id: string) {
-    await deleteDoc(doc(db, collectionName, id));
-    setStatus('Registro removido.');
+    try {
+      await deleteDoc(doc(db, collectionName, id));
+      setStatus('Registro removido.');
+    } catch (error) {
+      setStatus(firestoreErrorMessage(error, 'remover registro'));
+    }
   }
 
   async function changeStatus(collectionName: CollectionName, id: string, nextStatus: string) {
-    await updateDoc(doc(db, collectionName, id), { status: nextStatus, updatedAt: serverTimestamp() });
-    if (user?.preferences?.notifyStatusChanges !== false) {
-      await addDoc(collection(db, 'notifications'), {
-        title: 'Status atualizado',
-        message: `Um registro em ${collectionName} mudou para ${nextStatus}.`,
-        target: 'Admin',
-        status: 'Nova',
-        type: 'status-change',
-        createdBy: user?.id || '',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+    try {
+      await updateDoc(doc(db, collectionName, id), { status: nextStatus, updatedAt: serverTimestamp() });
+      if (user?.preferences?.notifyStatusChanges !== false) {
+        try {
+          await addDoc(collection(db, 'notifications'), {
+            title: 'Status atualizado',
+            message: `Um registro em ${collectionName} mudou para ${nextStatus}.`,
+            target: 'Admin',
+            status: 'Nova',
+            type: 'status-change',
+            createdBy: user?.id || '',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          });
+        } catch {
+          // A notificação é auxiliar; o status principal já foi salvo.
+        }
+      }
+      setStatus('Status atualizado.');
+    } catch (error) {
+      setStatus(firestoreErrorMessage(error, 'atualizar status'));
     }
-    setStatus('Status atualizado.');
   }
 
   async function handleAvatarFile(event: React.ChangeEvent<HTMLInputElement>) {
@@ -765,12 +807,18 @@ const AdminDashboard = () => {
       <form
         onSubmit={async (event) => {
           event.preventDefault();
-          await setDoc(doc(db, 'siteSettings', 'areasSection'), {
-            ...areasSectionForm,
-            updatedAt: serverTimestamp(),
-            updatedBy: user?.id || '',
-          });
-          setStatus('Seção pública atualizada no site.');
+          setStatus('Salvando seção pública...');
+
+          try {
+            await setDoc(doc(db, 'siteSettings', 'areasSection'), {
+              ...areasSectionForm,
+              updatedAt: serverTimestamp(),
+              updatedBy: user?.id || '',
+            });
+            setStatus('Seção pública atualizada no site.');
+          } catch (error) {
+            setStatus(firestoreErrorMessage(error, 'salvar seção pública'));
+          }
         }}
         className={`${panelClass} p-5 sm:p-6`}
       >
