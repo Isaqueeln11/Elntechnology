@@ -165,6 +165,109 @@ const pageLinks: Record<string, string> = {
   noticias: '/noticias-inovacoes',
 };
 
+const firebaseConsoleRulesUrl = 'https://console.firebase.google.com/u/0/project/elntechnology/firestore/rules';
+
+const firestoreRulesText = `rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function currentUser() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function isOwnerEmail() {
+      return signedIn()
+        && request.auth.token.email in [
+          "isaqueeln11@gmail.com",
+          "elntechnologyinnovations@gmail.com"
+        ];
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && (
+          isOwnerEmail()
+          || currentUser().data.role == "admin"
+        );
+    }
+
+    match /users/{userId} {
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && (
+          request.resource.data.role == "client"
+          || (isOwnerEmail() && request.resource.data.role == "admin")
+        );
+
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+
+      allow update: if signedIn()
+        && request.auth.uid == userId
+        && (
+          request.resource.data.role == resource.data.role
+          || (isOwnerEmail() && request.resource.data.role == "admin")
+        );
+
+      allow delete: if isAdmin();
+    }
+
+    match /siteContent/{contentId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /siteSettings/{settingId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /firmwareReleases/{releaseId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /systemEvents/{eventId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /clientes/{clientId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /projetos/{projectId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /technicians/{technicianId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /supportTickets/{ticketId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /documents/{documentId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /invoices/{invoiceId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    match /notifications/{notificationId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+  }
+}`;
+
 function toMoney(value: number) {
   return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
@@ -445,6 +548,15 @@ const AdminDashboard = () => {
       setStatus('Status atualizado.');
     } catch (error) {
       setStatus(firestoreErrorMessage(error, 'atualizar status'));
+    }
+  }
+
+  async function copyFirestoreRules() {
+    try {
+      await navigator.clipboard.writeText(firestoreRulesText);
+      setStatus('Regras copiadas. Cole em Firebase Console > Firestore Database > Regras > Publicar.');
+    } catch {
+      setStatus('Não consegui copiar automaticamente. Abra firestore.rules no projeto e cole no Firebase Console.');
     }
   }
 
@@ -764,11 +876,29 @@ const AdminDashboard = () => {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <a href="/" target="_blank" rel="noreferrer" className="rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200">
+              Ver site normal
+            </a>
             <a href="/produtos" target="_blank" rel="noreferrer" className="rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200">
               Ver produtos
             </a>
             <a href="/lojas" target="_blank" rel="noreferrer" className="rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200">
               Ver lojas
+            </a>
+          </div>
+        </div>
+
+        <div className="mt-5 rounded-md border border-amber-300/30 bg-amber-400/10 p-4 text-sm leading-6 text-amber-100">
+          <p className="font-black text-amber-50">Se aparecer "sem permissão", a regra publicada no Firebase ainda é a antiga.</p>
+          <p className="mt-1 text-amber-100/90">
+            A regra precisa ter `siteContent`, `siteSettings`, `systemEvents` e `isAdmin()` reconhecendo seus emails donos. Use os botões abaixo para copiar e abrir o lugar certo.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button type="button" onClick={copyFirestoreRules} className="rounded-md bg-[#159AFD] px-4 py-3 font-black text-white transition hover:bg-[#0D0F52]">
+              Copiar regras corretas
+            </button>
+            <a href={firebaseConsoleRulesUrl} target="_blank" rel="noreferrer" className="rounded-md border border-amber-200/30 px-4 py-3 font-black text-amber-50 transition hover:bg-amber-200/10">
+              Abrir regras no Firebase
             </a>
           </div>
         </div>

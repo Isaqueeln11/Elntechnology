@@ -54,13 +54,23 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex min-h-16 items-center justify-between gap-3 py-3">
             {/* Logo */}
-            <Link to="/" className="flex min-w-0 items-center space-x-2">
+            <Link to="/" className="flex min-w-0 items-center space-x-2" title="Ir para o site normal">
               <img
                 src="/Eln technology.png"
                 alt="ELN Technology Logo"
                 className="h-10 w-10 flex-none object-contain"
               />
               <span className={`notranslate hidden truncate text-lg font-bold sm:block lg:text-xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`} translate="no">ELN Technology</span>
+            </Link>
+
+            <Link
+              to="/"
+              className={`hidden items-center gap-2 rounded-md border px-3 py-2 text-sm font-bold transition sm:inline-flex ${
+                isDark ? 'border-white/10 text-slate-200 hover:bg-white/10' : 'border-sky-100 text-slate-700 hover:bg-sky-50'
+              }`}
+            >
+              <Home className="h-4 w-4" />
+              Site normal
             </Link>
 
             {/* Search Bar */}
@@ -140,11 +150,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 <Home className="w-4 h-4 mr-2" />
                 Voltar ao Site
               </Link>
-              <button className={`flex w-full items-center rounded-md px-3 py-2 transition-colors ${isDark ? 'text-gray-300 hover:bg-[#159AFD]/20 hover:text-white' : 'text-slate-600 hover:bg-sky-50 hover:text-[#0D0F52]'}`}>
+              <button onClick={() => navigate('/dashboard?tab=settings')} className={`flex w-full items-center rounded-md px-3 py-2 transition-colors ${isDark ? 'text-gray-300 hover:bg-[#159AFD]/20 hover:text-white' : 'text-slate-600 hover:bg-sky-50 hover:text-[#0D0F52]'}`}>
                 <User className="w-4 h-4 mr-2" />
                 Meu Perfil
               </button>
-              <button className={`flex w-full items-center rounded-md px-3 py-2 transition-colors ${isDark ? 'text-gray-300 hover:bg-[#159AFD]/20 hover:text-white' : 'text-slate-600 hover:bg-sky-50 hover:text-[#0D0F52]'}`}>
+              <button onClick={() => navigate('/dashboard?tab=settings')} className={`flex w-full items-center rounded-md px-3 py-2 transition-colors ${isDark ? 'text-gray-300 hover:bg-[#159AFD]/20 hover:text-white' : 'text-slate-600 hover:bg-sky-50 hover:text-[#0D0F52]'}`}>
                 <Settings className="w-4 h-4 mr-2" />
                 Configurações
               </button>
