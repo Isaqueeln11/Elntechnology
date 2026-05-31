@@ -101,7 +101,7 @@ const OtaAdminPanel = () => {
         setDatabaseStatus('Dados sincronizados com Firestore.');
       },
       () => {
-        setDatabaseStatus('Nao foi possivel conectar ao Firestore. Verifique as regras do banco.');
+        setDatabaseStatus('Não foi possível conectar ao Firestore. Verifique as regras do banco.');
       },
     );
 
@@ -119,7 +119,7 @@ const OtaAdminPanel = () => {
       let binUrl = form.binUrl.trim();
 
       if (!binUrl) {
-        setDatabaseStatus('Cole o link do .bin ou o link da release do GitHub. No plano gratis, o arquivo precisa ficar hospedado fora do Firebase Storage.');
+        setDatabaseStatus('Cole o link do .bin ou o link da release do GitHub. No plano grátis, o arquivo precisa ficar hospedado fora do Firebase Storage.');
         setIsSaving(false);
         return;
       }
@@ -156,7 +156,7 @@ const OtaAdminPanel = () => {
     if (!file) return;
 
     if (!file.name.toLowerCase().endsWith('.bin')) {
-      setDatabaseStatus('Escolha um arquivo com extensao .bin.');
+      setDatabaseStatus('Escolha um arquivo com extensão .bin.');
       event.target.value = '';
       return;
     }
@@ -173,7 +173,7 @@ const OtaAdminPanel = () => {
       }));
       setDatabaseStatus(`Arquivo selecionado: ${file.name}. SHA-256 calculado. Agora cole o link da release ou do .bin hospedado.`);
     } catch {
-      setDatabaseStatus('Nao foi possivel calcular o SHA-256 do arquivo.');
+      setDatabaseStatus('Não foi possível calcular o SHA-256 do arquivo.');
     }
   }
 
@@ -201,7 +201,7 @@ const OtaAdminPanel = () => {
       await navigator.clipboard.writeText(manifestJson);
       setCopyStatus('Manifesto copiado.');
     } catch {
-      setCopyStatus('Nao foi possivel copiar automaticamente.');
+      setCopyStatus('Não foi possível copiar automaticamente.');
     }
   }
 
@@ -209,7 +209,7 @@ const OtaAdminPanel = () => {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-xl border border-[#159AFD]/30 bg-[#159AFD]/10 p-4 text-sm font-semibold text-sky-100">
+      <div className="rounded-md border border-[#159AFD]/30 bg-[#159AFD]/10 p-4 text-sm font-semibold text-sky-100">
         <div className="flex items-center gap-3">
           <Database className="h-5 w-5 flex-none text-[#159AFD]" />
           <span>{databaseStatus}</span>
@@ -217,14 +217,14 @@ const OtaAdminPanel = () => {
       </div>
 
       <div className="grid gap-6 2xl:grid-cols-[0.9fr_1.1fr]">
-        <section className="rounded-xl border border-[#159AFD]/30 bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 p-5 backdrop-blur-sm sm:p-6">
+        <section className="rounded-md border border-[#159AFD]/30 bg-[#0D0F52]/40 p-5 backdrop-blur-sm sm:p-6">
           <div className="mb-5 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#159AFD]/20 text-[#159AFD]">
               <UploadCloud className="h-6 w-6" />
             </div>
             <div>
               <h3 className="text-xl font-semibold text-white">Novo firmware OTA</h3>
-              <p className="text-sm text-gray-400">Cadastre a versao no banco Firestore.</p>
+              <p className="text-sm text-gray-400">Cadastre a versão no banco Firestore.</p>
             </div>
           </div>
 
@@ -327,7 +327,7 @@ const OtaAdminPanel = () => {
                 value={form.notes}
                 onChange={(event) => setForm({ ...form, notes: event.target.value })}
                 className="mt-2 h-24 w-full resize-none rounded-lg border border-[#159AFD]/20 bg-black/30 p-3 text-white outline-none focus:border-[#159AFD]"
-                placeholder="Correções, melhorias e observacoes da versao"
+                placeholder="Correções, melhorias e observações da versão"
               />
             </label>
 
@@ -341,7 +341,7 @@ const OtaAdminPanel = () => {
           </form>
         </section>
 
-        <section className="rounded-xl border border-[#159AFD]/30 bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 p-5 backdrop-blur-sm sm:p-6">
+        <section className="rounded-md border border-[#159AFD]/30 bg-[#0D0F52]/40 p-5 backdrop-blur-sm sm:p-6">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#159AFD]/20 text-[#159AFD]">
@@ -381,7 +381,7 @@ const OtaAdminPanel = () => {
         </section>
       </div>
 
-      <section className="rounded-xl border border-[#159AFD]/30 bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 p-5 backdrop-blur-sm sm:p-6">
+      <section className="rounded-md border border-[#159AFD]/30 bg-[#0D0F52]/40 p-5 backdrop-blur-sm sm:p-6">
         <div className="mb-5 flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#159AFD]/20 text-[#159AFD]">
             <Cpu className="h-6 w-6" />

@@ -21,9 +21,9 @@ const categories = [
     ],
   },
   {
-    category: 'Automacao',
+    category: 'Automação',
     technologies: [
-      { name: 'Robotica', icon: Bot },
+      { name: 'Robótica', icon: Bot },
       { name: 'Firmware', icon: Cpu },
       { name: 'Dashboards', icon: Database },
       { name: 'OTA', icon: Wifi },
@@ -40,7 +40,7 @@ const TechStack = () => {
           <span className="text-sm font-semibold uppercase tracking-wider text-[#159AFD]">Tecnologia</span>
           <h2 className="mt-3 text-4xl font-bold text-white">Tecnologias e ferramentas</h2>
           <p className="mx-auto mt-4 max-w-3xl text-lg text-gray-400">
-            Base tecnica para desenvolver solucoes completas em IoT, robotica e sistemas embarcados.
+            Base técnica para desenvolver soluções completas em IoT, robótica e sistemas embarcados.
           </p>
         </div>
 
@@ -48,7 +48,7 @@ const TechStack = () => {
           {categories.map((category) => (
             <div
               key={category.category}
-              className="rounded-xl border border-[#159AFD]/30 bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 p-6 backdrop-blur-sm"
+              className="rounded-md border border-[#159AFD]/30 bg-[#0D0F52]/40 p-6 backdrop-blur-sm"
             >
               <h3 className="mb-6 text-center text-xl font-bold text-white">{category.category}</h3>
               <div className="grid grid-cols-2 gap-3">

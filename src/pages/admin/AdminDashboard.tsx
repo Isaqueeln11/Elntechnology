@@ -232,7 +232,7 @@ function compressImage(file: File): Promise<string> {
       image.src = String(reader.result);
     };
 
-    reader.onerror = () => reject(new Error('Nao foi possivel ler a imagem.'));
+    reader.onerror = () => reject(new Error('Não foi possível ler a imagem.'));
 
     image.onload = () => {
       const maxSize = 520;
@@ -243,7 +243,7 @@ function compressImage(file: File): Promise<string> {
       const context = canvas.getContext('2d');
 
       if (!context) {
-        reject(new Error('Nao foi possivel preparar a imagem.'));
+        reject(new Error('Não foi possível preparar a imagem.'));
         return;
       }
 
@@ -251,7 +251,7 @@ function compressImage(file: File): Promise<string> {
       resolve(canvas.toDataURL('image/jpeg', 0.82));
     };
 
-    image.onerror = () => reject(new Error('Arquivo de imagem invalido.'));
+    image.onerror = () => reject(new Error('Arquivo de imagem inválido.'));
     reader.readAsDataURL(file);
   });
 }
@@ -403,7 +403,7 @@ const AdminDashboard = () => {
     }
 
     if (!user?.id) {
-      setStatus('Usuário nao autenticado.');
+      setStatus('Usuário não autenticado.');
       return;
     }
 
@@ -415,7 +415,7 @@ const AdminDashboard = () => {
       setProfileForm((current) => ({ ...current, avatar }));
       setStatus('Foto carregada. Clique em salvar perfil para gravar no usuário.');
     } catch {
-      setStatus('Nao foi possivel carregar a foto. Tente outra imagem.');
+      setStatus('Não foi possível carregar a foto. Tente outra imagem.');
     } finally {
       setIsUploadingAvatar(false);
     }

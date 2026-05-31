@@ -24,7 +24,7 @@ const Register = () => {
     }
 
     if (password !== confirmPassword) {
-      setError('As senhas nao coincidem.');
+      setError('As senhas não coincidem.');
       return;
     }
 
@@ -33,7 +33,7 @@ const Register = () => {
     setIsSubmitting(false);
 
     if (!result.success) {
-      setError(result.message || 'Nao foi possivel criar a conta.');
+      setError(result.message || 'Não foi possível criar a conta.');
       return;
     }
 

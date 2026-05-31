@@ -23,7 +23,7 @@ const Login = () => {
       if (result.success) {
         navigate('/dashboard');
       } else {
-        setError(result.message || 'Nao foi possivel entrar.');
+        setError(result.message || 'Não foi possível entrar.');
       }
     } catch {
       setError('Erro ao fazer login. Tente novamente.');
@@ -37,7 +37,7 @@ const Login = () => {
     setStatus('');
 
     if (!email) {
-      setError('Digite seu email para receber a recuperacao de senha.');
+      setError('Digite seu email para receber a recuperação de senha.');
       return;
     }
 
@@ -64,12 +64,12 @@ const Login = () => {
 
       <main className="mx-auto grid min-h-[calc(100vh-88px)] w-full max-w-6xl items-center gap-8 px-4 pb-10 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]">
         <section className="hidden lg:block">
-          <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Area segura</p>
+          <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Área segura</p>
           <h1 className="mt-4 text-5xl font-black leading-tight text-[#0D0F52]">
-            Gerencie projetos, clientes e atualizacoes OTA.
+            Gerencie projetos, clientes e atualizações OTA.
           </h1>
           <p className="mt-5 max-w-xl text-lg leading-8 text-slate-600">
-            Entre com uma conta criada no Firebase para acessar o painel correto. Nao existem mais contas prontas.
+            Entre com uma conta criada no Firebase para acessar o painel correto. Não existem mais contas prontas.
           </p>
 
           <div className="mt-8 grid gap-3">
@@ -172,7 +172,7 @@ const Login = () => {
           </form>
 
           <p className="mt-6 text-center text-sm text-slate-500">
-            Nao tem uma conta?{' '}
+            Não tem uma conta?{' '}
             <Link to="/register" className="font-black text-[#159AFD] transition hover:text-[#0D0F52]">
               Criar conta
             </Link>

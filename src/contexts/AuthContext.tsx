@@ -90,19 +90,19 @@ function firebaseMessage(error: unknown) {
 
   switch (code) {
     case 'auth/email-already-in-use':
-      return 'Este email ja esta cadastrado.';
+      return 'Este email já está cadastrado.';
     case 'auth/invalid-email':
-      return 'Email invalido.';
+      return 'Email inválido.';
     case 'auth/weak-password':
       return 'A senha precisa ter pelo menos 6 caracteres.';
     case 'auth/invalid-credential':
     case 'auth/user-not-found':
     case 'auth/wrong-password':
-      return 'Email ou senha incorretos. Se ainda nao criou essa conta, use Criar conta primeiro.';
+      return 'Email ou senha incorretos. Se ainda não criou essa conta, use Criar conta primeiro.';
     case 'auth/network-request-failed':
       return 'Falha de rede ao conectar com o Firebase.';
     default:
-      return 'Nao foi possivel concluir a operacao.';
+      return 'Não foi possível concluir a operação.';
   }
 }
 
@@ -260,7 +260,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       await addDoc(collection(db, 'notifications'), {
-        title: 'Novo usuario cadastrado',
+        title: 'Novo usuário cadastrado',
         message: `${data.name} criou uma conta com o email ${data.email.trim()}.`,
         target: 'Admin',
         status: 'Nova',
@@ -271,7 +271,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       await addDoc(collection(db, 'systemEvents'), {
-        title: 'Cadastro de usuario',
+        title: 'Cadastro de usuário',
         message: `${data.name} entrou no sistema.`,
         type: 'user-created',
         userId: credential.user.uid,
@@ -303,7 +303,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateUserProfile = async (data: Partial<Pick<User, 'name' | 'company' | 'avatar' | 'theme' | 'preferences'>>) => {
     if (!auth.currentUser || !user) {
-      return { success: false, message: 'Usuario nao autenticado.' };
+      return { success: false, message: 'Usuário não autenticado.' };
     }
 
     try {
@@ -344,7 +344,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (nextUser.theme) setTheme(nextUser.theme);
       return { success: true, message: 'Perfil atualizado com sucesso.' };
     } catch {
-      return { success: false, message: 'Nao foi possivel atualizar o perfil.' };
+      return { success: false, message: 'Não foi possível atualizar o perfil.' };
     }
   };
 

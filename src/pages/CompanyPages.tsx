@@ -61,7 +61,7 @@ const pages: Record<string, PageData> = {
       {
         title: 'Projetos finalizados',
         text: 'Área para listar projetos entregues com resumo técnico, fotos e data de conclusão.',
-        items: ['Nome do projeto', 'Cliente ou aplicacao', 'Componentes usados', 'Resultado entregue'],
+        items: ['Nome do projeto', 'Cliente ou aplicação', 'Componentes usados', 'Resultado entregue'],
       },
       {
         title: 'Protótipos em teste',
@@ -88,7 +88,7 @@ const pages: Record<string, PageData> = {
       {
         title: 'Correções',
         text: 'Lista de problemas encontrados e resolvidos no sistema.',
-        items: ['Tela corrigida', 'Data da correcao', 'Responsável', 'Como validar'],
+        items: ['Tela corrigida', 'Data da correção', 'Responsável', 'Como validar'],
       },
       {
         title: 'Melhorias futuras',
@@ -164,7 +164,7 @@ const pages: Record<string, PageData> = {
     description:
       'Use está página para organizar sistemas web, firmware, placas, automações, app, testes e novas funcionalidades.',
     icon: Hammer,
-    highlight: 'Cada desenvolvimento pode ter etapa, prioridade, responsável, versao e data prevista.',
+    highlight: 'Cada desenvolvimento pode ter etapa, prioridade, responsável, versão e data prevista.',
     sections: [
       {
         title: 'Firmware e OTA',
@@ -214,7 +214,7 @@ const pages: Record<string, PageData> = {
   videos: {
     key: 'videos',
     eyebrow: 'Vídeos e futuro',
-    title: 'Espaço para publicar vídeos, novidades e proximos lançamentos.',
+    title: 'Espaço para publicar vídeos, novidades e próximos lançamentos.',
     description:
       'Uma página preparada para demonstrações, vídeos do YouTube, bastidores, roadmap e apresentacoes futuras.',
     icon: MonitorPlay,
@@ -227,7 +227,7 @@ const pages: Record<string, PageData> = {
       },
       {
         title: 'Roadmap',
-        text: 'Organize o que vem depois: app, novos produtos, melhorias e integracoes.',
+        text: 'Organize o que vem depois: app, novos produtos, melhorias e integrações.',
         items: ['Próximo lançamento', 'Meta', 'Status', 'Data prevista'],
       },
       {
@@ -254,7 +254,7 @@ const pages: Record<string, PageData> = {
       },
       {
         title: 'Inovações',
-        text: 'Atualizacoes de sistema, novas funções, produtos e tecnologias em teste.',
+        text: 'Atualizações de sistema, novas funções, produtos e tecnologias em teste.',
         items: ['Melhoria', 'Produto', 'Versão', 'Resultado'],
       },
       {
