@@ -213,7 +213,7 @@ const languageOptions: Array<{ value: Language; label: string }> = [
 
 const copy = {
   pt: {
-    nav: { '#sobre': 'Sobre', '#areas': 'Áreas', '#servicos': 'Soluções', '#contato': 'Contato' },
+    nav: { '#sobre': 'Sobre', '/lojas': 'Loja', '#areas': 'Áreas', '#servicos': 'Soluções', '#contato': 'Contato' },
     login: 'Login',
     startProject: 'Iniciar projeto',
     themeLight: 'Modo claro',
@@ -250,7 +250,7 @@ const copy = {
     submit: 'Enviar solicitação',
   },
   en: {
-    nav: { '#sobre': 'About', '#areas': 'Areas', '#servicos': 'Solutions', '#contato': 'Contact' },
+    nav: { '#sobre': 'About', '/lojas': 'Store', '#areas': 'Areas', '#servicos': 'Solutions', '#contato': 'Contact' },
     login: 'Login',
     startProject: 'Start project',
     themeLight: 'Light mode',
@@ -287,7 +287,7 @@ const copy = {
     submit: 'Send request',
   },
   es: {
-    nav: { '#sobre': 'Nosotros', '#areas': 'Áreas', '#servicos': 'Soluciones', '#contato': 'Contacto' },
+    nav: { '#sobre': 'Nosotros', '/lojas': 'Tienda', '#areas': 'Áreas', '#servicos': 'Soluciones', '#contato': 'Contacto' },
     login: 'Acceder',
     startProject: 'Iniciar proyecto',
     themeLight: 'Modo claro',
