@@ -59,6 +59,7 @@ import logoUrl from '../ELN TECHNOLOGY.svg';
 
 const navLinks = [
   { label: 'Sobre', href: '#sobre' },
+  { label: 'Loja', href: '/lojas' },
   { label: 'Áreas', href: '#areas' },
   { label: 'Soluções', href: '#servicos' },
   { label: 'Contato', href: '#contato' },
