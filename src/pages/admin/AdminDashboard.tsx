@@ -744,13 +744,13 @@ const AdminDashboard = () => {
               label="Subpágina"
               value={siteContentForm.page}
               onChange={(page) => setSiteContentForm({ ...siteContentForm, page })}
-              options={['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'produtos', 'videos', 'noticias']}
+              options={['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'produtos', 'lojas', 'videos', 'noticias']}
             />
             <SelectField
               label="Tipo de conteúdo"
               value={siteContentForm.type}
               onChange={(type) => setSiteContentForm({ ...siteContentForm, type })}
-              options={['Projeto', 'Documento', 'Vídeo', 'Produto', 'Melhoria', 'Equipe', 'Atividade', 'Notícia', 'Inovação', 'Link']}
+              options={['Projeto', 'Documento', 'Vídeo', 'Produto', 'Loja', 'Melhoria', 'Equipe', 'Atividade', 'Notícia', 'Inovação', 'Link']}
             />
             <Field label="Título" value={siteContentForm.title} onChange={(title) => setSiteContentForm({ ...siteContentForm, title })} />
             <Field label="Link, documento, imagem ou vídeo" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="https://..." required={false} />

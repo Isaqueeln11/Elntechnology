@@ -12,6 +12,7 @@ import {
   Moon,
   Package,
   Rocket,
+  Store,
   Sun,
   Users,
   Wrench,
@@ -211,6 +212,33 @@ const pages: Record<string, PageData> = {
     ],
     workflow: ['Cadastrar produto', 'Adicionar foto', 'Definir valor', 'Publicar no site'],
   },
+  lojas: {
+    key: 'lojas',
+    eyebrow: 'Lojas',
+    title: 'Espaço para organizar lojas, parceiros e canais oficiais da ELN Technology.',
+    description:
+      'Use esta página para cadastrar pontos de venda, links de compra, lojas parceiras, catálogos externos e canais confiáveis para atendimento.',
+    icon: Store,
+    highlight: 'Cada loja pode ter nome, endereço, link, contato, tipo de parceria e produtos disponíveis.',
+    sections: [
+      {
+        title: 'Lojas oficiais',
+        text: 'Liste canais próprios ou autorizados para venda e atendimento.',
+        items: ['Nome da loja', 'Link oficial', 'WhatsApp', 'Produtos'],
+      },
+      {
+        title: 'Parceiros',
+        text: 'Organize empresas parceiras, revendedores e pontos de apoio técnico.',
+        items: ['Empresa', 'Cidade', 'Contato', 'Tipo de parceria'],
+      },
+      {
+        title: 'Links de compra',
+        text: 'Centralize links de marketplaces, catálogos e páginas externas confiáveis.',
+        items: ['Produto', 'Preço', 'Disponibilidade', 'URL'],
+      },
+    ],
+    workflow: ['Cadastrar loja', 'Adicionar contato', 'Vincular produtos', 'Publicar canal oficial'],
+  },
   videos: {
     key: 'videos',
     eyebrow: 'Vídeos e futuro',
@@ -271,10 +299,11 @@ const quickLinks = [
   { label: 'Projetos', to: '/projetos-desenvolvidos', icon: CircuitBoard },
   { label: 'Melhorias', to: '/melhorias', icon: Wrench },
   { label: 'Equipe', to: '/equipe', icon: Users },
-  { label: 'Análise', to: '/atividades-análise', icon: BarChart3 },
+  { label: 'Análise', to: '/atividades-analise', icon: BarChart3 },
   { label: 'Produtos', to: '/produtos', icon: Package },
+  { label: 'Lojas', to: '/lojas', icon: Store },
   { label: 'Vídeos', to: '/videos-futuro', icon: MonitorPlay },
-  { label: 'Notícias', to: '/notícias-inovações', icon: Rocket },
+  { label: 'Notícias', to: '/noticias-inovacoes', icon: Rocket },
 ];
 
 function CompanyPage({ data }: { data: PageData }) {
@@ -503,6 +532,10 @@ export function DesenvolvimentosPage() {
 
 export function ProdutosPage() {
   return <CompanyPage data={pages.produtos} />;
+}
+
+export function LojasPage() {
+  return <CompanyPage data={pages.lojas} />;
 }
 
 export function VideosFuturoPage() {

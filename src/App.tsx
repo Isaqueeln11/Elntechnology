@@ -24,6 +24,7 @@ import {
   Send,
   ShieldCheck,
   Sparkles,
+  Store,
   Sun,
   Users,
   Wifi,
@@ -46,6 +47,7 @@ import {
   AtividadesAnalisePage,
   DesenvolvimentosPage,
   EquipePage,
+  LojasPage,
   MelhoriasPage,
   NoticiasInovacoesPage,
   ProdutosPage,
@@ -171,6 +173,12 @@ const siteAreas = [
     title: 'Produtos',
     text: 'Monte catálogo com produtos, equipamentos, serviços e valores.',
     href: '/produtos',
+  },
+  {
+    icon: Store,
+    title: 'Lojas',
+    text: 'Organize pontos de venda, parceiros, links de compra e canais oficiais.',
+    href: '/lojas',
   },
   {
     icon: MonitorPlay,
@@ -906,6 +914,7 @@ function App() {
             <Route path="/atividades-analise" element={<AtividadesAnalisePage />} />
             <Route path="/desenvolvimentos" element={<DesenvolvimentosPage />} />
             <Route path="/produtos" element={<ProdutosPage />} />
+            <Route path="/lojas" element={<LojasPage />} />
             <Route path="/videos-futuro" element={<VideosFuturoPage />} />
             <Route path="/noticias-inovacoes" element={<NoticiasInovacoesPage />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
