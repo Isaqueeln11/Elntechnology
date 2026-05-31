@@ -18,6 +18,9 @@ O projeto agora usa Firebase real para login, cadastro e banco.
    - `orders`
    - `notifications`
    - `firmwareReleases`
+   - `siteContent`
+   - `siteSettings`
+   - `systemEvents`
 
 ## Regras mais seguras
 
@@ -42,7 +45,11 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return signedIn() && currentUser().data.role == "admin";
+      return signedIn()
+        && (
+          isOwnerEmail()
+          || currentUser().data.role == "admin"
+        );
     }
 
     function isOwnerEmail() {

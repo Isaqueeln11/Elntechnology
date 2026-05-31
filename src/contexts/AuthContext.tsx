@@ -264,24 +264,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: serverTimestamp(),
       });
 
-      await addDoc(collection(db, 'notifications'), {
-        title: 'Novo usuário cadastrado',
-        message: `${data.name} criou uma conta com o email ${data.email.trim()}.`,
-        target: 'Admin',
-        status: 'Nova',
-        type: 'new-user',
-        userId: credential.user.uid,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      try {
+        await addDoc(collection(db, 'notifications'), {
+          title: 'Novo usuário cadastrado',
+          message: `${data.name} criou uma conta com o email ${data.email.trim()}.`,
+          target: 'Admin',
+          status: 'Nova',
+          type: 'new-user',
+          userId: credential.user.uid,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      } catch {
+        // A conta ja foi criada. A notificacao depende das regras de admin do Firestore.
+      }
 
-      await addDoc(collection(db, 'systemEvents'), {
-        title: 'Cadastro de usuário',
-        message: `${data.name} entrou no sistema.`,
-        type: 'user-created',
-        userId: credential.user.uid,
-        createdAt: serverTimestamp(),
-      });
+      try {
+        await addDoc(collection(db, 'systemEvents'), {
+          title: 'Cadastro de usuário',
+          message: `${data.name} entrou no sistema.`,
+          type: 'user-created',
+          userId: credential.user.uid,
+          createdAt: serverTimestamp(),
+        });
+      } catch {
+        // Historico auxiliar: nao pode impedir cadastro/login.
+      }
 
       setUser(profile);
       return { success: true };

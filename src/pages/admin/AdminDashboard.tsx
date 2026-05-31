@@ -354,16 +354,16 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const subscriptions = [
-      onSnapshot(collection(db, 'clientes'), (snapshot) => setClients(asList<ClientRecord>(snapshot))),
-      onSnapshot(collection(db, 'projetos'), (snapshot) => setProjects(asList<ProjectRecord>(snapshot))),
-      onSnapshot(collection(db, 'technicians'), (snapshot) => setTechnicians(asList<TechnicianRecord>(snapshot))),
-      onSnapshot(collection(db, 'supportTickets'), (snapshot) => setTickets(asList<TicketRecord>(snapshot))),
-      onSnapshot(collection(db, 'documents'), (snapshot) => setDocuments(asList<DocumentRecord>(snapshot))),
-      onSnapshot(collection(db, 'invoices'), (snapshot) => setInvoices(asList<InvoiceRecord>(snapshot))),
-      onSnapshot(collection(db, 'orders'), (snapshot) => setOrders(asList<OrderRecord>(snapshot))),
-      onSnapshot(collection(db, 'notifications'), (snapshot) => setNotifications(asList<NotificationRecord>(snapshot))),
-      onSnapshot(collection(db, 'users'), (snapshot) => setRegisteredUsers(asList<UserRecord>(snapshot))),
-      onSnapshot(collection(db, 'systemEvents'), (snapshot) => setSystemEvents(asList<SystemEventRecord>(snapshot))),
+      onSnapshot(collection(db, 'clientes'), (snapshot) => setClients(asList<ClientRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar clientes'))),
+      onSnapshot(collection(db, 'projetos'), (snapshot) => setProjects(asList<ProjectRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar projetos'))),
+      onSnapshot(collection(db, 'technicians'), (snapshot) => setTechnicians(asList<TechnicianRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar técnicos'))),
+      onSnapshot(collection(db, 'supportTickets'), (snapshot) => setTickets(asList<TicketRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar suporte'))),
+      onSnapshot(collection(db, 'documents'), (snapshot) => setDocuments(asList<DocumentRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar documentos'))),
+      onSnapshot(collection(db, 'invoices'), (snapshot) => setInvoices(asList<InvoiceRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar faturamento'))),
+      onSnapshot(collection(db, 'orders'), (snapshot) => setOrders(asList<OrderRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar pedidos'))),
+      onSnapshot(collection(db, 'notifications'), (snapshot) => setNotifications(asList<NotificationRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar notificações'))),
+      onSnapshot(collection(db, 'users'), (snapshot) => setRegisteredUsers(asList<UserRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar usuários'))),
+      onSnapshot(collection(db, 'systemEvents'), (snapshot) => setSystemEvents(asList<SystemEventRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar atividades'))),
       onSnapshot(
         collection(db, 'siteContent'),
         (snapshot) => setSiteContent(asList<SiteContentRecord>(snapshot)),
@@ -373,7 +373,7 @@ const AdminDashboard = () => {
         if (snapshot.exists()) {
           setAreasSectionForm({ ...defaultAreasSectionForm, ...snapshot.data() });
         }
-      }),
+      }, (error) => setStatus(firestoreErrorMessage(error, 'carregar textos públicos'))),
     ];
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
@@ -773,7 +773,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
           <button
             type="button"
             onClick={() => setSiteContentForm({ page: 'produtos', type: 'Produto', title: '', description: '', url: '', status: 'Publicado' })}
@@ -799,6 +799,20 @@ const AdminDashboard = () => {
             <span>
               <span className="block font-black text-slate-950 dark:text-white">Adicionar loja</span>
               <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Prepara o formulário para publicar na página /lojas.</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSiteContentForm({ page: 'noticias', type: 'Notícia', title: '', description: '', url: '', status: 'Publicado' })}
+            className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
+          >
+            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
+              <MonitorPlay className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block font-black text-slate-950 dark:text-white">Adicionar publicação</span>
+              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Prepara o formulário para publicar em notícias e inovações.</span>
             </span>
           </button>
         </div>
@@ -845,9 +859,23 @@ const AdminDashboard = () => {
         title="Adicionar conteúdo público"
         onSubmit={(event) => {
           event.preventDefault();
+          const nextContent = {
+            page: siteContentForm.page.trim().toLowerCase(),
+            type: siteContentForm.type.trim(),
+            title: siteContentForm.title.trim(),
+            description: siteContentForm.description.trim(),
+            url: siteContentForm.url.trim(),
+            status: siteContentForm.status || 'Publicado',
+          };
+
+          if (!nextContent.title) {
+            setStatus('Informe um título para salvar o conteúdo.');
+            return;
+          }
+
           createRecord(
             'siteContent',
-            siteContentForm,
+            nextContent,
             () => setSiteContentForm({ page: 'projetos', type: 'Projeto', title: '', description: '', url: '', status: 'Publicado' }),
             'Conteúdo publicado na subpágina.',
           );
@@ -1050,6 +1078,11 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const statusIsError = /erro|falha|sem permiss|não|nao|inválido|informe/i.test(status);
+  const statusClass = statusIsError
+    ? 'border-rose-400/30 bg-rose-500/12 text-rose-200'
+    : 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200';
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -1076,7 +1109,11 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {status && <div className="rounded-md border border-emerald-400/25 bg-emerald-500/10 p-3 text-sm font-semibold text-emerald-200">{status}</div>}
+        {status && (
+          <div role="status" className={`sticky top-20 z-30 rounded-md border p-3 text-sm font-semibold shadow-lg backdrop-blur ${statusClass}`}>
+            {status}
+          </div>
+        )}
 
         <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
           <aside className={`${panelClass} h-fit p-2 lg:sticky lg:top-24`}>

@@ -309,6 +309,7 @@ const quickLinks = [
 function CompanyPage({ data }: { data: PageData }) {
   const { isDark, toggleTheme } = useTheme();
   const [contentItems, setContentItems] = useState<SiteContentItem[]>([]);
+  const [loadError, setLoadError] = useState('');
   const Icon = data.icon;
   const publishedItems = useMemo(
     () => contentItems.filter((item) => item.page === data.key && item.status !== 'Rascunho'),
@@ -316,9 +317,14 @@ function CompanyPage({ data }: { data: PageData }) {
   );
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'siteContent'), (snapshot) => {
-      setContentItems(snapshot.docs.map((item) => ({ id: item.id, ...item.data() }) as SiteContentItem));
-    });
+    const unsubscribe = onSnapshot(
+      collection(db, 'siteContent'),
+      (snapshot) => {
+        setLoadError('');
+        setContentItems(snapshot.docs.map((item) => ({ id: item.id, ...item.data() }) as SiteContentItem));
+      },
+      () => setLoadError('Não foi possível carregar os conteúdos publicados. Confira as regras do Firestore.'),
+    );
 
     return unsubscribe;
   }, []);
@@ -450,13 +456,17 @@ function CompanyPage({ data }: { data: PageData }) {
                   Conteúdos adicionados pelo painel
                 </h2>
               </div>
-              <Link to="/notícias-inovações" className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
+              <Link to="/noticias-inovacoes" className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
                 Ver notícias
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
-            {publishedItems.length === 0 ? (
+            {loadError ? (
+              <div className={`rounded-md border p-6 ${isDark ? 'border-rose-400/30 bg-rose-500/10 text-rose-100' : 'border-rose-200 bg-rose-50 text-rose-700'}`}>
+                <p className="font-black">{loadError}</p>
+              </div>
+            ) : publishedItems.length === 0 ? (
               <div className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
                 <p className="font-black">Nenhum conteúdo publicado ainda.</p>
                 <p className={`mt-2 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
