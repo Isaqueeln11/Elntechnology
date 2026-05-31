@@ -411,9 +411,15 @@ function HomePage() {
 
           <div className="hidden items-center gap-8 lg:flex">
             {navLinks.map((link) => (
-              <a key={link.href} href={link.href} className={`text-sm font-semibold transition hover:text-sky-500 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                {navCopy[link.href] || link.label}
-              </a>
+              link.href.startsWith('/') ? (
+                <Link key={link.href} to={link.href} className={`text-sm font-semibold transition hover:text-sky-500 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  {navCopy[link.href] || link.label}
+                </Link>
+              ) : (
+                <a key={link.href} href={link.href} className={`text-sm font-semibold transition hover:text-sky-500 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  {navCopy[link.href] || link.label}
+                </a>
+              )
             ))}
           </div>
 
@@ -469,14 +475,25 @@ function HomePage() {
           <div className={`border-t px-4 py-4 lg:hidden ${isDark ? 'border-white/10 bg-[#080B24]' : 'border-sky-100 bg-white'}`}>
             <div className="mx-auto flex max-w-7xl flex-col gap-2">
               {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className={`rounded-md px-3 py-3 font-semibold ${isDark ? 'text-slate-200 hover:bg-white/10' : 'text-slate-700 hover:bg-sky-50'}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {navCopy[link.href] || link.label}
-                </a>
+                link.href.startsWith('/') ? (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    className={`rounded-md px-3 py-3 font-semibold ${isDark ? 'text-slate-200 hover:bg-white/10' : 'text-slate-700 hover:bg-sky-50'}`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {navCopy[link.href] || link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className={`rounded-md px-3 py-3 font-semibold ${isDark ? 'text-slate-200 hover:bg-white/10' : 'text-slate-700 hover:bg-sky-50'}`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {navCopy[link.href] || link.label}
+                  </a>
+                )
               ))}
               <label className={`flex items-center gap-2 rounded-md px-3 py-3 font-semibold ${isDark ? 'text-slate-200 hover:bg-white/10' : 'text-slate-700 hover:bg-sky-50'}`}>
                 <Globe2 className="h-4 w-4 text-[#159AFD]" />
@@ -537,6 +554,15 @@ function HomePage() {
                   {t.solutions}
                   <ChevronRight className="h-5 w-5" />
                 </a>
+                <Link
+                  to="/lojas"
+                  className={`inline-flex items-center justify-center gap-2 rounded-md border px-6 py-4 font-bold transition hover:-translate-y-0.5 hover:border-[#159AFD] hover:text-[#159AFD] ${
+                    isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52]'
+                  }`}
+                >
+                  Loja oficial
+                  <Store className="h-5 w-5" />
+                </Link>
               </div>
             </div>
           </div>

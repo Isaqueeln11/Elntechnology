@@ -306,15 +306,51 @@ const quickLinks = [
   { label: 'Notícias', to: '/noticias-inovacoes', icon: Rocket },
 ];
 
+const sampleStoreProducts: SiteContentItem[] = [
+  {
+    id: 'sample-iot',
+    page: 'lojas',
+    type: 'Produto',
+    title: 'Kit IoT ESP32 para automação',
+    description: 'Controlador com ESP32 para protótipos, sensores, acionamentos e projetos conectados. Valor sob orçamento.',
+    url: 'https://wa.me/5581997092380?text=Olá,%20quero%20saber%20sobre%20o%20Kit%20IoT%20ESP32',
+    status: 'Publicado',
+  },
+  {
+    id: 'sample-pcb',
+    page: 'lojas',
+    type: 'Serviço',
+    title: 'Projeto de PCB personalizada',
+    description: 'Desenvolvimento de placa eletrônica, revisão de circuito, documentação e preparação para fabricação.',
+    url: 'https://wa.me/5581997092380?text=Olá,%20quero%20um%20orçamento%20de%20PCB%20personalizada',
+    status: 'Publicado',
+  },
+  {
+    id: 'sample-3d',
+    page: 'lojas',
+    type: 'Serviço',
+    title: 'Impressão 3D e protótipo',
+    description: 'Modelagem, impressão 3D, ajustes de encaixe e protótipos para projetos de tecnologia.',
+    url: 'https://wa.me/5581997092380?text=Olá,%20quero%20saber%20sobre%20impressão%203D',
+    status: 'Publicado',
+  },
+];
+
 function CompanyPage({ data }: { data: PageData }) {
   const { isDark, toggleTheme } = useTheme();
   const [contentItems, setContentItems] = useState<SiteContentItem[]>([]);
   const [loadError, setLoadError] = useState('');
   const Icon = data.icon;
+  const isStorePage = data.key === 'lojas';
   const publishedItems = useMemo(
     () => contentItems.filter((item) => item.page === data.key && item.status !== 'Rascunho'),
     [contentItems, data.key],
   );
+  const storeItems = useMemo(() => {
+    if (!isStorePage) return [];
+    const items = contentItems.filter((item) => ['lojas', 'produtos'].includes(item.page || '') && item.status !== 'Rascunho');
+    return items.length ? items : sampleStoreProducts;
+  }, [contentItems, isStorePage]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -421,6 +457,56 @@ function CompanyPage({ data }: { data: PageData }) {
             </div>
           </div>
         </section>
+
+        {isStorePage && (
+          <section className="pb-16">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className={`rounded-md border p-5 sm:p-7 ${isDark ? 'border-white/10 bg-white/[0.045]' : 'border-sky-100 bg-white shadow-sm'}`}>
+                <div className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-5 dark:border-white/10 sm:flex-row sm:items-end">
+                  <div>
+                    <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Vitrine oficial</p>
+                    <h2 className={`mt-2 text-2xl font-black sm:text-3xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
+                      Produtos e serviços disponíveis
+                    </h2>
+                    <p className={`mt-2 max-w-2xl leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                      Estes cards aparecem automaticamente quando você publica itens nas páginas produtos ou lojas pelo admin.
+                    </p>
+                  </div>
+                  <Link to="/dashboard?tab=sitePages" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#159AFD]/30 px-4 py-3 text-sm font-black text-[#159AFD] transition hover:bg-[#159AFD]/10">
+                    Admin da loja
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+
+                <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                  {storeItems.map((item) => (
+                    <article key={item.id} className={`flex min-h-64 flex-col rounded-md border p-5 transition hover:-translate-y-1 ${isDark ? 'border-white/10 bg-[#070A1F]/70 hover:bg-[#070A1F]' : 'border-sky-100 bg-[#F7FBFF] hover:bg-white'}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#159AFD] text-white">
+                          {item.type === 'Loja' ? <Store className="h-6 w-6" /> : <Package className="h-6 w-6" />}
+                        </div>
+                        <span className="rounded-md bg-[#159AFD]/15 px-3 py-1 text-xs font-black uppercase text-[#159AFD]">
+                          {item.type || 'Produto'}
+                        </span>
+                      </div>
+                      <h3 className={`mt-5 text-xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{item.title}</h3>
+                      <p className={`mt-3 flex-1 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.description}</p>
+                      <a
+                        href={item.url || `https://wa.me/5581997092380?text=${encodeURIComponent(`Olá, quero saber sobre ${item.title || 'um produto da ELN Technology'}`)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 font-black text-white transition hover:bg-[#0D0F52]"
+                      >
+                        Comprar ou consultar
+                        <ArrowRight className="h-4 w-4" />
+                      </a>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         <section id="conteúdos" className="pb-16">
           <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
