@@ -608,14 +608,14 @@ function HomePage() {
           </div>
         </section>
 
-        <section id="contato" className="bg-[#EEF7FF] py-20">
+        <section id="contato" className={`${isDark ? 'bg-[#0B102C]' : 'bg-[#EEF7FF]'} py-20`}>
           <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
             <div>
               <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Contato</p>
-              <h2 className="mt-3 max-w-3xl break-words text-3xl font-black leading-tight text-[#0D0F52] sm:text-4xl lg:text-5xl">
+              <h2 className={`mt-3 max-w-3xl break-words text-3xl font-black leading-tight sm:text-4xl lg:text-5xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
                 Conte sua ideia para a <BrandName />.
               </h2>
-              <p className="mt-5 text-lg leading-8 text-slate-600">
+              <p className={`mt-5 text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                 Use o formulário para organizar o pedido. Ele funciona na página e deixa a solicitação pronta para retorno.
               </p>
               <div className="mt-8 space-y-4">
@@ -623,7 +623,7 @@ function HomePage() {
                   href="https://mail.google.com/mail/?view=cm&fs=1&to=elntechnologyinnovations@gmail.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]"
+                  className={`flex items-center gap-3 font-bold hover:text-[#159AFD] ${isDark ? 'text-slate-100' : 'text-[#0D0F52]'}`}
                 >
                   <Mail className="h-5 w-5" />
                   elntechnologyinnovations@gmail.com
@@ -632,7 +632,7 @@ function HomePage() {
                   href="https://wa.me/5581997092380"
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]"
+                  className={`flex items-center gap-3 font-bold hover:text-[#159AFD] ${isDark ? 'text-slate-100' : 'text-[#0D0F52]'}`}
                 >
                   <Phone className="h-5 w-5" />
                   WhatsApp: +55 (81) 99709-2380
@@ -641,7 +641,7 @@ function HomePage() {
                   href="https://instagram.com/eln_technology"
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-3 font-bold text-[#0D0F52] hover:text-[#159AFD]"
+                  className={`flex items-center gap-3 font-bold hover:text-[#159AFD] ${isDark ? 'text-slate-100' : 'text-[#0D0F52]'}`}
                 >
                   <Instagram className="h-5 w-5" />
                   @eln_technology
@@ -649,21 +649,29 @@ function HomePage() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="rounded-md border border-sky-100 bg-white p-6 shadow-xl shadow-sky-900/10">
+            <form onSubmit={handleSubmit} className={`rounded-md border p-6 shadow-xl ${
+              isDark ? 'border-white/10 bg-white/[0.04] shadow-black/20' : 'border-sky-100 bg-white shadow-sky-900/10'
+            }`}>
               <div className="grid gap-4 sm:grid-cols-2">
-                <label className="text-sm font-bold text-slate-700">
+                <label className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                   Nome
-                  <input name="name" required className="mt-2 w-full rounded-md border border-sky-100 px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100" />
+                  <input name="name" required className={`mt-2 w-full rounded-md border px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100 ${
+                    isDark ? 'border-white/10 bg-slate-950/60 text-white' : 'border-sky-100 bg-white text-slate-950'
+                  }`} />
                 </label>
-                <label className="text-sm font-bold text-slate-700">
+                <label className={`text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                   WhatsApp
-                  <input name="phone" required className="mt-2 w-full rounded-md border border-sky-100 px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100" />
+                  <input name="phone" required className={`mt-2 w-full rounded-md border px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100 ${
+                    isDark ? 'border-white/10 bg-slate-950/60 text-white' : 'border-sky-100 bg-white text-slate-950'
+                  }`} />
                 </label>
               </div>
 
-              <label className="mt-4 block text-sm font-bold text-slate-700">
+              <label className={`mt-4 block text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                 Tipo de projeto
-                <select name="type" className="mt-2 w-full rounded-md border border-sky-100 px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100">
+                <select name="type" className={`mt-2 w-full rounded-md border px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100 ${
+                  isDark ? 'border-white/10 bg-slate-950/60 text-white' : 'border-sky-100 bg-white text-slate-950'
+                }`}>
                   <option>IoT e automação</option>
                   <option>Impressão 3D</option>
                   <option>Robótica</option>
@@ -672,13 +680,15 @@ function HomePage() {
                 </select>
               </label>
 
-              <label className="mt-4 block text-sm font-bold text-slate-700">
+              <label className={`mt-4 block text-sm font-bold ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                 Descreva sua ideia
                 <textarea
                   name="message"
                   required
                   rows={5}
-                  className="mt-2 w-full resize-none rounded-md border border-sky-100 px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100"
+                  className={`mt-2 w-full resize-none rounded-md border px-4 py-3 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-sky-100 ${
+                    isDark ? 'border-white/10 bg-slate-950/60 text-white' : 'border-sky-100 bg-white text-slate-950'
+                  }`}
                 />
               </label>
 
@@ -693,8 +703,8 @@ function HomePage() {
         </section>
       </main>
 
-      <footer className="border-t border-sky-100 bg-white py-8">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 px-4 text-sm text-slate-500 sm:px-6 lg:flex-row lg:items-center lg:px-8">
+      <footer className={`border-t py-8 ${isDark ? 'border-white/10 bg-[#070A1F]' : 'border-sky-100 bg-white'}`}>
+        <div className={`mx-auto flex max-w-7xl flex-col justify-between gap-4 px-4 text-sm sm:px-6 lg:flex-row lg:items-center lg:px-8 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
           <div className="flex items-center gap-3">
             <img src={logoUrl} alt="" className="h-10 w-24 object-contain" />
             <BrandName className="font-semibold" />
