@@ -1069,6 +1069,110 @@ const AdminDashboard = () => {
     />
   );
 
+  const renderStoreProducts = () => (
+    <div className="space-y-6">
+      <div className={`${panelClass} p-5 sm:p-6`}>
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#159AFD]">Loja oficial</p>
+            <h3 className="mt-2 text-xl font-black text-slate-950 dark:text-white">Cadastre somente produtos e serviços da vitrine.</h3>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500 dark:text-slate-400">
+              Esta área é só para loja: imagem do produto, link de compra, código/SKU, preço em R$ ou US$, categoria, disponibilidade e ficha técnica.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button type="button" onClick={() => prepareStoreProduct('lojas')} className="rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
+              Novo produto
+            </button>
+            <a href="/lojas" target="_blank" rel="noreferrer" className="rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200">
+              Ver loja
+            </a>
+            <a href="/produtos" target="_blank" rel="noreferrer" className="rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200">
+              Ver produtos
+            </a>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          {[
+            { label: 'Itens na vitrine', value: String(storeContentItems.length) },
+            { label: 'Publicados', value: String(storeContentItems.filter((item) => item.status !== 'Rascunho').length) },
+            { label: 'Destaques', value: String(storeContentItems.filter((item) => item.featured).length) },
+          ].map((item) => (
+            <div key={item.label} className="rounded-md border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.035]">
+              <p className="text-2xl font-black text-slate-950 dark:text-white">{item.value}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-500 dark:text-slate-400">{item.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <CrudPanel
+        title={editingSiteContentId ? 'Editar produto da loja' : 'Adicionar produto da loja'}
+        onSubmit={async (event) => {
+          event.preventDefault();
+          await saveSiteContent(() => setSiteContentForm({ ...defaultStoreProductForm }), editingSiteContentId ? 'Produto atualizado na loja.' : 'Produto salvo na loja.');
+        }}
+        form={
+          <>
+            <SelectField label="Onde aparece" value={siteContentForm.page} onChange={(page) => setSiteContentForm({ ...siteContentForm, page })} options={['lojas', 'produtos']} />
+            <SelectField label="Tipo" value={siteContentForm.type} onChange={(type) => setSiteContentForm({ ...siteContentForm, type })} options={['Produto', 'Serviço', 'Loja']} />
+            <Field label="Nome do produto ou serviço" value={siteContentForm.title} onChange={(title) => setSiteContentForm({ ...siteContentForm, title })} placeholder="Ex.: ESP32-S3 Super Mini" />
+            <div className="grid gap-4 sm:grid-cols-[0.45fr_1fr]">
+              <SelectField label="Moeda" value={siteContentForm.currency} onChange={(currency) => setSiteContentForm({ ...siteContentForm, currency: currency as 'BRL' | 'USD' })} options={['BRL', 'USD']} />
+              <Field label="Preço ou valor" value={siteContentForm.price} onChange={(price) => setSiteContentForm({ ...siteContentForm, price })} placeholder="Ex.: 25,90, R$ 25,90, US$ 5.00 ou Sob orçamento" required={false} />
+            </div>
+            <Field label="URL da imagem do produto" value={siteContentForm.imageUrl} onChange={(imageUrl) => setSiteContentForm({ ...siteContentForm, imageUrl })} placeholder="https://..." required={false} />
+            <Field label="Link de compra ou atendimento" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="Shopee, Mercado Livre, WhatsApp, catálogo ou site" required={false} />
+            <Field label="Código/SKU do produto" value={siteContentForm.sku} onChange={(sku) => setSiteContentForm({ ...siteContentForm, sku })} placeholder="Ex.: ESP32-S3-001" required={false} />
+            <Field label="Categoria" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: IoT e automação" required={false} />
+            <Field label="Marketplace ou canal" value={siteContentForm.marketplace} onChange={(marketplace) => setSiteContentForm({ ...siteContentForm, marketplace })} placeholder="Ex.: Shopee, Mercado Livre, Loja oficial" required={false} />
+            <SelectField label="Disponibilidade" value={siteContentForm.availability} onChange={(availability) => setSiteContentForm({ ...siteContentForm, availability })} options={['Disponível', 'Sob encomenda', 'Sob consulta', 'Indisponível']} />
+            <SelectField label="Status" value={siteContentForm.status} onChange={(statusValue) => setSiteContentForm({ ...siteContentForm, status: statusValue })} options={['Publicado', 'Rascunho']} />
+            <Field label="Link do datasheet/manual" value={siteContentForm.datasheetUrl} onChange={(datasheetUrl) => setSiteContentForm({ ...siteContentForm, datasheetUrl })} placeholder="https://..." required={false} />
+            <TextAreaField label="Descrição para a vitrine" value={siteContentForm.description} onChange={(description) => setSiteContentForm({ ...siteContentForm, description })} placeholder="Explique o produto, aplicação e uso." />
+            <TextAreaField label="Especificações técnicas, uma por linha" value={siteContentForm.specifications} onChange={(specifications) => setSiteContentForm({ ...siteContentForm, specifications })} placeholder={'Processador: ESP32-S3\nMemória: 4 MB Flash\nConectividade: Wi-Fi + Bluetooth'} />
+            <TextAreaField label="Recursos e aplicações, um por linha" value={siteContentForm.features} onChange={(features) => setSiteContentForm({ ...siteContentForm, features })} placeholder={'Atualização OTA\nPainel web\nAplicação em IoT'} />
+            <label className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-white p-3 text-sm font-semibold text-slate-700 dark:border-white/10 dark:bg-[#070A1F]/70 dark:text-slate-300">
+              Destacar na vitrine
+              <input type="checkbox" checked={siteContentForm.featured} onChange={(event) => setSiteContentForm({ ...siteContentForm, featured: event.target.checked })} className="h-5 w-5 accent-[#159AFD]" />
+            </label>
+            {editingSiteContentId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingSiteContentId(null);
+                  setSiteContentForm({ ...defaultStoreProductForm });
+                  setStatus('Edição cancelada.');
+                }}
+                className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-300"
+              >
+                Cancelar edição
+              </button>
+            )}
+          </>
+        }
+        emptyText="Nenhum produto cadastrado na loja."
+        items={storeContentItems.map((item) => ({
+          id: item.id,
+          title: item.title || 'Produto sem título',
+          subtitle: `${item.page || 'lojas'} - ${item.category || item.type || 'Produto'} - ${item.status || 'Publicado'}`,
+          meta: [formatStorePrice(item), item.sku, item.marketplace, item.availability].filter(Boolean).join(' · '),
+          status: item.status,
+          link: item.url,
+          actions: [
+            { label: 'Editar', onClick: () => startEditingSiteContent(item) },
+            { label: 'Ver loja', onClick: () => window.open(item.page === 'produtos' ? '/produtos' : '/lojas', '_blank', 'noopener,noreferrer') },
+            { label: 'Ver ficha', onClick: () => window.open(`/produto/${item.id}`, '_blank', 'noopener,noreferrer') },
+            { label: 'Publicar', onClick: () => changeStatus('siteContent', item.id, 'Publicado') },
+            { label: 'Rascunho', onClick: () => changeStatus('siteContent', item.id, 'Rascunho') },
+          ],
+          remove: () => removeRecord('siteContent', item.id),
+        }))}
+      />
+    </div>
+  );
+
   const renderSitePages = () => (
     <div className="space-y-6">
       <div className={`${panelClass} p-5 sm:p-6`}>
@@ -1132,8 +1236,8 @@ const AdminDashboard = () => {
           <button
             type="button"
             onClick={() => {
-              setEditingSiteContentId(null);
-              setSiteContentForm({ ...defaultSiteContentForm, page: 'produtos', type: 'Produto', category: 'IoT e automação', currency: 'BRL', marketplace: 'Loja oficial' });
+              prepareStoreProduct('produtos');
+              setActiveTab('store');
             }}
             className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
           >
@@ -1149,8 +1253,8 @@ const AdminDashboard = () => {
           <button
             type="button"
             onClick={() => {
-              setEditingSiteContentId(null);
-              setSiteContentForm({ ...defaultSiteContentForm, page: 'lojas', type: 'Loja', category: 'Canal oficial', currency: 'BRL', marketplace: 'WhatsApp' });
+              prepareStoreProduct('lojas');
+              setActiveTab('store');
             }}
             className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
           >
