@@ -27,3 +27,14 @@ npm run build
 ```
 
 Os arquivos finais ficam na pasta `dist`.
+
+## Hospedagem
+
+Para publicar no Cloudflare Pages usando o GitHub, siga o guia em [`docs/CLOUDFLARE_PAGES.md`](docs/CLOUDFLARE_PAGES.md).
+
+Configuracao do build:
+
+- Branch: `main`
+- Comando: `npm run build`
+- Pasta publicada: `dist`
+- Node.js: `22`
