@@ -214,12 +214,12 @@ const pages: Record<string, PageData> = {
   },
   lojas: {
     key: 'lojas',
-    eyebrow: 'Lojas',
-    title: 'Espaço para organizar lojas, parceiros e canais oficiais da ELN Technology.',
+    eyebrow: 'Loja oficial',
+    title: 'Produtos, serviços e canais oficiais da ELN Technology em um só lugar.',
     description:
-      'Use esta página para cadastrar pontos de venda, links de compra, lojas parceiras, catálogos externos e canais confiáveis para atendimento.',
+      'Encontre equipamentos, serviços, kits, protótipos e links confiáveis para falar direto com a ELN Technology.',
     icon: Store,
-    highlight: 'Cada loja pode ter nome, endereço, link, contato, tipo de parceria e produtos disponíveis.',
+    highlight: 'A vitrine mostra produtos cadastrados pelo painel admin e mantém contato direto por WhatsApp.',
     sections: [
       {
         title: 'Lojas oficiais',
@@ -351,6 +351,19 @@ function CompanyPage({ data }: { data: PageData }) {
     const items = contentItems.filter((item) => ['lojas', 'produtos'].includes(item.page || '') && item.status !== 'Rascunho');
     return items.length ? items : sampleStoreProducts;
   }, [contentItems, isStorePage]);
+  const footerHighlights = isStorePage
+    ? [
+        { icon: Store, label: 'Canal oficial' },
+        { icon: Package, label: 'Produtos sob medida' },
+        { icon: Clock3, label: 'Orçamento rápido' },
+        { icon: Users, label: 'Atendimento direto' },
+      ]
+    : [
+        { icon: Clock3, label: 'Histórico organizado' },
+        { icon: Boxes, label: 'Espaço para anexos' },
+        { icon: Activity, label: 'Status por etapa' },
+        { icon: Rocket, label: 'Pronto para crescer' },
+      ];
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -472,10 +485,10 @@ function CompanyPage({ data }: { data: PageData }) {
                       Estes cards aparecem automaticamente quando você publica itens nas páginas produtos ou lojas pelo admin.
                     </p>
                   </div>
-                  <Link to="/dashboard?tab=sitePages" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#159AFD]/30 px-4 py-3 text-sm font-black text-[#159AFD] transition hover:bg-[#159AFD]/10">
-                    Admin da loja
+                  <a href="https://wa.me/5581997092380?text=Olá,%20quero%20falar%20com%20a%20ELN%20Technology" target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#159AFD]/30 px-4 py-3 text-sm font-black text-[#159AFD] transition hover:bg-[#159AFD]/10">
+                    Atendimento da loja
                     <ArrowRight className="h-4 w-4" />
-                  </Link>
+                  </a>
                 </div>
 
                 <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -508,6 +521,8 @@ function CompanyPage({ data }: { data: PageData }) {
           </section>
         )}
 
+        {!isStorePage && (
+          <>
         <section id="conteúdos" className="pb-16">
           <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
             {data.sections.map((section) => (
@@ -585,15 +600,12 @@ function CompanyPage({ data }: { data: PageData }) {
             )}
           </div>
         </section>
+          </>
+        )}
 
         <section className={`border-t py-16 ${isDark ? 'border-white/10 bg-[#080B24]' : 'border-sky-100 bg-white'}`}>
           <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
-            {[
-              { icon: Clock3, label: 'Histórico organizado' },
-              { icon: Boxes, label: 'Espaço para anexos' },
-              { icon: Activity, label: 'Status por etapa' },
-              { icon: Rocket, label: 'Pronto para crescer' },
-            ].map(({ icon: FooterIcon, label }) => (
+            {footerHighlights.map(({ icon: FooterIcon, label }) => (
               <div key={label} className={`rounded-md border p-5 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-[#F7FBFF]'}`}>
                 <FooterIcon className="h-7 w-7 text-[#159AFD]" />
                 <p className="mt-3 font-black">{label}</p>

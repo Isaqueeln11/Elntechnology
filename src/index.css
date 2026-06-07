@@ -9,6 +9,7 @@ html {
 
 body {
   min-width: 320px;
+  margin: 0;
   overflow-x: hidden;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -33,6 +34,26 @@ button {
   min-width: 0;
 }
 
+a,
+button,
+input,
+select,
+textarea {
+  outline-offset: 3px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #159afd;
+}
+
+::selection {
+  background: rgba(21, 154, 253, 0.28);
+}
+
 @media (max-width: 640px) {
   .mobile-scrollbar {
     scrollbar-width: none;
@@ -46,10 +67,8 @@ button {
 .circuit-grid {
   background-image:
     linear-gradient(rgba(21, 154, 253, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(21, 154, 253, 0.08) 1px, transparent 1px),
-    radial-gradient(circle at 20% 20%, rgba(21, 154, 253, 0.16), transparent 28%),
-    radial-gradient(circle at 80% 10%, rgba(13, 15, 82, 0.12), transparent 24%);
-  background-size: 42px 42px, 42px 42px, 100% 100%, 100% 100%;
+    linear-gradient(90deg, rgba(21, 154, 253, 0.08) 1px, transparent 1px);
+  background-size: 42px 42px, 42px 42px;
   animation: circuit-drift 18s linear infinite;
 }
 
@@ -78,5 +97,20 @@ button {
 
   to {
     transform: rotate(360deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

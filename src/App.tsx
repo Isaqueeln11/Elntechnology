@@ -34,28 +34,27 @@ import {
 } from 'lucide-react';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import Login from './Login';
-import Register from './Register';
-import Dashboard from './pages/Dashboard';
-import Unauthorized from './pages/Unauthorized';
-import ExplorarSolucoes from './pages/ExplorarSolucoes';
-import IniciarProjeto from './pages/IniciarProjeto';
-import Inovacoes from './pages/Inovacoes';
-import PCBs from './pages/PCBs';
-import {
-  AtividadesAnalisePage,
-  DesenvolvimentosPage,
-  EquipePage,
-  LojasPage,
-  MelhoriasPage,
-  NoticiasInovacoesPage,
-  ProdutosPage,
-  ProjetosDesenvolvidos,
-  VideosFuturoPage,
-} from './pages/CompanyPages';
 import { db } from './firebase';
 import logoUrl from '../ELN TECHNOLOGY.svg';
+
+const ProtectedRoute = React.lazy(() => import('./components/ProtectedRoute'));
+const Login = React.lazy(() => import('./Login'));
+const Register = React.lazy(() => import('./Register'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const Unauthorized = React.lazy(() => import('./pages/Unauthorized'));
+const ExplorarSolucoes = React.lazy(() => import('./pages/ExplorarSolucoes'));
+const IniciarProjeto = React.lazy(() => import('./pages/IniciarProjeto'));
+const Inovacoes = React.lazy(() => import('./pages/Inovacoes'));
+const PCBs = React.lazy(() => import('./pages/PCBs'));
+const ProjetosDesenvolvidos = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.ProjetosDesenvolvidos })));
+const MelhoriasPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.MelhoriasPage })));
+const EquipePage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.EquipePage })));
+const AtividadesAnalisePage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.AtividadesAnalisePage })));
+const DesenvolvimentosPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.DesenvolvimentosPage })));
+const ProdutosPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.ProdutosPage })));
+const LojasPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.LojasPage })));
+const VideosFuturoPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.VideosFuturoPage })));
+const NoticiasInovacoesPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.NoticiasInovacoesPage })));
 
 const navLinks = [
   { label: 'Sobre', href: '#sobre' },
@@ -351,6 +350,17 @@ function BrandName({ className = '' }: { className?: string }) {
   );
 }
 
+function PageLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[#070A1F] px-4 text-white">
+      <div className="flex items-center gap-3 rounded-md border border-white/10 bg-white/5 px-5 py-4">
+        <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-[#159AFD]" />
+        <span className="font-bold">Carregando ELN Technology...</span>
+      </div>
+    </div>
+  );
+}
+
 function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [selectedService, setSelectedService] = React.useState('IoT e automação');
@@ -412,7 +422,8 @@ function HomePage() {
           <div className="hidden items-center gap-8 lg:flex">
             {navLinks.map((link) => (
               link.href.startsWith('/') ? (
-                <Link key={link.href} to={link.href} className={`text-sm font-semibold transition hover:text-sky-500 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                <Link key={link.href} to={link.href} className="inline-flex items-center gap-2 rounded-md bg-[#159AFD]/12 px-3 py-2 text-sm font-black text-[#159AFD] transition hover:bg-[#159AFD] hover:text-white">
+                  <Store className="h-4 w-4" />
                   {navCopy[link.href] || link.label}
                 </Link>
               ) : (
@@ -479,9 +490,10 @@ function HomePage() {
                   <Link
                     key={link.href}
                     to={link.href}
-                    className={`rounded-md px-3 py-3 font-semibold ${isDark ? 'text-slate-200 hover:bg-white/10' : 'text-slate-700 hover:bg-sky-50'}`}
+                    className="flex items-center gap-3 rounded-md bg-[#159AFD]/12 px-3 py-3 font-black text-[#159AFD]"
                     onClick={() => setIsMenuOpen(false)}
                   >
+                    <Store className="h-5 w-5" />
                     {navCopy[link.href] || link.label}
                   </Link>
                 ) : (
@@ -538,31 +550,22 @@ function HomePage() {
               </p>
 
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                <a
-                  href="#contato"
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0D0F52] px-6 py-4 font-bold text-white shadow-xl shadow-slate-900/15 transition hover:-translate-y-0.5 hover:bg-[#159AFD]"
-                >
-                  {t.quote}
-                  <Send className="h-5 w-5" />
-                </a>
-                <a
-                  href="#servicos"
-                  className={`inline-flex items-center justify-center gap-2 rounded-md border px-6 py-4 font-bold transition hover:-translate-y-0.5 hover:border-[#159AFD] hover:text-[#159AFD] ${
-                    isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52]'
-                  }`}
-                >
-                  {t.solutions}
-                  <ChevronRight className="h-5 w-5" />
-                </a>
                 <Link
                   to="/lojas"
-                  className={`inline-flex items-center justify-center gap-2 rounded-md border px-6 py-4 font-bold transition hover:-translate-y-0.5 hover:border-[#159AFD] hover:text-[#159AFD] ${
-                    isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52]'
-                  }`}
+                  className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-6 py-4 font-black text-white shadow-xl shadow-sky-500/20 transition hover:-translate-y-0.5 hover:bg-[#0D0F52]"
                 >
                   Loja oficial
                   <Store className="h-5 w-5" />
                 </Link>
+                <a
+                  href="#contato"
+                  className={`inline-flex items-center justify-center gap-2 rounded-md border px-6 py-4 font-bold transition hover:-translate-y-0.5 hover:border-[#159AFD] hover:text-[#159AFD] ${
+                    isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52]'
+                  }`}
+                >
+                  {t.quote}
+                  <Send className="h-5 w-5" />
+                </a>
               </div>
             </div>
           </div>
@@ -927,35 +930,37 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Router>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
-            <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
-            <Route path="/inovacoes" element={<Inovacoes />} />
-            <Route path="/pcbs" element={<PCBs />} />
-            <Route path="/projetos-desenvolvidos" element={<ProjetosDesenvolvidos />} />
-            <Route path="/melhorias" element={<MelhoriasPage />} />
-            <Route path="/equipe" element={<EquipePage />} />
-            <Route path="/atividades-analise" element={<AtividadesAnalisePage />} />
-            <Route path="/desenvolvimentos" element={<DesenvolvimentosPage />} />
-            <Route path="/produtos" element={<ProdutosPage />} />
-            <Route path="/lojas" element={<LojasPage />} />
-            <Route path="/videos-futuro" element={<VideosFuturoPage />} />
-            <Route path="/noticias-inovacoes" element={<NoticiasInovacoesPage />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route path="/dashboard/paginas" element={<Navigate to="/dashboard?tab=sitePages" replace />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <React.Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
+              <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
+              <Route path="/inovacoes" element={<Inovacoes />} />
+              <Route path="/pcbs" element={<PCBs />} />
+              <Route path="/projetos-desenvolvidos" element={<ProjetosDesenvolvidos />} />
+              <Route path="/melhorias" element={<MelhoriasPage />} />
+              <Route path="/equipe" element={<EquipePage />} />
+              <Route path="/atividades-analise" element={<AtividadesAnalisePage />} />
+              <Route path="/desenvolvimentos" element={<DesenvolvimentosPage />} />
+              <Route path="/produtos" element={<ProdutosPage />} />
+              <Route path="/lojas" element={<LojasPage />} />
+              <Route path="/videos-futuro" element={<VideosFuturoPage />} />
+              <Route path="/noticias-inovacoes" element={<NoticiasInovacoesPage />} />
+              <Route path="/unauthorized" element={<Unauthorized />} />
+              <Route path="/dashboard/paginas" element={<Navigate to="/dashboard?tab=sitePages" replace />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </React.Suspense>
         </Router>
       </AuthProvider>
     </ThemeProvider>
