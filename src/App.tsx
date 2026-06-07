@@ -418,8 +418,8 @@ function HomePage() {
           }`}>
             {navLinks.map((link) => (
               link.href.startsWith('/') ? (
-                <Link key={link.href} to={link.href} className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-black text-[#159AFD] transition hover:bg-[#159AFD] hover:text-white">
-                  <Store className="h-4 w-4" />
+                <Link key={link.href} to={link.href} className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition hover:bg-[#159AFD]/10 hover:text-[#159AFD] ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  {link.href === '/lojas' ? <Store className="h-4 w-4 text-[#159AFD]" /> : <Cpu className="h-4 w-4 text-[#159AFD]" />}
                   {navCopy[link.href] || link.label}
                 </Link>
               ) : (

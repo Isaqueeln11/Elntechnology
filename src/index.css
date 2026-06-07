@@ -15,6 +15,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.dashboard-shell *,
+.dashboard-shell *::before,
+.dashboard-shell *::after,
+main *,
+main *::before,
+main *::after {
+  animation: none !important;
+}
+
+.dashboard-shell article,
+.dashboard-shell aside,
+.dashboard-shell form,
+.dashboard-shell section {
+  border-radius: 8px;
+}
+
 #root {
   min-height: 100vh;
   overflow-x: hidden;

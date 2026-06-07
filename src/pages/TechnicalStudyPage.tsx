@@ -51,7 +51,7 @@ export default function TechnicalStudyPage() {
       doc(db, 'siteContent', studyId),
       (snapshot) => {
         const data = snapshot.exists() ? ({ id: snapshot.id, ...snapshot.data() } as StoreProduct) : null;
-        setStudy(data?.page === 'estudos' && data.status !== 'Rascunho' ? data : null);
+        setStudy(data && data.page === 'estudos' && data.status !== 'Rascunho' ? data : null);
         setIsLoading(false);
       },
       () => {

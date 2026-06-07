@@ -717,7 +717,7 @@ function CompanyPage({ data }: { data: PageData }) {
                       <Search className="mx-auto h-8 w-8 text-[#159AFD]" />
                       <p className="mt-4 font-black">Nenhum produto real publicado ainda.</p>
                       <p className={`mt-2 text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                        Entre no painel admin, abra Loja e Site, clique em Cadastrar produto real e salve com status Publicado.
+                        Entre no painel admin, abra Conteúdo público, clique em Cadastrar produto real e salve com status Publicado.
                       </p>
                     </div>
                   )}

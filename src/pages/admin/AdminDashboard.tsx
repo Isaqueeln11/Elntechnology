@@ -1307,6 +1307,7 @@ const AdminDashboard = () => {
           actions: [
             ...(item.page && pageLinks[item.page] ? [{ label: 'Ver página', onClick: () => window.open(pageLinks[item.page], '_blank', 'noopener,noreferrer') }] : []),
             ...(['produtos', 'lojas'].includes(item.page || '') ? [{ label: 'Ver ficha técnica', onClick: () => window.open(`/produto/${item.id}`, '_blank', 'noopener,noreferrer') }] : []),
+            ...(item.page === 'estudos' ? [{ label: 'Ver estudo', onClick: () => window.open(`/estudos/${item.id}`, '_blank', 'noopener,noreferrer') }] : []),
             { label: 'Editar', onClick: () => startEditingSiteContent(item) },
             { label: 'Publicar', onClick: () => changeStatus('siteContent', item.id, 'Publicado') },
             { label: 'Rascunho', onClick: () => changeStatus('siteContent', item.id, 'Rascunho') },
