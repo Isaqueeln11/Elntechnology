@@ -6,6 +6,7 @@ import {
   BarChart3,
   Bell,
   CreditCard,
+  Cpu,
   FileText,
   FolderOpen,
   MessageSquare,
@@ -149,7 +150,7 @@ const tabs = [
   { id: 'technicians', label: 'Técnicos', icon: Users, description: 'Equipe técnica e especialidades' },
   { id: 'support', label: 'Suporte', icon: MessageSquare, description: 'Tickets e atendimento' },
   { id: 'documents', label: 'Documentos', icon: FileText, description: 'Links, contratos e arquivos' },
-  { id: 'sitePages', label: 'Loja e Site', icon: MonitorPlay, description: 'Produtos, equipe, loja, notícias e subpáginas públicas' },
+  { id: 'sitePages', label: 'Conteúdo público', icon: MonitorPlay, description: 'Estudos, produtos, equipe, loja, notícias e subpáginas públicas' },
   { id: 'billing', label: 'Faturamento', icon: CreditCard, description: 'Valores, vencimentos e status' },
   { id: 'notifications', label: 'Notificações', icon: Bell, description: 'Avisos para clientes e equipe' },
   { id: 'ota', label: 'Códigos OTA', icon: UploadCloud, description: 'Versões e firmware dos equipamentos' },
@@ -166,8 +167,8 @@ const defaultAreasSectionForm = {
   buttonHref: '/noticias-inovacoes',
 };
 
-const sitePageOptions = ['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'produtos', 'lojas', 'videos', 'noticias'];
-const siteContentTypeOptions = ['Projeto', 'Documento', 'Vídeo', 'Produto', 'Loja', 'Melhoria', 'Equipe', 'Atividade', 'Notícia', 'Inovação', 'Link'];
+const sitePageOptions = ['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'estudos', 'produtos', 'lojas', 'videos', 'noticias'];
+const siteContentTypeOptions = ['Projeto', 'Documento', 'Vídeo', 'Estudo', 'Produto', 'Loja', 'Melhoria', 'Equipe', 'Atividade', 'Notícia', 'Inovação', 'Link'];
 const defaultSiteContentForm = {
   page: 'projetos',
   type: 'Projeto',
@@ -194,6 +195,7 @@ const pageLinks: Record<string, string> = {
   equipe: '/equipe',
   atividades: '/atividades-analise',
   desenvolvimentos: '/desenvolvimentos',
+  estudos: '/estudos',
   produtos: '/produtos',
   lojas: '/lojas',
   videos: '/videos-futuro',
@@ -987,10 +989,10 @@ const AdminDashboard = () => {
       <div className={`${panelClass} p-5 sm:p-6`}>
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#159AFD]">Loja, equipe e páginas públicas</p>
-            <h3 className="mt-2 text-xl font-black text-slate-950 dark:text-white">Cadastre produtos reais, membros da equipe, lojas e publicações.</h3>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#159AFD]">Conteúdo público do site</p>
+            <h3 className="mt-2 text-xl font-black text-slate-950 dark:text-white">Cadastre estudos, produtos reais, equipe, lojas e publicações.</h3>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500 dark:text-slate-400">
-              Produto só aparece na vitrine se estiver salvo no Firebase com página produtos ou lojas e status Publicado.
+              Estudos aparecem em /estudos. Produtos aparecem em /produtos e /lojas. Tudo precisa estar com status Publicado.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -1002,6 +1004,9 @@ const AdminDashboard = () => {
             </a>
             <a href="/lojas" target="_blank" rel="noreferrer" className="rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200">
               Ver lojas
+            </a>
+            <a href="/estudos" target="_blank" rel="noreferrer" className="rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200">
+              Ver estudos
             </a>
           </div>
         </div>
@@ -1021,7 +1026,24 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-5 grid gap-3 lg:grid-cols-2 xl:grid-cols-5">
+          <button
+            type="button"
+            onClick={() => {
+              setEditingSiteContentId(null);
+              setSiteContentForm({ ...defaultSiteContentForm, page: 'estudos', type: 'Estudo', category: 'ESP32 e placas' });
+            }}
+            className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
+          >
+            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
+              <Cpu className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block font-black text-slate-950 dark:text-white">Cadastrar estudo</span>
+              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Placa, módulo, datasheet, pinagem, setup e anotações.</span>
+            </span>
+          </button>
+
           <button
             type="button"
             onClick={() => {
@@ -1192,15 +1214,15 @@ const AdminDashboard = () => {
               options={siteContentTypeOptions}
             />
             <Field
-              label={['produtos', 'lojas'].includes(siteContentForm.page) ? 'Nome do produto, serviço ou loja' : siteContentForm.page === 'equipe' ? 'Nome do membro da equipe' : 'Título'}
+              label={['produtos', 'lojas'].includes(siteContentForm.page) ? 'Nome do produto, serviço ou loja' : siteContentForm.page === 'equipe' ? 'Nome do membro da equipe' : siteContentForm.page === 'estudos' ? 'Nome da placa, módulo ou estudo' : 'Título'}
               value={siteContentForm.title}
               onChange={(title) => setSiteContentForm({ ...siteContentForm, title })}
             />
             <Field
-              label={['produtos', 'lojas'].includes(siteContentForm.page) ? 'Link de compra ou contato' : siteContentForm.page === 'equipe' ? 'Link de contato ou perfil' : 'Link, documento, imagem ou vídeo'}
+              label={['produtos', 'lojas'].includes(siteContentForm.page) ? 'Link de compra ou contato' : siteContentForm.page === 'equipe' ? 'Link de contato ou perfil' : siteContentForm.page === 'estudos' ? 'Link principal da referência' : 'Link, documento, imagem ou vídeo'}
               value={siteContentForm.url}
               onChange={(url) => setSiteContentForm({ ...siteContentForm, url })}
-              placeholder={['produtos', 'lojas'].includes(siteContentForm.page) ? 'Shopee, Mercado Livre, WhatsApp, catálogo ou site' : 'https://...'}
+              placeholder={['produtos', 'lojas'].includes(siteContentForm.page) ? 'Shopee, Mercado Livre, WhatsApp, catálogo ou site' : siteContentForm.page === 'estudos' ? 'Documentação, artigo, vídeo ou repositório' : 'https://...'}
               required={false}
             />
             {['produtos', 'lojas'].includes(siteContentForm.page) && (
@@ -1241,6 +1263,20 @@ const AdminDashboard = () => {
                 <Field label="Cargo ou função" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: Administrador, técnico, parceiro" required={false} />
                 <Field label="URL da foto" value={siteContentForm.imageUrl} onChange={(imageUrl) => setSiteContentForm({ ...siteContentForm, imageUrl })} placeholder="https://..." required={false} />
                 <TextAreaField label="Responsabilidades, uma por linha" value={siteContentForm.features} onChange={(features) => setSiteContentForm({ ...siteContentForm, features })} placeholder={'Atendimento ao cliente\nProjetos eletrônicos\nAtualizações OTA'} />
+              </div>
+            )}
+            {siteContentForm.page === 'estudos' && (
+              <div className="grid gap-4 rounded-md border border-[#159AFD]/20 bg-[#159AFD]/5 p-4">
+                <div>
+                  <p className="font-bold text-slate-950 dark:text-white">Ficha de estudo técnico</p>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Esses dados aparecem na lista /estudos e na ficha /estudos/id.</p>
+                </div>
+                <Field label="Categoria" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: ESP32, Display, Sensor, Fonte" required={false} />
+                <Field label="Modelo ou código" value={siteContentForm.sku} onChange={(sku) => setSiteContentForm({ ...siteContentForm, sku })} placeholder="Ex.: ESP32-S3 Super Mini" required={false} />
+                <Field label="URL da imagem" value={siteContentForm.imageUrl} onChange={(imageUrl) => setSiteContentForm({ ...siteContentForm, imageUrl })} placeholder="https://..." required={false} />
+                <Field label="Datasheet ou manual" value={siteContentForm.datasheetUrl} onChange={(datasheetUrl) => setSiteContentForm({ ...siteContentForm, datasheetUrl })} placeholder="https://..." required={false} />
+                <TextAreaField label="Especificações, uma por linha" value={siteContentForm.specifications} onChange={(specifications) => setSiteContentForm({ ...siteContentForm, specifications })} placeholder={'Chip: ESP32-S3\nCPU: 240 MHz\nFlash: 4 MB\nUSB: USB-C\nDimensões: 18 x 23,5 mm'} />
+                <TextAreaField label="Configuração, testes e notas, uma por linha" value={siteContentForm.features} onChange={(features) => setSiteContentForm({ ...siteContentForm, features })} placeholder={'IDE: Arduino IDE\nBiblioteca: ESP32 by Espressif\nTeste: blink no LED interno\nObservação: conferir tensão antes de alimentar'} />
               </div>
             )}
             <SelectField label="Status" value={siteContentForm.status} onChange={(statusValue) => setSiteContentForm({ ...siteContentForm, status: statusValue })} options={['Publicado', 'Rascunho']} />

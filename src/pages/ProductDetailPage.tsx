@@ -18,7 +18,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { Link, useParams } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
-import { formatStorePrice, sampleStoreProducts, type StoreProduct } from '../data/storeCatalog';
+import { formatStorePrice, isDemoStoreProduct, type StoreProduct } from '../data/storeCatalog';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
 import SiteFooter from '../components/SiteFooter';
 
@@ -47,20 +47,21 @@ const sections = [
 export default function ProductDetailPage() {
   const { productId = '' } = useParams();
   const { isDark, toggleTheme } = useTheme();
-  const [product, setProduct] = useState<StoreProduct | null>(() => sampleStoreProducts.find((item) => item.id === productId) || null);
-  const [isLoading, setIsLoading] = useState(!sampleStoreProducts.some((item) => item.id === productId));
+  const [product, setProduct] = useState<StoreProduct | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
-    const fallback = sampleStoreProducts.find((item) => item.id === productId) || null;
     const unsubscribe = onSnapshot(
       doc(db, 'siteContent', productId),
       (snapshot) => {
-        setProduct(snapshot.exists() ? ({ id: snapshot.id, ...snapshot.data() } as StoreProduct) : fallback);
+        const data = snapshot.exists() ? ({ id: snapshot.id, ...snapshot.data() } as StoreProduct) : null;
+        const isPublicProduct = data && ['lojas', 'produtos'].includes(data.page || '') && data.status !== 'Rascunho' && !isDemoStoreProduct(data);
+        setProduct(isPublicProduct ? data : null);
         setIsLoading(false);
       },
       () => {
-        setProduct(fallback);
+        setProduct(null);
         setIsLoading(false);
       },
     );

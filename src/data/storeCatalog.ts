@@ -30,6 +30,41 @@ export function formatStorePrice(product: StoreProduct) {
   return currency === 'USD' ? `US$ ${rawPrice}` : `R$ ${rawPrice}`;
 }
 
+const demoIds = new Set([
+  'sample-iot',
+  'sample-esp32-s3',
+  'sample-ota-controller',
+  'sample-pcb',
+  'sample-3d',
+  'sample-installation',
+]);
+
+const demoSkus = new Set([
+  'ELN-IOT-ESP32',
+  'ELN-ESP32-S3-MINI',
+  'ELN-CTRL-OTA',
+  'ELN-PCB-CUSTOM',
+  'ELN-3D-PROTOTIPO',
+  'ELN-SUP-INSTALL',
+]);
+
+const demoTitles = [
+  'kit iot esp32 para automação',
+  'esp32-s3 super mini',
+  'controlador eln com atualização ota',
+  'projeto de pcb personalizada',
+  'impressão 3d e protótipo',
+  'instalação e configuração técnica',
+];
+
+export function isDemoStoreProduct(product: StoreProduct) {
+  const id = (product.id || '').trim();
+  const sku = (product.sku || '').trim().toUpperCase();
+  const title = (product.title || '').trim().toLocaleLowerCase('pt-BR');
+
+  return demoIds.has(id) || demoSkus.has(sku) || demoTitles.includes(title);
+}
+
 export const sampleStoreProducts: StoreProduct[] = [
   {
     id: 'sample-iot',

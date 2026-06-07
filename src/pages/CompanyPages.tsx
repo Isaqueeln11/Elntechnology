@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   CircuitBoard,
   Clock3,
+  Cpu,
   Hammer,
   Home,
   MonitorPlay,
@@ -24,7 +25,7 @@ import { Link } from 'react-router-dom';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
-import { formatStorePrice, type StoreProduct } from '../data/storeCatalog';
+import { formatStorePrice, isDemoStoreProduct, type StoreProduct } from '../data/storeCatalog';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
 import SiteFooter from '../components/SiteFooter';
 
@@ -287,6 +288,33 @@ const pages: Record<string, PageData> = {
     ],
     workflow: ['Criar novidade', 'Adicionar mídia', 'Publicar no site', 'Atualizar quando evoluir'],
   },
+  estudos: {
+    key: 'estudos',
+    eyebrow: 'Base técnica',
+    title: 'Estudos, placas, módulos e referências técnicas organizadas.',
+    description:
+      'Registre o que foi estudado: ESP32, sensores, displays, links úteis, datasheets, configuração rápida, pinagem e observações práticas.',
+    icon: Cpu,
+    highlight: 'Cada estudo pode ter foto, modelo, especificações, links, notas e ficha técnica em página própria.',
+    sections: [
+      {
+        title: 'Placas e módulos',
+        text: 'Organiza ESP32, sensores, displays, módulos de câmera, relés, fontes e componentes usados nos projetos.',
+        items: ['Modelo', 'Chip', 'Memória', 'Conectividade'],
+      },
+      {
+        title: 'Configuração rápida',
+        text: 'Guarda passos de setup, bibliotecas, IDE, drivers, tensão, portas e comandos testados.',
+        items: ['IDE', 'Bibliotecas', 'Alimentação', 'Primeiro teste'],
+      },
+      {
+        title: 'Links e anotações',
+        text: 'Centraliza datasheets, lojas, vídeos, repositórios e observações para consulta futura.',
+        items: ['Datasheet', 'Pinagem', 'Repositório', 'Notas'],
+      },
+    ],
+    workflow: ['Cadastrar estudo', 'Adicionar especificações', 'Vincular links', 'Publicar ficha'],
+  },
 };
 
 const quickLinks = [
@@ -294,10 +322,11 @@ const quickLinks = [
   { label: 'Melhorias', to: '/melhorias', icon: Wrench },
   { label: 'Equipe', to: '/equipe', icon: Users },
   { label: 'Análise', to: '/atividades-analise', icon: BarChart3 },
+  { label: 'Estudos', to: '/estudos', icon: Cpu },
   { label: 'Produtos', to: '/produtos', icon: Package },
-  { label: 'Lojas', to: '/lojas', icon: Store },
   { label: 'Vídeos', to: '/videos-futuro', icon: MonitorPlay },
   { label: 'Notícias', to: '/noticias-inovacoes', icon: Rocket },
+  { label: 'Loja', to: '/lojas', icon: Store },
 ];
 
 const defaultTeamMembers: StoreProduct[] = [
@@ -357,6 +386,7 @@ function CompanyPage({ data }: { data: PageData }) {
   const Icon = data.icon;
   const isStorePage = ['lojas', 'produtos'].includes(data.key);
   const isTeamPage = data.key === 'equipe';
+  const isStudyPage = data.key === 'estudos';
   const publishedItems = useMemo(
     () => contentItems.filter((item) => item.page === data.key && item.status !== 'Rascunho'),
     [contentItems, data.key],
@@ -370,7 +400,7 @@ function CompanyPage({ data }: { data: PageData }) {
   );
   const storeItems = useMemo(() => {
     if (!isStorePage) return [];
-    const items = contentItems.filter((item) => ['lojas', 'produtos'].includes(item.page || '') && item.status !== 'Rascunho');
+    const items = contentItems.filter((item) => ['lojas', 'produtos'].includes(item.page || '') && item.status !== 'Rascunho' && !isDemoStoreProduct(item));
     return items.sort((first, second) => Number(Boolean(second.featured)) - Number(Boolean(first.featured)));
   }, [contentItems, isStorePage]);
   const storeCategories = useMemo(
@@ -399,9 +429,11 @@ function CompanyPage({ data }: { data: PageData }) {
         { icon: Rocket, label: 'Pronto para crescer' },
       ];
   const displayedPublicItems = isTeamPage ? teamItems : publishedItems;
-  const publicSectionTitle = isTeamPage ? 'Equipe cadastrada' : 'Conteúdos adicionados pelo painel';
+  const publicSectionTitle = isTeamPage ? 'Equipe cadastrada' : isStudyPage ? 'Estudos publicados pelo painel' : 'Conteúdos adicionados pelo painel';
   const publicSectionText = isTeamPage
     ? 'Membros, funções e responsabilidades que você publicar no admin aparecem aqui.'
+    : isStudyPage
+      ? 'Cadastre placas, módulos, links, especificações e observações pelo admin para montar sua base técnica.'
     : 'Esta área vai mostrar os documentos, vídeos, produtos e novidades publicados pela ELN Technology.';
 
   useEffect(() => {
@@ -530,13 +562,13 @@ function CompanyPage({ data }: { data: PageData }) {
                 <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
                   <Icon className="h-7 w-7" />
                 </div>
-                <h2 className="mt-5 text-2xl font-black">Como usar este espaço</h2>
+                <h2 className="mt-5 text-2xl font-black">Resumo da área</h2>
                 <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{data.highlight}</p>
                 <div className="mt-6 grid gap-3">
-                  {data.workflow.map((step, index) => (
-                    <div key={step} className={`flex items-center gap-3 rounded-md border p-3 ${isDark ? 'border-white/10 bg-[#070A1F]/60' : 'border-sky-100 bg-white'}`}>
-                      <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#0D0F52] text-sm font-black text-white">{index + 1}</span>
-                      <span className="font-bold">{step}</span>
+                  {data.sections.map((section) => (
+                    <div key={section.title} className={`flex items-center gap-3 rounded-md border p-3 ${isDark ? 'border-white/10 bg-[#070A1F]/60' : 'border-sky-100 bg-white'}`}>
+                      <CheckCircle2 className="h-5 w-5 flex-none text-[#159AFD]" />
+                      <span className="font-bold">{section.title}</span>
                     </div>
                   ))}
                 </div>
@@ -785,6 +817,12 @@ function CompanyPage({ data }: { data: PageData }) {
                         <ArrowRight className="h-4 w-4" />
                       </a>
                     )}
+                    {isStudyPage && (
+                      <Link to={`/estudos/${item.id}`} className="mt-5 inline-flex items-center gap-2 text-sm font-black text-[#159AFD] hover:underline">
+                        Abrir ficha técnica
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    )}
                     </div>
                   </article>
                 ))}
@@ -829,6 +867,10 @@ export function AtividadesAnalisePage() {
 
 export function DesenvolvimentosPage() {
   return <CompanyPage data={pages.desenvolvimentos} />;
+}
+
+export function EstudosPage() {
+  return <CompanyPage data={pages.estudos} />;
 }
 
 export function ProdutosPage() {

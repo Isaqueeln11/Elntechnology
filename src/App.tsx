@@ -52,18 +52,21 @@ const MelhoriasPage = React.lazy(() => import('./pages/CompanyPages').then((modu
 const EquipePage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.EquipePage })));
 const AtividadesAnalisePage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.AtividadesAnalisePage })));
 const DesenvolvimentosPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.DesenvolvimentosPage })));
+const EstudosPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.EstudosPage })));
 const ProdutosPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.ProdutosPage })));
 const LojasPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.LojasPage })));
 const VideosFuturoPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.VideosFuturoPage })));
 const NoticiasInovacoesPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.NoticiasInovacoesPage })));
 const ProductDetailPage = React.lazy(() => import('./pages/ProductDetailPage'));
+const TechnicalStudyPage = React.lazy(() => import('./pages/TechnicalStudyPage'));
 
 const navLinks = [
   { label: 'Sobre', href: '#sobre' },
-  { label: 'Loja', href: '/lojas' },
   { label: 'Áreas', href: '#areas' },
   { label: 'Soluções', href: '#servicos' },
+  { label: 'Estudos', href: '/estudos' },
   { label: 'Contato', href: '#contato' },
+  { label: 'Loja', href: '/lojas' },
 ];
 
 const services = [
@@ -171,16 +174,16 @@ const siteAreas = [
     href: '/desenvolvimentos',
   },
   {
+    icon: Cpu,
+    title: 'Base técnica',
+    text: 'Guarde estudos de placas, módulos, datasheets, links, pinagem e anotações.',
+    href: '/estudos',
+  },
+  {
     icon: Package,
     title: 'Produtos',
     text: 'Consulte produtos, equipamentos, serviços disponíveis e valores.',
     href: '/produtos',
-  },
-  {
-    icon: Store,
-    title: 'Lojas',
-    text: 'Encontre produtos, canais oficiais e atendimento para compra.',
-    href: '/lojas',
   },
   {
     icon: MonitorPlay,
@@ -193,6 +196,12 @@ const siteAreas = [
     title: 'Notícias e inovações',
     text: 'Acompanhe novidades, lançamentos e comunicados da ELN Technology.',
     href: '/noticias-inovacoes',
+  },
+  {
+    icon: Store,
+    title: 'Loja',
+    text: 'Canais oficiais e atendimento para compra ficam aqui, sem ocupar o foco principal.',
+    href: '/lojas',
   },
 ];
 
@@ -214,7 +223,7 @@ const languageOptions: Array<{ value: Language; label: string }> = [
 
 const copy = {
   pt: {
-    nav: { '#sobre': 'Sobre', '/lojas': 'Loja', '#areas': 'Áreas', '#servicos': 'Soluções', '#contato': 'Contato' },
+    nav: { '#sobre': 'Sobre', '#areas': 'Áreas', '#servicos': 'Soluções', '/estudos': 'Estudos', '#contato': 'Contato', '/lojas': 'Loja' },
     login: 'Login',
     startProject: 'Iniciar projeto',
     themeLight: 'Modo claro',
@@ -251,7 +260,7 @@ const copy = {
     submit: 'Enviar solicitação',
   },
   en: {
-    nav: { '#sobre': 'About', '/lojas': 'Store', '#areas': 'Areas', '#servicos': 'Solutions', '#contato': 'Contact' },
+    nav: { '#sobre': 'About', '#areas': 'Areas', '#servicos': 'Solutions', '/estudos': 'Studies', '#contato': 'Contact', '/lojas': 'Store' },
     login: 'Login',
     startProject: 'Start project',
     themeLight: 'Light mode',
@@ -288,7 +297,7 @@ const copy = {
     submit: 'Send request',
   },
   es: {
-    nav: { '#sobre': 'Nosotros', '/lojas': 'Tienda', '#areas': 'Áreas', '#servicos': 'Soluciones', '#contato': 'Contacto' },
+    nav: { '#sobre': 'Nosotros', '#areas': 'Áreas', '#servicos': 'Soluciones', '/estudos': 'Estudios', '#contato': 'Contacto', '/lojas': 'Tienda' },
     login: 'Acceder',
     startProject: 'Iniciar proyecto',
     themeLight: 'Modo claro',
@@ -480,7 +489,7 @@ function HomePage() {
                     className="flex items-center gap-3 rounded-md bg-[#159AFD]/12 px-3 py-3 font-black text-[#159AFD]"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Store className="h-5 w-5" />
+                    {link.href === '/lojas' ? <Store className="h-5 w-5" /> : <Cpu className="h-5 w-5" />}
                     {navCopy[link.href] || link.label}
                   </Link>
                 ) : (
@@ -537,22 +546,22 @@ function HomePage() {
               </p>
 
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-                <Link
-                  to="/lojas"
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-6 py-4 font-black text-white shadow-xl shadow-sky-500/20 transition hover:bg-[#0D0F52]"
-                >
-                  Loja oficial
-                  <Store className="h-5 w-5" />
-                </Link>
                 <a
                   href="#contato"
-                  className={`inline-flex items-center justify-center gap-2 rounded-md border px-6 py-4 font-bold transition hover:border-[#159AFD] hover:text-[#159AFD] ${
-                    isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52]'
-                  }`}
+                  className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-6 py-4 font-black text-white shadow-xl shadow-sky-500/20 transition hover:bg-[#0D0F52]"
                 >
                   {t.quote}
                   <Send className="h-5 w-5" />
                 </a>
+                <Link
+                  to="/estudos"
+                  className={`inline-flex items-center justify-center gap-2 rounded-md border px-6 py-4 font-bold transition hover:border-[#159AFD] hover:text-[#159AFD] ${
+                    isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52]'
+                  }`}
+                >
+                  Base técnica
+                  <Cpu className="h-5 w-5" />
+                </Link>
               </div>
             </div>
           </div>
@@ -903,6 +912,8 @@ function App() {
               <Route path="/equipe" element={<EquipePage />} />
               <Route path="/atividades-analise" element={<AtividadesAnalisePage />} />
               <Route path="/desenvolvimentos" element={<DesenvolvimentosPage />} />
+              <Route path="/estudos" element={<EstudosPage />} />
+              <Route path="/estudos/:studyId" element={<TechnicalStudyPage />} />
               <Route path="/produtos" element={<ProdutosPage />} />
               <Route path="/produto/:productId" element={<ProductDetailPage />} />
               <Route path="/lojas" element={<LojasPage />} />
