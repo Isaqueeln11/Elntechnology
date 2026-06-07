@@ -209,9 +209,9 @@ const pages: Record<string, PageData> = {
   lojas: {
     key: 'lojas',
     eyebrow: 'Loja oficial',
-    title: 'Produtos, serviços e canais oficiais da ELN Technology em um só lugar.',
+    title: 'Tecnologia pronta para o seu próximo projeto.',
     description:
-      'Encontre equipamentos, serviços, kits, protótipos e links confiáveis para falar direto com a ELN Technology.',
+      'Conheça placas, controladores, protótipos e serviços técnicos com atendimento direto da ELN Technology.',
     icon: Store,
     highlight: 'A vitrine mostra produtos cadastrados pelo painel admin e mantém contato direto por WhatsApp.',
     sections: [
@@ -315,7 +315,9 @@ function CompanyPage({ data }: { data: PageData }) {
   const storeItems = useMemo(() => {
     if (!isStorePage) return [];
     const items = contentItems.filter((item) => ['lojas', 'produtos'].includes(item.page || '') && item.status !== 'Rascunho');
-    return (items.length ? items : sampleStoreProducts).sort((first, second) => Number(Boolean(second.featured)) - Number(Boolean(first.featured)));
+    const publishedIds = new Set(items.map((item) => item.id));
+    const products = [...items, ...sampleStoreProducts.filter((item) => !publishedIds.has(item.id))];
+    return products.sort((first, second) => Number(Boolean(second.featured)) - Number(Boolean(first.featured)));
   }, [contentItems, isStorePage]);
   const storeCategories = useMemo(
     () => ['Todos', ...Array.from(new Set(storeItems.map((item) => item.category).filter((category): category is string => Boolean(category))))],
@@ -389,7 +391,7 @@ function CompanyPage({ data }: { data: PageData }) {
 
       <main>
         <section className={`border-b py-14 sm:py-20 ${isDark ? 'border-white/10 bg-[#0D0F52]' : 'border-sky-100 bg-white'}`}>
-          <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_0.75fr] lg:px-8">
+          <div className={`mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:px-8 ${isStorePage ? 'lg:grid-cols-[1.15fr_0.85fr] lg:items-center' : 'lg:grid-cols-[1fr_0.75fr]'}`}>
             <div>
               <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">{data.eyebrow}</p>
               <h1 className={`mt-4 max-w-4xl text-3xl font-black leading-tight sm:text-5xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
@@ -399,10 +401,10 @@ function CompanyPage({ data }: { data: PageData }) {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a
-                  href="#conteúdos"
+                  href={isStorePage ? '#vitrine' : '#conteúdos'}
                   className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 font-black text-white transition hover:bg-[#0D0F52]"
                 >
-                  Ver conteúdos publicados
+                  {isStorePage ? 'Ver produtos disponíveis' : 'Ver conteúdos publicados'}
                   <ArrowRight className="h-4 w-4" />
                 </a>
                 <Link
@@ -414,25 +416,58 @@ function CompanyPage({ data }: { data: PageData }) {
               </div>
             </div>
 
-            <aside className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/10' : 'border-sky-100 bg-[#EEF7FF]'}`}>
-              <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
-                <Icon className="h-7 w-7" />
-              </div>
-              <h2 className="mt-5 text-2xl font-black">Como usar este espaco</h2>
-              <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{data.highlight}</p>
-              <div className="mt-6 grid gap-3">
-                {data.workflow.map((step, index) => (
-                  <div key={step} className={`flex items-center gap-3 rounded-md border p-3 ${isDark ? 'border-white/10 bg-[#070A1F]/60' : 'border-sky-100 bg-white'}`}>
-                    <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#0D0F52] text-sm font-black text-white">{index + 1}</span>
-                    <span className="font-bold">{step}</span>
+            {isStorePage ? (
+              <aside className={`rounded-md border p-6 sm:p-7 ${isDark ? 'border-white/10 bg-white/[0.08]' : 'border-sky-100 bg-[#EEF7FF]'}`}>
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
+                    <Store className="h-7 w-7" />
                   </div>
-                ))}
-              </div>
-            </aside>
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Atendimento oficial</p>
+                    <h2 className="mt-1 text-xl font-black">Compre com orientação técnica</h2>
+                  </div>
+                </div>
+                <p className={`mt-5 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                  Tire dúvidas, solicite adaptações e receba uma proposta adequada ao seu projeto.
+                </p>
+                <div className="mt-6 grid grid-cols-3 gap-3">
+                  {[
+                    { value: `${storeItems.length}`, label: 'soluções' },
+                    { value: 'OTA', label: 'firmware' },
+                    { value: 'Direto', label: 'suporte' },
+                  ].map((item) => (
+                    <div key={item.label} className={`rounded-md border px-3 py-4 text-center ${isDark ? 'border-white/10 bg-[#070A1F]/60' : 'border-sky-100 bg-white'}`}>
+                      <p className="text-lg font-black text-[#159AFD]">{item.value}</p>
+                      <p className={`mt-1 text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{item.label}</p>
+                    </div>
+                  ))}
+                </div>
+                <a href="#vitrine" className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 font-black text-white transition hover:bg-[#0D0F52]">
+                  Explorar produtos
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+              </aside>
+            ) : (
+              <aside className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/10' : 'border-sky-100 bg-[#EEF7FF]'}`}>
+                <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
+                  <Icon className="h-7 w-7" />
+                </div>
+                <h2 className="mt-5 text-2xl font-black">Como usar este espaço</h2>
+                <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{data.highlight}</p>
+                <div className="mt-6 grid gap-3">
+                  {data.workflow.map((step, index) => (
+                    <div key={step} className={`flex items-center gap-3 rounded-md border p-3 ${isDark ? 'border-white/10 bg-[#070A1F]/60' : 'border-sky-100 bg-white'}`}>
+                      <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#0D0F52] text-sm font-black text-white">{index + 1}</span>
+                      <span className="font-bold">{step}</span>
+                    </div>
+                  ))}
+                </div>
+              </aside>
+            )}
           </div>
         </section>
 
-        <section className="py-10">
+        <section className={`py-10 ${isStorePage ? 'hidden' : ''}`}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
               {quickLinks.map(({ label, to, icon: LinkIcon }) => (
@@ -450,7 +485,7 @@ function CompanyPage({ data }: { data: PageData }) {
         </section>
 
         {isStorePage && (
-          <section className="pb-16">
+          <section id="vitrine" className="py-12 sm:py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className={`rounded-md border p-5 sm:p-7 ${isDark ? 'border-white/10 bg-white/[0.045]' : 'border-sky-100 bg-white shadow-sm'}`}>
                 <div className="flex flex-col justify-between gap-4 border-b border-slate-200 pb-5 dark:border-white/10 sm:flex-row sm:items-end">
@@ -460,7 +495,7 @@ function CompanyPage({ data }: { data: PageData }) {
                       Produtos e serviços disponíveis
                     </h2>
                     <p className={`mt-2 max-w-2xl leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                      Estes cards aparecem automaticamente quando você publica itens nas páginas produtos ou lojas pelo admin.
+                      Compare soluções, consulte detalhes técnicos e fale diretamente com a equipe.
                     </p>
                   </div>
                   <a href="https://wa.me/5581997092380?text=Olá,%20quero%20falar%20com%20a%20ELN%20Technology" target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#159AFD]/30 px-4 py-3 text-sm font-black text-[#159AFD] transition hover:bg-[#159AFD]/10">
@@ -507,8 +542,14 @@ function CompanyPage({ data }: { data: PageData }) {
                 <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                   {filteredStoreItems.map((item) => (
                     <article key={item.id} className={`flex min-h-64 flex-col overflow-hidden rounded-md border transition ${isDark ? 'border-white/10 bg-[#070A1F]/70 hover:bg-[#070A1F]' : 'border-sky-100 bg-[#F7FBFF] hover:bg-white'}`}>
-                      {item.imageUrl && (
-                        <img src={item.imageUrl} alt={item.title || 'Produto ELN Technology'} loading="lazy" className="aspect-[4/3] w-full border-b border-white/10 object-cover" />
+                      {item.imageUrl ? (
+                        <img src={item.imageUrl} alt={item.title || 'Produto ELN Technology'} loading="lazy" className="aspect-[16/9] w-full border-b border-white/10 object-cover" />
+                      ) : (
+                        <div className={`flex aspect-[16/9] items-center justify-center border-b ${isDark ? 'border-white/10 bg-[#0D0F52]' : 'border-sky-100 bg-[#EEF7FF]'}`}>
+                          <div className="flex h-20 w-20 items-center justify-center rounded-md border border-[#159AFD]/30 bg-[#159AFD]/10 text-[#159AFD]">
+                            {item.type === 'Serviço' ? <Wrench className="h-10 w-10" /> : <Package className="h-10 w-10" />}
+                          </div>
+                        </div>
                       )}
                       <div className="flex flex-1 flex-col p-5">
                       <div className="flex items-start justify-between gap-3">
