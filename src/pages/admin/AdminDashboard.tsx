@@ -43,6 +43,7 @@ interface ClientRecord extends BaseRecord {
 interface ProjectRecord extends BaseRecord {
   name?: string;
   client?: string;
+  clientEmail?: string;
   status?: string;
   budget?: string;
   deadline?: string;
@@ -61,6 +62,7 @@ interface TechnicianRecord extends BaseRecord {
 interface TicketRecord extends BaseRecord {
   title?: string;
   client?: string;
+  clientEmail?: string;
   priority?: string;
   status?: string;
   message?: string;
@@ -69,6 +71,7 @@ interface TicketRecord extends BaseRecord {
 interface DocumentRecord extends BaseRecord {
   title?: string;
   client?: string;
+  clientEmail?: string;
   category?: string;
   url?: string;
 }
@@ -76,6 +79,7 @@ interface DocumentRecord extends BaseRecord {
 interface InvoiceRecord extends BaseRecord {
   title?: string;
   client?: string;
+  clientEmail?: string;
   amount?: string;
   dueDate?: string;
   status?: string;
@@ -84,6 +88,7 @@ interface InvoiceRecord extends BaseRecord {
 interface OrderRecord extends BaseRecord {
   title?: string;
   client?: string;
+  clientEmail?: string;
   type?: string;
   budget?: string;
   status?: string;
@@ -213,6 +218,24 @@ service cloud.firestore {
         );
     }
 
+    function hasRole(role) {
+      return signedIn() && currentUser().data.role == role;
+    }
+
+    function ownsRecord(data) {
+      return signedIn()
+        && (
+          data.get("ownerId", "") == request.auth.uid
+          || data.get("clientEmail", "") == request.auth.token.email
+        );
+    }
+
+    function createsOwnRecord() {
+      return signedIn()
+        && request.resource.data.get("ownerId", "") == request.auth.uid
+        && request.resource.data.get("clientEmail", "") == request.auth.token.email;
+    }
+
     match /users/{userId} {
       allow create: if signedIn()
         && request.auth.uid == userId
@@ -249,7 +272,9 @@ service cloud.firestore {
     }
 
     match /systemEvents/{eventId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read, update, delete: if isAdmin();
+      allow create: if isAdmin()
+        || (signedIn() && request.resource.data.userId == request.auth.uid);
     }
 
     match /clientes/{clientId} {
@@ -257,7 +282,8 @@ service cloud.firestore {
     }
 
     match /projetos/{projectId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow create, update, delete: if isAdmin();
     }
 
     match /technicians/{technicianId} {
@@ -265,23 +291,45 @@ service cloud.firestore {
     }
 
     match /supportTickets/{ticketId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow create: if isAdmin() || createsOwnRecord();
+      allow update, delete: if isAdmin();
     }
 
     match /documents/{documentId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow create, update, delete: if isAdmin();
     }
 
     match /invoices/{invoiceId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow create, update, delete: if isAdmin();
     }
 
     match /orders/{orderId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow create: if isAdmin() || createsOwnRecord();
+      allow update, delete: if isAdmin();
     }
 
     match /notifications/{notificationId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin()
+        || ownsRecord(resource.data)
+        || (signedIn() && resource.data.target == "Todos")
+        || (hasRole("client") && resource.data.target == "Clientes")
+        || (hasRole("technician") && resource.data.target == "Técnicos");
+      allow create: if isAdmin()
+        || (
+          signedIn()
+          && request.resource.data.get("userId", "") == request.auth.uid
+          && request.resource.data.get("target", "") == "Admin"
+        );
+      allow update: if isAdmin()
+        || (
+          ownsRecord(resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt"])
+        );
+      allow delete: if isAdmin();
     }
   }
 }`;
@@ -431,12 +479,12 @@ const AdminDashboard = () => {
   const [areasSectionForm, setAreasSectionForm] = useState(defaultAreasSectionForm);
 
   const [clientForm, setClientForm] = useState({ name: '', email: '', phone: '', company: '' });
-  const [projectForm, setProjectForm] = useState({ name: '', client: '', status: 'Planejamento', budget: '', deadline: '', technician: '', progress: '0', description: '' });
+  const [projectForm, setProjectForm] = useState({ name: '', client: '', clientEmail: '', status: 'Planejamento', budget: '', deadline: '', technician: '', progress: '0', description: '' });
   const [technicianForm, setTechnicianForm] = useState({ name: '', email: '', specialty: '', phone: '' });
-  const [ticketForm, setTicketForm] = useState({ title: '', client: '', priority: 'Media', status: 'Aberto', message: '' });
-  const [documentForm, setDocumentForm] = useState({ title: '', client: '', category: 'Contrato', url: '' });
-  const [invoiceForm, setInvoiceForm] = useState({ title: '', client: '', amount: '', dueDate: '', status: 'Pendente' });
-  const [orderForm, setOrderForm] = useState({ title: '', client: '', type: 'Novo projeto', budget: '', status: 'Novo', notes: '' });
+  const [ticketForm, setTicketForm] = useState({ title: '', client: '', clientEmail: '', priority: 'Media', status: 'Aberto', message: '' });
+  const [documentForm, setDocumentForm] = useState({ title: '', client: '', clientEmail: '', category: 'Contrato', url: '' });
+  const [invoiceForm, setInvoiceForm] = useState({ title: '', client: '', clientEmail: '', amount: '', dueDate: '', status: 'Pendente' });
+  const [orderForm, setOrderForm] = useState({ title: '', client: '', clientEmail: '', type: 'Novo projeto', budget: '', status: 'Novo', notes: '' });
   const [notificationForm, setNotificationForm] = useState({ title: '', message: '', target: 'Todos', status: 'Rascunho' });
   const [siteContentForm, setSiteContentForm] = useState(defaultSiteContentForm);
   const [profileForm, setProfileForm] = useState({
@@ -785,7 +833,7 @@ const AdminDashboard = () => {
         createRecord(
           'projetos',
           projectForm,
-          () => setProjectForm({ name: '', client: '', status: 'Planejamento', budget: '', deadline: '', technician: '', progress: '0', description: '' }),
+          () => setProjectForm({ name: '', client: '', clientEmail: '', status: 'Planejamento', budget: '', deadline: '', technician: '', progress: '0', description: '' }),
           'Projeto cadastrado.',
         );
       }}
@@ -793,6 +841,7 @@ const AdminDashboard = () => {
         <>
           <Field label="Nome do projeto" value={projectForm.name} onChange={(name) => setProjectForm({ ...projectForm, name })} />
           <Field label="Cliente" value={projectForm.client} onChange={(client) => setProjectForm({ ...projectForm, client })} />
+          <Field label="E-mail da conta do cliente" type="email" value={projectForm.clientEmail} onChange={(clientEmail) => setProjectForm({ ...projectForm, clientEmail: clientEmail.trim().toLowerCase() })} placeholder="cliente@email.com" />
           <SelectField label="Status" value={projectForm.status} onChange={(statusValue) => setProjectForm({ ...projectForm, status: statusValue })} options={['Planejamento', 'Em andamento', 'Aguardando cliente', 'Concluído']} />
           <Field label="Valor" placeholder="R$ 0,00" value={projectForm.budget} onChange={(budget) => setProjectForm({ ...projectForm, budget })} />
           <Field label="Prazo" type="date" value={projectForm.deadline} onChange={(deadline) => setProjectForm({ ...projectForm, deadline })} required={false} />
@@ -848,12 +897,13 @@ const AdminDashboard = () => {
       title="Abrir ticket de suporte"
       onSubmit={(event) => {
         event.preventDefault();
-        createRecord('supportTickets', ticketForm, () => setTicketForm({ title: '', client: '', priority: 'Media', status: 'Aberto', message: '' }), 'Ticket cadastrado.');
+        createRecord('supportTickets', ticketForm, () => setTicketForm({ title: '', client: '', clientEmail: '', priority: 'Media', status: 'Aberto', message: '' }), 'Ticket cadastrado.');
       }}
       form={
         <>
           <Field label="Título" value={ticketForm.title} onChange={(title) => setTicketForm({ ...ticketForm, title })} />
           <Field label="Cliente" value={ticketForm.client} onChange={(client) => setTicketForm({ ...ticketForm, client })} />
+          <Field label="E-mail da conta do cliente" type="email" value={ticketForm.clientEmail} onChange={(clientEmail) => setTicketForm({ ...ticketForm, clientEmail: clientEmail.trim().toLowerCase() })} placeholder="cliente@email.com" />
           <SelectField label="Prioridade" value={ticketForm.priority} onChange={(priority) => setTicketForm({ ...ticketForm, priority })} options={['Baixa', 'Media', 'Alta', 'Urgente']} />
           <SelectField label="Status" value={ticketForm.status} onChange={(statusValue) => setTicketForm({ ...ticketForm, status: statusValue })} options={['Aberto', 'Em atendimento', 'Aguardando cliente', 'Resolvido']} />
           <TextAreaField label="Mensagem" value={ticketForm.message} onChange={(message) => setTicketForm({ ...ticketForm, message })} />
@@ -880,12 +930,13 @@ const AdminDashboard = () => {
       title="Adicionar documento"
       onSubmit={(event) => {
         event.preventDefault();
-        createRecord('documents', documentForm, () => setDocumentForm({ title: '', client: '', category: 'Contrato', url: '' }), 'Documento cadastrado.');
+        createRecord('documents', documentForm, () => setDocumentForm({ title: '', client: '', clientEmail: '', category: 'Contrato', url: '' }), 'Documento cadastrado.');
       }}
       form={
         <>
           <Field label="Título" value={documentForm.title} onChange={(title) => setDocumentForm({ ...documentForm, title })} />
           <Field label="Cliente/Projeto" value={documentForm.client} onChange={(client) => setDocumentForm({ ...documentForm, client })} />
+          <Field label="E-mail da conta do cliente" type="email" value={documentForm.clientEmail} onChange={(clientEmail) => setDocumentForm({ ...documentForm, clientEmail: clientEmail.trim().toLowerCase() })} placeholder="cliente@email.com" />
           <SelectField label="Categoria" value={documentForm.category} onChange={(category) => setDocumentForm({ ...documentForm, category })} options={['Contrato', 'Manual', 'Nota técnica', 'Arquivo do projeto', 'Outro']} />
           <Field label="Link do arquivo" value={documentForm.url} onChange={(url) => setDocumentForm({ ...documentForm, url })} placeholder="https://..." />
         </>
@@ -1153,12 +1204,13 @@ const AdminDashboard = () => {
       title="Adicionar faturamento"
       onSubmit={(event) => {
         event.preventDefault();
-        createRecord('invoices', invoiceForm, () => setInvoiceForm({ title: '', client: '', amount: '', dueDate: '', status: 'Pendente' }), 'Faturamento cadastrado.');
+        createRecord('invoices', invoiceForm, () => setInvoiceForm({ title: '', client: '', clientEmail: '', amount: '', dueDate: '', status: 'Pendente' }), 'Faturamento cadastrado.');
       }}
       form={
         <>
           <Field label="Título" value={invoiceForm.title} onChange={(title) => setInvoiceForm({ ...invoiceForm, title })} />
           <Field label="Cliente" value={invoiceForm.client} onChange={(client) => setInvoiceForm({ ...invoiceForm, client })} />
+          <Field label="E-mail da conta do cliente" type="email" value={invoiceForm.clientEmail} onChange={(clientEmail) => setInvoiceForm({ ...invoiceForm, clientEmail: clientEmail.trim().toLowerCase() })} placeholder="cliente@email.com" />
           <Field label="Valor" value={invoiceForm.amount} onChange={(amount) => setInvoiceForm({ ...invoiceForm, amount })} placeholder="R$ 0,00" />
           <Field label="Vencimento" type="date" value={invoiceForm.dueDate} onChange={(dueDate) => setInvoiceForm({ ...invoiceForm, dueDate })} required={false} />
           <SelectField label="Status" value={invoiceForm.status} onChange={(statusValue) => setInvoiceForm({ ...invoiceForm, status: statusValue })} options={['Pendente', 'Enviado', 'Pago', 'Atrasado', 'Cancelado']} />
@@ -1185,12 +1237,13 @@ const AdminDashboard = () => {
       title="Novo pedido"
       onSubmit={(event) => {
         event.preventDefault();
-        createRecord('orders', orderForm, () => setOrderForm({ title: '', client: '', type: 'Novo projeto', budget: '', status: 'Novo', notes: '' }), 'Pedido cadastrado.');
+        createRecord('orders', orderForm, () => setOrderForm({ title: '', client: '', clientEmail: '', type: 'Novo projeto', budget: '', status: 'Novo', notes: '' }), 'Pedido cadastrado.');
       }}
       form={
         <>
           <Field label="Título" value={orderForm.title} onChange={(title) => setOrderForm({ ...orderForm, title })} />
           <Field label="Cliente" value={orderForm.client} onChange={(client) => setOrderForm({ ...orderForm, client })} />
+          <Field label="E-mail da conta do cliente" type="email" value={orderForm.clientEmail} onChange={(clientEmail) => setOrderForm({ ...orderForm, clientEmail: clientEmail.trim().toLowerCase() })} placeholder="cliente@email.com" />
           <SelectField label="Tipo" value={orderForm.type} onChange={(type) => setOrderForm({ ...orderForm, type })} options={['Novo projeto', 'Manutenção', 'Atualização OTA', 'Documento', 'Suporte']} />
           <Field label="Valor previsto" value={orderForm.budget} onChange={(budget) => setOrderForm({ ...orderForm, budget })} placeholder="R$ 0,00" />
           <SelectField label="Status" value={orderForm.status} onChange={(statusValue) => setOrderForm({ ...orderForm, status: statusValue })} options={['Novo', 'Em análise', 'Aprovado', 'Recusado', 'Concluído']} />

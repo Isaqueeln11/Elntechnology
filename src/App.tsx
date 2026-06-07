@@ -141,55 +141,55 @@ const siteAreas = [
   {
     icon: CircuitBoard,
     title: 'Projetos desenvolvidos',
-    text: 'Publique projetos prontos, fotos, links, arquivos e resultado final.',
+    text: 'Conheça projetos concluídos, soluções aplicadas e resultados entregues.',
     href: '/projetos-desenvolvidos',
   },
   {
     icon: Wrench,
     title: 'Melhorias',
-    text: 'Organize correções, prioridades, segurança e próximas funções.',
+    text: 'Acompanhe correções, recursos novos e evolução das soluções ELN.',
     href: '/melhorias',
   },
   {
     icon: Users,
     title: 'Equipe',
-    text: 'Mostre administrador, técnicos, parceiros, cargos e responsabilidades.',
+    text: 'Conheça as pessoas, especialidades e responsabilidades por trás dos projetos.',
     href: '/equipe',
   },
   {
     icon: BarChart3,
     title: 'Atividades e análise',
-    text: 'Acompanhe atividades, indicadores, eventos e relatórios.',
+    text: 'Veja atividades recentes, indicadores e resultados importantes.',
     href: '/atividades-analise',
   },
   {
     icon: Rocket,
     title: 'Desenvolvimentos',
-    text: 'Liste firmware, painel, hardware, OTA e versões em construção.',
+    text: 'Acompanhe firmware, hardware, painéis e atualizações em desenvolvimento.',
     href: '/desenvolvimentos',
   },
   {
     icon: Package,
     title: 'Produtos',
-    text: 'Monte catálogo com produtos, equipamentos, serviços e valores.',
+    text: 'Consulte produtos, equipamentos, serviços disponíveis e valores.',
     href: '/produtos',
   },
   {
     icon: Store,
     title: 'Lojas',
-    text: 'Organize pontos de venda, parceiros, links de compra e canais oficiais.',
+    text: 'Encontre produtos, canais oficiais e atendimento para compra.',
     href: '/lojas',
   },
   {
     icon: MonitorPlay,
     title: 'Vídeos e futuro',
-    text: 'Espaço para demonstrações, novidades, roadmap e vídeos futuros.',
+    text: 'Veja demonstrações reais, bastidores e próximos lançamentos.',
     href: '/videos-futuro',
   },
   {
     icon: Sparkles,
     title: 'Notícias e inovações',
-    text: 'Publique novidades, lançamentos, comunicados e evoluções do sistema.',
+    text: 'Acompanhe novidades, lançamentos e comunicados da ELN Technology.',
     href: '/noticias-inovacoes',
   },
 ];
@@ -324,24 +324,6 @@ const copy = {
   },
 } satisfies Record<Language, Record<string, string | Record<string, string>>>;
 
-const improvementCards = [
-  {
-    icon: ShieldCheck,
-    title: 'Segurança',
-    text: 'Revisar regras do Firestore, permissões de admin e proteção dos dados.',
-  },
-  {
-    icon: Rocket,
-    title: 'Performance',
-    text: 'Separar páginas em carregamento sob demanda para abrir mais rápido.',
-  },
-  {
-    icon: Wrench,
-    title: 'Conteúdo',
-    text: 'Criar textos curtos por público: cliente, técnico e administrador.',
-  },
-];
-
 function BrandName({ className = '' }: { className?: string }) {
   return (
     <span className={`notranslate ${className}`} translate="no">
@@ -373,7 +355,7 @@ function HomePage() {
   const [areasSection, setAreasSection] = React.useState(defaultAreasSection);
   const { isDark, toggleTheme } = useTheme();
   const activeService = services.find((service) => service.title === selectedService) || services[0];
-  const visibleAreas = showAllAreas ? siteAreas : siteAreas.slice(0, 4);
+  const visibleAreas = showAllAreas ? siteAreas : siteAreas.slice(0, 3);
   const t = copy[language];
   const navCopy = t.nav as Record<string, string>;
 
@@ -552,14 +534,14 @@ function HomePage() {
               <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                 <Link
                   to="/lojas"
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-6 py-4 font-black text-white shadow-xl shadow-sky-500/20 transition hover:-translate-y-0.5 hover:bg-[#0D0F52]"
+                  className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-6 py-4 font-black text-white shadow-xl shadow-sky-500/20 transition hover:bg-[#0D0F52]"
                 >
                   Loja oficial
                   <Store className="h-5 w-5" />
                 </Link>
                 <a
                   href="#contato"
-                  className={`inline-flex items-center justify-center gap-2 rounded-md border px-6 py-4 font-bold transition hover:-translate-y-0.5 hover:border-[#159AFD] hover:text-[#159AFD] ${
+                  className={`inline-flex items-center justify-center gap-2 rounded-md border px-6 py-4 font-bold transition hover:border-[#159AFD] hover:text-[#159AFD] ${
                     isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52]'
                   }`}
                 >
@@ -635,7 +617,7 @@ function HomePage() {
                 <Link
                   key={href}
                   to={href}
-                  className={`group rounded-md border p-6 transition hover:-translate-y-1 hover:border-[#159AFD] ${
+                  className={`group rounded-md border p-6 transition hover:border-[#159AFD] ${
                     isDark ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-sky-100 bg-[#F7FBFF] shadow-sm hover:bg-white'
                   }`}
                 >
@@ -646,7 +628,7 @@ function HomePage() {
                   <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{text}</p>
                   <span className="mt-5 inline-flex items-center gap-2 text-sm font-black text-[#159AFD]">
                     {t.openPage}
-                    <ChevronRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                    <ChevronRight className="h-4 w-4" />
                   </span>
                 </Link>
               ))}
@@ -663,30 +645,6 @@ function HomePage() {
                 <ChevronRight className={`h-4 w-4 transition ${showAllAreas ? '-rotate-90' : 'rotate-90'}`} />
               </button>
             </div>
-            </div>
-          </div>
-        </section>
-
-        <section className={`${isDark ? 'bg-[#070A1F]' : 'bg-white'} py-16`}>
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-8 max-w-3xl">
-              <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">{t.improvementsEyebrow}</p>
-              <h2 className={`mt-3 text-3xl font-black leading-tight sm:text-4xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
-                {t.improvementsTitle}
-              </h2>
-              <p className={`mt-4 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{t.improvementsText}</p>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              {improvementCards.map(({ icon: Icon, title, text }) => (
-                <article key={title} className={`rounded-md border p-5 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-[#F7FBFF]'}`}>
-                  <div className="flex h-11 w-11 items-center justify-center rounded-md bg-[#159AFD] text-white">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className={`mt-4 text-lg font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{title}</h3>
-                  <p className={`mt-2 text-sm leading-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{text}</p>
-                </article>
-              ))}
             </div>
           </div>
         </section>
@@ -801,7 +759,7 @@ function HomePage() {
               {projectCards.map((project) => {
                 const Icon = project.icon;
                 return (
-                  <article key={project.title} className="rounded-md border border-white/10 bg-white/10 p-6 backdrop-blur transition hover:-translate-y-1 hover:bg-white/20">
+                  <article key={project.title} className="rounded-md border border-white/10 bg-white/10 p-6 backdrop-blur transition hover:bg-white/20">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#159AFD]">
                         <Icon className="h-6 w-6" />

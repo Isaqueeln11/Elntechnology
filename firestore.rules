@@ -26,6 +26,24 @@ service cloud.firestore {
         );
     }
 
+    function hasRole(role) {
+      return signedIn() && currentUser().data.role == role;
+    }
+
+    function ownsRecord(data) {
+      return signedIn()
+        && (
+          data.get("ownerId", "") == request.auth.uid
+          || data.get("clientEmail", "") == request.auth.token.email
+        );
+    }
+
+    function createsOwnRecord() {
+      return signedIn()
+        && request.resource.data.get("ownerId", "") == request.auth.uid
+        && request.resource.data.get("clientEmail", "") == request.auth.token.email;
+    }
+
     match /users/{userId} {
       allow create: if signedIn()
         && request.auth.uid == userId
@@ -62,7 +80,9 @@ service cloud.firestore {
     }
 
     match /systemEvents/{eventId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read, update, delete: if isAdmin();
+      allow create: if isAdmin()
+        || (signedIn() && request.resource.data.userId == request.auth.uid);
     }
 
     match /clientes/{clientId} {
@@ -70,7 +90,8 @@ service cloud.firestore {
     }
 
     match /projetos/{projectId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow create, update, delete: if isAdmin();
     }
 
     match /technicians/{technicianId} {
@@ -78,23 +99,45 @@ service cloud.firestore {
     }
 
     match /supportTickets/{ticketId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow create: if isAdmin() || createsOwnRecord();
+      allow update, delete: if isAdmin();
     }
 
     match /documents/{documentId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow create, update, delete: if isAdmin();
     }
 
     match /invoices/{invoiceId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow create, update, delete: if isAdmin();
     }
 
     match /orders/{orderId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow create: if isAdmin() || createsOwnRecord();
+      allow update, delete: if isAdmin();
     }
 
     match /notifications/{notificationId} {
-      allow read, create, update, delete: if isAdmin();
+      allow read: if isAdmin()
+        || ownsRecord(resource.data)
+        || (signedIn() && resource.data.target == "Todos")
+        || (hasRole("client") && resource.data.target == "Clientes")
+        || (hasRole("technician") && resource.data.target == "Técnicos");
+      allow create: if isAdmin()
+        || (
+          signedIn()
+          && request.resource.data.get("userId", "") == request.auth.uid
+          && request.resource.data.get("target", "") == "Admin"
+        );
+      allow update: if isAdmin()
+        || (
+          ownsRecord(resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt"])
+        );
+      allow delete: if isAdmin();
     }
   }
 }

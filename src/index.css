@@ -69,11 +69,10 @@ textarea:focus-visible {
     linear-gradient(rgba(21, 154, 253, 0.08) 1px, transparent 1px),
     linear-gradient(90deg, rgba(21, 154, 253, 0.08) 1px, transparent 1px);
   background-size: 42px 42px, 42px 42px;
-  animation: circuit-drift 18s linear infinite;
 }
 
 .hero-spin {
-  animation: hero-spin 18s linear infinite;
+  animation: none;
 }
 
 @keyframes circuit-drift {

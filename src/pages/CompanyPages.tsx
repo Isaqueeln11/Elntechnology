@@ -492,7 +492,7 @@ function CompanyPage({ data }: { data: PageData }) {
                 <Link
                   key={to}
                   to={to}
-                  className={`flex min-h-24 items-center gap-3 rounded-md border p-4 font-black transition hover:-translate-y-0.5 ${isDark ? 'border-white/10 bg-white/5 text-slate-200 hover:bg-white/10' : 'border-sky-100 bg-white text-[#0D0F52] hover:border-[#159AFD]'}`}
+                  className={`flex min-h-24 items-center gap-3 rounded-md border p-4 font-black transition ${isDark ? 'border-white/10 bg-white/5 text-slate-200 hover:bg-white/10' : 'border-sky-100 bg-white text-[#0D0F52] hover:border-[#159AFD]'}`}
                 >
                   <LinkIcon className="h-5 w-5 text-[#159AFD]" />
                   {label}
@@ -559,7 +559,7 @@ function CompanyPage({ data }: { data: PageData }) {
 
                 <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                   {filteredStoreItems.map((item) => (
-                    <article key={item.id} className={`flex min-h-64 flex-col overflow-hidden rounded-md border transition hover:-translate-y-1 ${isDark ? 'border-white/10 bg-[#070A1F]/70 hover:bg-[#070A1F]' : 'border-sky-100 bg-[#F7FBFF] hover:bg-white'}`}>
+                    <article key={item.id} className={`flex min-h-64 flex-col overflow-hidden rounded-md border transition ${isDark ? 'border-white/10 bg-[#070A1F]/70 hover:bg-[#070A1F]' : 'border-sky-100 bg-[#F7FBFF] hover:bg-white'}`}>
                       {item.imageUrl && (
                         <img src={item.imageUrl} alt={item.title || 'Produto ELN Technology'} loading="lazy" className="aspect-[4/3] w-full border-b border-white/10 object-cover" />
                       )}
