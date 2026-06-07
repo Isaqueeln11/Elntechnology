@@ -471,7 +471,7 @@ const TechnicianDashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="technician-dashboard space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between gap-3">
           <div>

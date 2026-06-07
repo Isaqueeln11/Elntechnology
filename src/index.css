@@ -75,6 +75,110 @@ textarea:focus-visible {
   animation: none;
 }
 
+.dashboard-light main {
+  color: #172033;
+}
+
+.dashboard-light .technician-dashboard [class*="bg-gradient-to-br"] {
+  border-color: #d8e2ec !important;
+  background: #ffffff !important;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.045);
+  backdrop-filter: none;
+}
+
+.dashboard-light .technician-dashboard > div:nth-child(2) {
+  border-color: #d8e2ec !important;
+  background: #ffffff !important;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.045);
+}
+
+.dashboard-light .technician-dashboard [class*="bg-black/20"] {
+  border: 1px solid #e2e8f0;
+  background: #f8fafc !important;
+}
+
+.dashboard-light .technician-dashboard h1.text-white,
+.dashboard-light .technician-dashboard h2.text-white,
+.dashboard-light .technician-dashboard h3.text-white,
+.dashboard-light .technician-dashboard h4.text-white,
+.dashboard-light .technician-dashboard h5.text-white,
+.dashboard-light .technician-dashboard p.text-white,
+.dashboard-light .technician-dashboard span.text-white {
+  color: #172033 !important;
+}
+
+.dashboard-light .technician-dashboard .text-gray-300 {
+  color: #475569 !important;
+}
+
+.dashboard-light .technician-dashboard .text-gray-400 {
+  color: #64748b !important;
+}
+
+.dashboard-light .technician-dashboard .bg-gray-700,
+.dashboard-light .technician-dashboard .bg-gray-800 {
+  background: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+.dashboard-light .technician-dashboard button.bg-\[\#159AFD\],
+.dashboard-light .technician-dashboard button.bg-green-500,
+.dashboard-light .technician-dashboard button.bg-yellow-500 {
+  color: #ffffff !important;
+}
+
+.dashboard-light .technician-dashboard button.bg-\[\#159AFD\] span,
+.dashboard-light .technician-dashboard button.bg-green-500 span,
+.dashboard-light .technician-dashboard button.bg-yellow-500 span {
+  color: #ffffff !important;
+}
+
+.dashboard-light .technician-dashboard .fixed [class*="bg-[#0D0F52]"] {
+  border-color: #d8e2ec !important;
+  background: #ffffff !important;
+  color: #172033 !important;
+}
+
+.dashboard-light .ota-admin-panel section {
+  border-color: #d8e2ec !important;
+  background: #ffffff !important;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.045);
+  backdrop-filter: none;
+}
+
+.dashboard-light .ota-admin-panel h3.text-white,
+.dashboard-light .ota-admin-panel h4.text-white {
+  color: #172033 !important;
+}
+
+.dashboard-light .ota-admin-panel .text-gray-200,
+.dashboard-light .ota-admin-panel .text-gray-300 {
+  color: #475569 !important;
+}
+
+.dashboard-light .ota-admin-panel .text-gray-400 {
+  color: #64748b !important;
+}
+
+.dashboard-light .ota-admin-panel input,
+.dashboard-light .ota-admin-panel textarea {
+  border-color: #cbd8e6 !important;
+  background: #f8fafc !important;
+  color: #172033 !important;
+}
+
+.dashboard-light .ota-admin-panel article,
+.dashboard-light .ota-admin-panel [class*="bg-black/20"] {
+  border-color: #e2e8f0 !important;
+  background: #f8fafc !important;
+}
+
+.dashboard-light .ota-admin-panel pre {
+  border-color: #1e3a5f !important;
+  background: #071426 !important;
+  color: #d7ecff !important;
+}
+
 @keyframes circuit-drift {
   from {
     background-position: 0 0, 0 0, center, center;

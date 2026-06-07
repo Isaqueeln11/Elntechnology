@@ -151,7 +151,7 @@ const tabs = [
 ];
 
 const inputClass = 'mt-2 w-full rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10 dark:border-white/10 dark:bg-[#070A1F]/70 dark:text-white dark:placeholder:text-slate-500';
-const panelClass = 'rounded-md border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045]';
+const panelClass = 'rounded-md border border-[#D8E2EC] bg-white shadow-[0_6px_20px_rgba(15,23,42,0.045)] dark:border-white/10 dark:bg-white/[0.045] dark:shadow-none';
 const defaultAreasSectionForm = {
   eyebrow: 'Espaços do site',
   title: 'Áreas da ELN Technology para acompanhar projetos, equipe, produtos e novidades.',
@@ -1362,8 +1362,8 @@ const AdminDashboard = () => {
 
   const statusIsError = /erro|falha|sem permiss|não|nao|inválido|informe/i.test(status);
   const statusClass = statusIsError
-    ? 'border-rose-400/30 bg-rose-500/12 text-rose-200'
-    : 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200';
+    ? isDark ? 'border-rose-400/30 bg-rose-500/12 text-rose-200' : 'border-rose-200 bg-rose-50 text-rose-700'
+    : isDark ? 'border-emerald-400/25 bg-emerald-500/10 text-emerald-200' : 'border-emerald-200 bg-emerald-50 text-emerald-700';
 
   return (
     <DashboardLayout>
@@ -1406,7 +1406,9 @@ const AdminDashboard = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex min-h-12 items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-bold transition-all ${
                     activeTab === tab.id
-                      ? 'bg-[#159AFD] text-white shadow-md shadow-[#159AFD]/15'
+                      ? isDark
+                        ? 'bg-[#159AFD] text-white shadow-md shadow-[#159AFD]/15'
+                        : 'bg-[#0D0F52] text-white shadow-md shadow-slate-900/10'
                       : isDark
                         ? 'text-slate-300 hover:bg-white/7 hover:text-white'
                         : 'text-slate-600 hover:bg-[#F7FBFF] hover:text-[#0D0F52]'

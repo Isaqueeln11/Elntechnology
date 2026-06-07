@@ -41,8 +41,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className={`min-h-screen transition-colors ${isDark ? 'bg-[#070A1F] text-white' : 'bg-[#F7FBFF] text-slate-950'}`}>
-      <nav className={`sticky top-0 z-40 border-b shadow-sm backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/92' : 'border-sky-100/70 bg-white/90'}`}>
+    <div className={`dashboard-shell min-h-screen transition-colors ${isDark ? 'dashboard-dark bg-[#070A1F] text-white' : 'dashboard-light bg-[#F1F5F9] text-slate-950'}`}>
+      <nav className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/92 shadow-sm' : 'border-slate-200 bg-white/95 shadow-[0_1px_12px_rgba(15,23,42,0.06)]'}`}>
         <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-3" title="Ir para o site normal">
             <img src="/favicon.svg" alt="ELN Technology" className="h-10 w-10 flex-none rounded-md object-contain" />
@@ -52,7 +52,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           <div className="flex items-center gap-1 sm:gap-2">
             <Link
               to="/"
-              className={`hidden items-center gap-2 rounded-md border px-3 py-2 text-sm font-bold transition sm:inline-flex ${isDark ? 'border-white/10 text-slate-200 hover:bg-white/10' : 'border-sky-100 text-slate-700 hover:bg-sky-50'}`}
+              className={`hidden items-center gap-2 rounded-md border px-3 py-2 text-sm font-bold transition sm:inline-flex ${isDark ? 'border-white/10 text-slate-200 hover:bg-white/10' : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-[#159AFD]/40 hover:bg-sky-50'}`}
             >
               <Home className="h-4 w-4" />
               Site
@@ -74,7 +74,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             >
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
-            <button type="button" onClick={() => navigate('/dashboard?tab=settings')} className="hidden items-center gap-3 rounded-md p-1.5 transition hover:bg-white/5 md:flex">
+            <button type="button" onClick={() => navigate('/dashboard?tab=settings')} className={`hidden items-center gap-3 rounded-md border p-1.5 pr-3 transition md:flex ${isDark ? 'border-transparent hover:bg-white/5' : 'border-slate-200 bg-slate-50 hover:border-[#159AFD]/35 hover:bg-white'}`}>
               <img src={user?.avatar || '/favicon.svg'} alt={user?.name || 'Usuário'} className="h-9 w-9 rounded-md border border-[#159AFD]/50 object-cover" />
               <span className="max-w-44 text-left"><span className={`block truncate text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{user?.name}</span><span className={`block truncate text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>{user?.email}</span></span>
             </button>

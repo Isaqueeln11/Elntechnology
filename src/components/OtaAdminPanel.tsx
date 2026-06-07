@@ -208,7 +208,7 @@ const OtaAdminPanel = () => {
   const downloadHref = `data:application/json;charset=utf-8,${encodeURIComponent(manifestJson)}`;
 
   return (
-    <div className="space-y-8">
+    <div className="ota-admin-panel space-y-8">
       <div className="rounded-md border border-[#159AFD]/30 bg-[#159AFD]/10 p-4 text-sm font-semibold text-sky-100">
         <div className="flex items-center gap-3">
           <Database className="h-5 w-5 flex-none text-[#159AFD]" />

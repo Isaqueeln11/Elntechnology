@@ -86,7 +86,7 @@ const tabs = [
 
 const inputClass =
   'mt-2 w-full rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-950 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10 dark:border-white/10 dark:bg-[#070A1F]/70 dark:text-white';
-const panelClass = 'rounded-md border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/[0.045]';
+const panelClass = 'rounded-md border border-[#D8E2EC] bg-white shadow-[0_6px_20px_rgba(15,23,42,0.045)] dark:border-white/10 dark:bg-white/[0.045] dark:shadow-none';
 
 function formatDate(value?: string) {
   if (!value) return 'Não informado';
@@ -309,8 +309,8 @@ function ClientDashboard() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  const primaryButton = 'inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]';
-  const secondaryButton = 'inline-flex items-center justify-center gap-2 rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200';
+  const primaryButton = 'inline-flex items-center justify-center gap-2 rounded-md bg-[#0D0F52] px-4 py-3 text-sm font-black text-white transition hover:bg-[#159AFD] dark:bg-[#159AFD] dark:hover:bg-[#508AD0]';
+  const secondaryButton = 'inline-flex items-center justify-center gap-2 rounded-md border border-[#CBD8E6] bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:bg-sky-50 hover:text-[#0D0F52] dark:border-white/10 dark:bg-transparent dark:text-slate-200 dark:hover:bg-white/5';
 
   const renderOverview = () => (
     <div className="space-y-6">
@@ -573,7 +573,7 @@ function ClientDashboard() {
           <aside className={`${panelClass} h-fit p-2 lg:sticky lg:top-24`}>
             <nav className="mobile-scrollbar flex gap-1 overflow-x-auto lg:block lg:space-y-1 lg:overflow-visible">
               {tabs.map(({ id, label, icon: Icon }) => (
-                <button key={id} type="button" onClick={() => openTab(id)} className={`flex min-h-11 flex-none items-center gap-3 rounded-md px-3 py-2 text-sm font-bold transition lg:w-full ${activeTab === id ? 'bg-[#159AFD] text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5'}`}><Icon className="h-4 w-4" />{label}</button>
+                <button key={id} type="button" onClick={() => openTab(id)} className={`flex min-h-11 flex-none items-center gap-3 rounded-md px-3 py-2 text-sm font-bold transition lg:w-full ${activeTab === id ? 'bg-[#0D0F52] text-white shadow-sm dark:bg-[#159AFD]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#0D0F52] dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white'}`}><Icon className="h-4 w-4" />{label}</button>
               ))}
             </nav>
           </aside>
