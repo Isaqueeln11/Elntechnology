@@ -103,6 +103,7 @@ interface NotificationRecord extends BaseRecord {
   status?: string;
   type?: string;
   userId?: string;
+  clientEmail?: string;
 }
 
 interface UserRecord extends BaseRecord {
@@ -510,7 +511,7 @@ const AdminDashboard = () => {
   const [documentForm, setDocumentForm] = useState({ title: '', client: '', clientEmail: '', category: 'Contrato', url: '' });
   const [invoiceForm, setInvoiceForm] = useState({ title: '', client: '', clientEmail: '', amount: '', dueDate: '', status: 'Pendente' });
   const [orderForm, setOrderForm] = useState({ title: '', client: '', clientEmail: '', type: 'Novo projeto', budget: '', status: 'Novo', notes: '' });
-  const [notificationForm, setNotificationForm] = useState({ title: '', message: '', target: 'Todos', status: 'Enviada' });
+  const [notificationForm, setNotificationForm] = useState({ title: '', message: '', target: 'Todos', status: 'Enviada', clientEmail: '' });
   const [siteContentForm, setSiteContentForm] = useState(defaultSiteContentForm);
   const [profileForm, setProfileForm] = useState({
     name: user?.name || '',
@@ -1390,12 +1391,18 @@ const AdminDashboard = () => {
       title="Criar notificação"
       onSubmit={(event) => {
         event.preventDefault();
-        createRecord('notifications', notificationForm, () => setNotificationForm({ title: '', message: '', target: 'Todos', status: 'Enviada' }), 'Notificação enviada.');
+        createRecord(
+          'notifications',
+          { ...notificationForm, clientEmail: notificationForm.clientEmail.trim().toLowerCase() },
+          () => setNotificationForm({ title: '', message: '', target: 'Todos', status: 'Enviada', clientEmail: '' }),
+          'Notificação enviada.',
+        );
       }}
       form={
         <>
           <Field label="Título" value={notificationForm.title} onChange={(title) => setNotificationForm({ ...notificationForm, title })} />
           <SelectField label="Destino" value={notificationForm.target} onChange={(target) => setNotificationForm({ ...notificationForm, target })} options={['Todos', 'Clientes', 'Técnicos', 'Admin']} />
+          <Field label="E-mail específico do cliente" type="email" value={notificationForm.clientEmail} onChange={(clientEmail) => setNotificationForm({ ...notificationForm, clientEmail })} placeholder="cliente@email.com" required={false} />
           <SelectField label="Status" value={notificationForm.status} onChange={(statusValue) => setNotificationForm({ ...notificationForm, status: statusValue })} options={['Rascunho', 'Nova', 'Enviada', 'Lida']} />
           <TextAreaField label="Mensagem" value={notificationForm.message} onChange={(message) => setNotificationForm({ ...notificationForm, message })} />
         </>
@@ -1404,7 +1411,7 @@ const AdminDashboard = () => {
       items={notifications.map((notification) => ({
         id: notification.id,
         title: notification.title || 'Notificação sem título',
-        subtitle: `${notification.target || 'Todos'} - ${notification.status || 'Rascunho'}`,
+        subtitle: [notification.target || 'Todos', notification.status || 'Rascunho', notification.clientEmail].filter(Boolean).join(' - '),
         meta: notification.message || '',
         status: notification.status,
         actions: [

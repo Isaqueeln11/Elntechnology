@@ -23,11 +23,16 @@ export function formatStorePrice(product: StoreProduct) {
   const rawPrice = (product.price || '').trim();
 
   if (!rawPrice) return 'Consulte o valor';
-  if (/^(R\$|US\$|USD|BRL)/i.test(rawPrice)) return rawPrice;
+  if (/(R\$|US\$|USD|BRL)/i.test(rawPrice)) return rawPrice;
   if (/orcamento|orçamento|consulte|sob consulta|personalizado/i.test(rawPrice)) return rawPrice;
 
   const currency = product.currency || 'BRL';
-  return currency === 'USD' ? `US$ ${rawPrice}` : `R$ ${rawPrice}`;
+  const symbol = currency === 'USD' ? 'US$' : 'R$';
+  const startingAt = rawPrice.match(/^a partir(?:\s+de)?\s+(.+)$/i);
+
+  if (startingAt?.[1]) return `A partir de ${symbol} ${startingAt[1].trim()}`;
+
+  return `${symbol} ${rawPrice}`;
 }
 
 const demoIds = new Set([

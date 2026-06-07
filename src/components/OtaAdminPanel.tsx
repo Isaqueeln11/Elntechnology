@@ -28,6 +28,12 @@ const emptyForm = {
   notes: '',
 };
 
+const otaChecklist = [
+  'Escolha o arquivo .bin para calcular SHA-256 e tamanho.',
+  'Cole o link da release do GitHub ou a URL direta do .bin.',
+  'Salve como ativo para o equipamento aparecer no manifesto OTA.',
+];
+
 async function fileSha256(file: File) {
   const buffer = await file.arrayBuffer();
   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
@@ -216,8 +222,17 @@ const OtaAdminPanel = () => {
         </div>
       </div>
 
-      <div className="grid gap-6 2xl:grid-cols-[0.9fr_1.1fr]">
-        <section className="rounded-md border border-[#159AFD]/30 bg-[#0D0F52]/40 p-5 backdrop-blur-sm sm:p-6">
+      <div className="grid gap-3 md:grid-cols-3">
+        {otaChecklist.map((item, index) => (
+          <div key={item} className="rounded-md border border-[#159AFD]/20 bg-[#159AFD]/5 p-4 text-sm font-semibold text-gray-300">
+            <span className="mb-3 flex h-8 w-8 items-center justify-center rounded-md bg-[#159AFD] text-xs font-black text-white">{index + 1}</span>
+            {item}
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(340px,0.72fr)_minmax(0,1.28fr)]">
+        <section className="overflow-hidden rounded-md border border-[#159AFD]/30 bg-[#0D0F52]/40 p-5 backdrop-blur-sm sm:p-6">
           <div className="mb-5 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#159AFD]/20 text-[#159AFD]">
               <UploadCloud className="h-6 w-6" />
@@ -341,7 +356,7 @@ const OtaAdminPanel = () => {
           </form>
         </section>
 
-        <section className="rounded-md border border-[#159AFD]/30 bg-[#0D0F52]/40 p-5 backdrop-blur-sm sm:p-6">
+        <section className="overflow-hidden rounded-md border border-[#159AFD]/30 bg-[#0D0F52]/40 p-5 backdrop-blur-sm sm:p-6">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#159AFD]/20 text-[#159AFD]">
@@ -375,7 +390,7 @@ const OtaAdminPanel = () => {
 
           {copyStatus && <p className="mb-3 rounded-lg bg-emerald-500/10 p-3 text-sm text-emerald-300">{copyStatus}</p>}
 
-          <pre className="max-h-[520px] w-full overflow-auto rounded-lg border border-[#159AFD]/20 bg-black/40 p-4 text-xs leading-6 text-sky-100">
+          <pre className="max-h-[680px] w-full overflow-auto rounded-lg border border-[#159AFD]/20 bg-black/40 p-4 text-xs leading-6 text-sky-100">
             {manifestJson}
           </pre>
         </section>

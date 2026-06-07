@@ -354,7 +354,8 @@ function StoreProductVisual({ item, isDark }: { item: StoreProduct; isDark: bool
         alt={item.title || 'Produto ELN Technology'}
         loading="lazy"
         onError={() => setImageFailed(true)}
-        className="aspect-[16/9] w-full border-b border-white/10 object-cover"
+        referrerPolicy="no-referrer"
+        className="aspect-[16/9] w-full border-b border-white/10 bg-white object-contain p-3"
       />
     );
   }
@@ -429,7 +430,7 @@ function CompanyPage({ data }: { data: PageData }) {
         { icon: Rocket, label: 'Pronto para crescer' },
       ];
   const displayedPublicItems = isTeamPage ? teamItems : publishedItems;
-  const publicSectionTitle = isTeamPage ? 'Equipe cadastrada' : isStudyPage ? 'Estudos publicados pelo painel' : 'Conteúdos adicionados pelo painel';
+  const publicSectionTitle = isTeamPage ? 'Equipe e responsáveis cadastrados' : isStudyPage ? 'Estudos publicados pelo painel' : 'Conteúdos adicionados pelo painel';
   const publicSectionText = isTeamPage
     ? 'Membros, funções e responsabilidades que você publicar no admin aparecem aqui.'
     : isStudyPage
@@ -543,13 +544,13 @@ function CompanyPage({ data }: { data: PageData }) {
                 <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
                   <Users className="h-7 w-7" />
                 </div>
-                <p className="mt-5 text-xs font-black uppercase tracking-widest text-[#159AFD]">Responsável pelo sistema</p>
-                <h2 className="mt-2 text-2xl font-black">Isaque Domingos Santana Silva</h2>
+                <p className="mt-5 text-xs font-black uppercase tracking-widest text-[#159AFD]">Equipe publicada pelo painel</p>
+                <h2 className="mt-2 text-2xl font-black">Responsabilidades, contatos e funções em um só lugar</h2>
                 <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                  Administração, clientes, valores, projetos, técnicos, OTA e comunicação direta da ELN Technology.
+                  Cadastre membros no admin para mostrar quem atende, quem executa projetos e quais áreas cada pessoa acompanha.
                 </p>
                 <div className="mt-6 grid gap-3">
-                  {['Painel administrativo', 'Projetos e clientes', 'Produtos e loja', 'Suporte e entregas'].map((step) => (
+                  {['Administração', 'Técnicos', 'Parceiros', 'Atendimento e suporte'].map((step) => (
                     <div key={step} className={`flex items-center gap-3 rounded-md border p-3 ${isDark ? 'border-white/10 bg-[#070A1F]/60' : 'border-sky-100 bg-white'}`}>
                       <CheckCircle2 className="h-5 w-5 flex-none text-[#159AFD]" />
                       <span className="font-bold">{step}</span>

@@ -17,10 +17,7 @@ body {
 
 .dashboard-shell *,
 .dashboard-shell *::before,
-.dashboard-shell *::after,
-main *,
-main *::before,
-main *::after {
+.dashboard-shell *::after {
   animation: none !important;
 }
 
