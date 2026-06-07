@@ -123,6 +123,11 @@ interface SiteContentRecord extends BaseRecord {
   description?: string;
   url?: string;
   status?: string;
+  price?: string;
+  category?: string;
+  imageUrl?: string;
+  availability?: string;
+  featured?: boolean;
 }
 
 const tabs = [
@@ -152,6 +157,19 @@ const defaultAreasSectionForm = {
 
 const sitePageOptions = ['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'produtos', 'lojas', 'videos', 'noticias'];
 const siteContentTypeOptions = ['Projeto', 'Documento', 'Vídeo', 'Produto', 'Loja', 'Melhoria', 'Equipe', 'Atividade', 'Notícia', 'Inovação', 'Link'];
+const defaultSiteContentForm = {
+  page: 'projetos',
+  type: 'Projeto',
+  title: '',
+  description: '',
+  url: '',
+  status: 'Publicado',
+  price: '',
+  category: '',
+  imageUrl: '',
+  availability: 'Disponível',
+  featured: false,
+};
 
 const pageLinks: Record<string, string> = {
   projetos: '/projetos-desenvolvidos',
@@ -409,6 +427,7 @@ const AdminDashboard = () => {
   const [registeredUsers, setRegisteredUsers] = useState<UserRecord[]>([]);
   const [systemEvents, setSystemEvents] = useState<SystemEventRecord[]>([]);
   const [siteContent, setSiteContent] = useState<SiteContentRecord[]>([]);
+  const [editingSiteContentId, setEditingSiteContentId] = useState<string | null>(null);
   const [areasSectionForm, setAreasSectionForm] = useState(defaultAreasSectionForm);
 
   const [clientForm, setClientForm] = useState({ name: '', email: '', phone: '', company: '' });
@@ -419,7 +438,7 @@ const AdminDashboard = () => {
   const [invoiceForm, setInvoiceForm] = useState({ title: '', client: '', amount: '', dueDate: '', status: 'Pendente' });
   const [orderForm, setOrderForm] = useState({ title: '', client: '', type: 'Novo projeto', budget: '', status: 'Novo', notes: '' });
   const [notificationForm, setNotificationForm] = useState({ title: '', message: '', target: 'Todos', status: 'Rascunho' });
-  const [siteContentForm, setSiteContentForm] = useState({ page: 'projetos', type: 'Projeto', title: '', description: '', url: '', status: 'Publicado' });
+  const [siteContentForm, setSiteContentForm] = useState(defaultSiteContentForm);
   const [profileForm, setProfileForm] = useState({
     name: user?.name || '',
     company: user?.company || '',
@@ -549,6 +568,25 @@ const AdminDashboard = () => {
     } catch (error) {
       setStatus(firestoreErrorMessage(error, 'atualizar status'));
     }
+  }
+
+  function startEditingSiteContent(item: SiteContentRecord) {
+    setEditingSiteContentId(item.id);
+    setSiteContentForm({
+      ...defaultSiteContentForm,
+      page: item.page || defaultSiteContentForm.page,
+      type: item.type || defaultSiteContentForm.type,
+      title: item.title || '',
+      description: item.description || '',
+      url: item.url || '',
+      status: item.status || defaultSiteContentForm.status,
+      price: item.price || '',
+      category: item.category || '',
+      imageUrl: item.imageUrl || '',
+      availability: item.availability || defaultSiteContentForm.availability,
+      featured: Boolean(item.featured),
+    });
+    setStatus(`Editando: ${item.title || 'conteúdo sem título'}.`);
   }
 
   async function copyFirestoreRules() {
@@ -906,7 +944,10 @@ const AdminDashboard = () => {
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
           <button
             type="button"
-            onClick={() => setSiteContentForm({ page: 'produtos', type: 'Produto', title: '', description: '', url: '', status: 'Publicado' })}
+            onClick={() => {
+              setEditingSiteContentId(null);
+              setSiteContentForm({ ...defaultSiteContentForm, page: 'produtos', type: 'Produto', category: 'Produtos' });
+            }}
             className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
           >
             <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
@@ -920,7 +961,10 @@ const AdminDashboard = () => {
 
           <button
             type="button"
-            onClick={() => setSiteContentForm({ page: 'lojas', type: 'Loja', title: '', description: '', url: '', status: 'Publicado' })}
+            onClick={() => {
+              setEditingSiteContentId(null);
+              setSiteContentForm({ ...defaultSiteContentForm, page: 'lojas', type: 'Loja', category: 'Canal oficial' });
+            }}
             className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
           >
             <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
@@ -934,7 +978,10 @@ const AdminDashboard = () => {
 
           <button
             type="button"
-            onClick={() => setSiteContentForm({ page: 'noticias', type: 'Notícia', title: '', description: '', url: '', status: 'Publicado' })}
+            onClick={() => {
+              setEditingSiteContentId(null);
+              setSiteContentForm({ ...defaultSiteContentForm, page: 'noticias', type: 'Notícia', category: 'Notícias' });
+            }}
             className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
           >
             <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
@@ -986,8 +1033,8 @@ const AdminDashboard = () => {
       </form>
 
       <CrudPanel
-        title="Adicionar conteúdo público"
-        onSubmit={(event) => {
+        title={editingSiteContentId ? 'Editar conteúdo público' : 'Adicionar conteúdo público'}
+        onSubmit={async (event) => {
           event.preventDefault();
           const nextContent = {
             page: siteContentForm.page.trim().toLowerCase(),
@@ -996,6 +1043,11 @@ const AdminDashboard = () => {
             description: siteContentForm.description.trim(),
             url: siteContentForm.url.trim(),
             status: siteContentForm.status || 'Publicado',
+            price: siteContentForm.price.trim(),
+            category: siteContentForm.category.trim(),
+            imageUrl: siteContentForm.imageUrl.trim(),
+            availability: siteContentForm.availability,
+            featured: siteContentForm.featured,
           };
 
           if (!nextContent.title) {
@@ -1003,12 +1055,24 @@ const AdminDashboard = () => {
             return;
           }
 
-          createRecord(
-            'siteContent',
-            nextContent,
-            () => setSiteContentForm({ page: 'projetos', type: 'Projeto', title: '', description: '', url: '', status: 'Publicado' }),
-            'Conteúdo publicado na subpágina.',
-          );
+          if (editingSiteContentId) {
+            setStatus('Atualizando conteúdo...');
+            try {
+              await updateDoc(doc(db, 'siteContent', editingSiteContentId), {
+                ...nextContent,
+                updatedAt: serverTimestamp(),
+                updatedBy: user?.id || '',
+              });
+              setSiteContentForm({ ...defaultSiteContentForm });
+              setEditingSiteContentId(null);
+              setStatus('Conteúdo atualizado no site.');
+            } catch (error) {
+              setStatus(firestoreErrorMessage(error, 'atualizar conteúdo'));
+            }
+            return;
+          }
+
+          await createRecord('siteContent', nextContent, () => setSiteContentForm({ ...defaultSiteContentForm }), 'Conteúdo publicado na subpágina.');
         }}
         form={
           <>
@@ -1026,8 +1090,42 @@ const AdminDashboard = () => {
             />
             <Field label="Título" value={siteContentForm.title} onChange={(title) => setSiteContentForm({ ...siteContentForm, title })} />
             <Field label="Link, documento, imagem ou vídeo" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="https://..." required={false} />
+            {['produtos', 'lojas'].includes(siteContentForm.page) && (
+              <div className="grid gap-4 rounded-md border border-[#159AFD]/20 bg-[#159AFD]/5 p-4">
+                <div>
+                  <p className="font-bold text-slate-950 dark:text-white">Informações comerciais</p>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Esses dados aparecem na vitrine da loja.</p>
+                </div>
+                <Field label="Preço ou valor" value={siteContentForm.price} onChange={(price) => setSiteContentForm({ ...siteContentForm, price })} placeholder="Ex.: R$ 249,00 ou Sob orçamento" required={false} />
+                <Field label="Categoria" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: IoT e automação" required={false} />
+                <Field label="URL da imagem do produto" value={siteContentForm.imageUrl} onChange={(imageUrl) => setSiteContentForm({ ...siteContentForm, imageUrl })} placeholder="https://..." required={false} />
+                <SelectField label="Disponibilidade" value={siteContentForm.availability} onChange={(availability) => setSiteContentForm({ ...siteContentForm, availability })} options={['Disponível', 'Sob encomenda', 'Indisponível']} />
+                <label className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-white p-3 text-sm font-semibold text-slate-700 dark:border-white/10 dark:bg-[#070A1F]/70 dark:text-slate-300">
+                  Destacar este item na loja
+                  <input
+                    type="checkbox"
+                    checked={siteContentForm.featured}
+                    onChange={(event) => setSiteContentForm({ ...siteContentForm, featured: event.target.checked })}
+                    className="h-5 w-5 accent-[#159AFD]"
+                  />
+                </label>
+              </div>
+            )}
             <SelectField label="Status" value={siteContentForm.status} onChange={(statusValue) => setSiteContentForm({ ...siteContentForm, status: statusValue })} options={['Publicado', 'Rascunho']} />
             <TextAreaField label="Descrição" value={siteContentForm.description} onChange={(description) => setSiteContentForm({ ...siteContentForm, description })} />
+            {editingSiteContentId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingSiteContentId(null);
+                  setSiteContentForm({ ...defaultSiteContentForm });
+                  setStatus('Edição cancelada.');
+                }}
+                className="w-full rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-300"
+              >
+                Cancelar edição
+              </button>
+            )}
           </>
         }
         emptyText="Nenhum conteúdo publicado nas subpáginas."
@@ -1035,11 +1133,12 @@ const AdminDashboard = () => {
           id: item.id,
           title: item.title || 'Conteúdo sem título',
           subtitle: `${item.page || 'sem página'} - ${item.type || 'Conteúdo'} - ${item.status || 'Publicado'}`,
-          meta: item.description || item.url || '',
+          meta: [item.price, item.availability, item.category, item.description || item.url].filter(Boolean).join(' · '),
           status: item.status,
           link: item.url,
           actions: [
             ...(item.page && pageLinks[item.page] ? [{ label: 'Ver página', onClick: () => window.open(pageLinks[item.page], '_blank', 'noopener,noreferrer') }] : []),
+            { label: 'Editar', onClick: () => startEditingSiteContent(item) },
             { label: 'Publicar', onClick: () => changeStatus('siteContent', item.id, 'Publicado') },
             { label: 'Rascunho', onClick: () => changeStatus('siteContent', item.id, 'Rascunho') },
           ],

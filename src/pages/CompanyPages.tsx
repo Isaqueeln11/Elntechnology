@@ -12,6 +12,8 @@ import {
   Moon,
   Package,
   Rocket,
+  Search,
+  Star,
   Store,
   Sun,
   Users,
@@ -47,6 +49,11 @@ type SiteContentItem = {
   description?: string;
   url?: string;
   status?: string;
+  price?: string;
+  category?: string;
+  imageUrl?: string;
+  availability?: string;
+  featured?: boolean;
 };
 
 const pages: Record<string, PageData> = {
@@ -312,9 +319,13 @@ const sampleStoreProducts: SiteContentItem[] = [
     page: 'lojas',
     type: 'Produto',
     title: 'Kit IoT ESP32 para automação',
-    description: 'Controlador com ESP32 para protótipos, sensores, acionamentos e projetos conectados. Valor sob orçamento.',
+    description: 'Controlador com ESP32 para protótipos, sensores, acionamentos e projetos conectados.',
     url: 'https://wa.me/5581997092380?text=Olá,%20quero%20saber%20sobre%20o%20Kit%20IoT%20ESP32',
     status: 'Publicado',
+    price: 'A partir de R$ 249,00',
+    category: 'IoT e automação',
+    availability: 'Sob encomenda',
+    featured: true,
   },
   {
     id: 'sample-pcb',
@@ -324,6 +335,9 @@ const sampleStoreProducts: SiteContentItem[] = [
     description: 'Desenvolvimento de placa eletrônica, revisão de circuito, documentação e preparação para fabricação.',
     url: 'https://wa.me/5581997092380?text=Olá,%20quero%20um%20orçamento%20de%20PCB%20personalizada',
     status: 'Publicado',
+    price: 'Orçamento personalizado',
+    category: 'Eletrônica e PCB',
+    availability: 'Sob encomenda',
   },
   {
     id: 'sample-3d',
@@ -333,6 +347,9 @@ const sampleStoreProducts: SiteContentItem[] = [
     description: 'Modelagem, impressão 3D, ajustes de encaixe e protótipos para projetos de tecnologia.',
     url: 'https://wa.me/5581997092380?text=Olá,%20quero%20saber%20sobre%20impressão%203D',
     status: 'Publicado',
+    price: 'A partir de R$ 35,00',
+    category: 'Impressão 3D',
+    availability: 'Disponível',
   },
 ];
 
@@ -340,6 +357,8 @@ function CompanyPage({ data }: { data: PageData }) {
   const { isDark, toggleTheme } = useTheme();
   const [contentItems, setContentItems] = useState<SiteContentItem[]>([]);
   const [loadError, setLoadError] = useState('');
+  const [storeSearch, setStoreSearch] = useState('');
+  const [storeCategory, setStoreCategory] = useState('Todos');
   const Icon = data.icon;
   const isStorePage = data.key === 'lojas';
   const publishedItems = useMemo(
@@ -349,8 +368,20 @@ function CompanyPage({ data }: { data: PageData }) {
   const storeItems = useMemo(() => {
     if (!isStorePage) return [];
     const items = contentItems.filter((item) => ['lojas', 'produtos'].includes(item.page || '') && item.status !== 'Rascunho');
-    return items.length ? items : sampleStoreProducts;
+    return (items.length ? items : sampleStoreProducts).sort((first, second) => Number(Boolean(second.featured)) - Number(Boolean(first.featured)));
   }, [contentItems, isStorePage]);
+  const storeCategories = useMemo(
+    () => ['Todos', ...Array.from(new Set(storeItems.map((item) => item.category).filter((category): category is string => Boolean(category))))],
+    [storeItems],
+  );
+  const filteredStoreItems = useMemo(() => {
+    const query = storeSearch.trim().toLocaleLowerCase('pt-BR');
+    return storeItems.filter((item) => {
+      const matchesCategory = storeCategory === 'Todos' || item.category === storeCategory;
+      const searchableText = [item.title, item.description, item.type, item.category].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
+      return matchesCategory && (!query || searchableText.includes(query));
+    });
+  }, [storeCategory, storeItems, storeSearch]);
   const footerHighlights = isStorePage
     ? [
         { icon: Store, label: 'Canal oficial' },
@@ -491,19 +522,79 @@ function CompanyPage({ data }: { data: PageData }) {
                   </a>
                 </div>
 
+                <div className="mt-5 grid gap-3 border-b border-slate-200 pb-5 dark:border-white/10 lg:grid-cols-[1fr_auto]">
+                  <label className={`flex min-h-12 items-center gap-3 rounded-md border px-4 ${isDark ? 'border-white/10 bg-[#070A1F]/70 text-white' : 'border-sky-100 bg-[#F7FBFF] text-[#0D0F52]'}`}>
+                    <Search className="h-5 w-5 flex-none text-[#159AFD]" />
+                    <input
+                      type="search"
+                      value={storeSearch}
+                      onChange={(event) => setStoreSearch(event.target.value)}
+                      placeholder="Buscar produto, serviço ou categoria"
+                      className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-500"
+                    />
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {storeCategories.map((category) => (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => setStoreCategory(category)}
+                        className={`min-h-12 rounded-md border px-4 text-sm font-black transition ${
+                          storeCategory === category
+                            ? 'border-[#159AFD] bg-[#159AFD] text-white'
+                            : isDark
+                              ? 'border-white/10 bg-[#070A1F]/70 text-slate-200 hover:border-[#159AFD]/50'
+                              : 'border-sky-100 bg-white text-[#0D0F52] hover:border-[#159AFD]/50'
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <p className={`mt-5 text-sm font-bold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                  {filteredStoreItems.length} item(ns) encontrado(s)
+                </p>
+
                 <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                  {storeItems.map((item) => (
-                    <article key={item.id} className={`flex min-h-64 flex-col rounded-md border p-5 transition hover:-translate-y-1 ${isDark ? 'border-white/10 bg-[#070A1F]/70 hover:bg-[#070A1F]' : 'border-sky-100 bg-[#F7FBFF] hover:bg-white'}`}>
+                  {filteredStoreItems.map((item) => (
+                    <article key={item.id} className={`flex min-h-64 flex-col overflow-hidden rounded-md border transition hover:-translate-y-1 ${isDark ? 'border-white/10 bg-[#070A1F]/70 hover:bg-[#070A1F]' : 'border-sky-100 bg-[#F7FBFF] hover:bg-white'}`}>
+                      {item.imageUrl && (
+                        <img src={item.imageUrl} alt={item.title || 'Produto ELN Technology'} loading="lazy" className="aspect-[4/3] w-full border-b border-white/10 object-cover" />
+                      )}
+                      <div className="flex flex-1 flex-col p-5">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#159AFD] text-white">
                           {item.type === 'Loja' ? <Store className="h-6 w-6" /> : <Package className="h-6 w-6" />}
                         </div>
-                        <span className="rounded-md bg-[#159AFD]/15 px-3 py-1 text-xs font-black uppercase text-[#159AFD]">
-                          {item.type || 'Produto'}
-                        </span>
+                        <div className="flex flex-wrap justify-end gap-2">
+                          {item.featured && (
+                            <span className="inline-flex items-center gap-1 rounded-md bg-amber-400/15 px-3 py-1 text-xs font-black uppercase text-amber-500">
+                              <Star className="h-3 w-3 fill-current" />
+                              Destaque
+                            </span>
+                          )}
+                          <span className="rounded-md bg-[#159AFD]/15 px-3 py-1 text-xs font-black uppercase text-[#159AFD]">
+                            {item.category || item.type || 'Produto'}
+                          </span>
+                        </div>
                       </div>
                       <h3 className={`mt-5 text-xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{item.title}</h3>
                       <p className={`mt-3 flex-1 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.description}</p>
+                      <div className="mt-5 flex flex-wrap items-end justify-between gap-3 border-t border-slate-200 pt-4 dark:border-white/10">
+                        <div>
+                          <p className="text-xs font-black uppercase text-slate-500">Valor</p>
+                          <p className={`mt-1 text-lg font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{item.price || 'Consulte o valor'}</p>
+                        </div>
+                        <span className={`rounded-md px-3 py-2 text-xs font-black ${
+                          item.availability === 'Indisponível'
+                            ? 'bg-rose-500/15 text-rose-500'
+                            : 'bg-emerald-500/15 text-emerald-500'
+                        }`}>
+                          {item.availability || 'Disponível'}
+                        </span>
+                      </div>
                       <a
                         href={item.url || `https://wa.me/5581997092380?text=${encodeURIComponent(`Olá, quero saber sobre ${item.title || 'um produto da ELN Technology'}`)}`}
                         target="_blank"
@@ -513,8 +604,16 @@ function CompanyPage({ data }: { data: PageData }) {
                         Comprar ou consultar
                         <ArrowRight className="h-4 w-4" />
                       </a>
+                      </div>
                     </article>
                   ))}
+                  {filteredStoreItems.length === 0 && (
+                    <div className={`rounded-md border p-8 text-center md:col-span-2 lg:col-span-3 ${isDark ? 'border-white/10 bg-[#070A1F]/70' : 'border-sky-100 bg-[#F7FBFF]'}`}>
+                      <Search className="mx-auto h-8 w-8 text-[#159AFD]" />
+                      <p className="mt-4 font-black">Nenhum item encontrado.</p>
+                      <p className={`mt-2 text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Tente outra busca ou selecione a categoria Todos.</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -577,10 +676,12 @@ function CompanyPage({ data }: { data: PageData }) {
             ) : (
               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {publishedItems.map((item) => (
-                  <article key={item.id} className={`rounded-md border p-5 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
+                  <article key={item.id} className={`overflow-hidden rounded-md border ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
+                    {item.imageUrl && <img src={item.imageUrl} alt={item.title || 'Conteúdo ELN Technology'} loading="lazy" className="aspect-[16/9] w-full border-b border-white/10 object-cover" />}
+                    <div className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <span className="rounded-md bg-[#159AFD]/15 px-3 py-1 text-xs font-black uppercase text-[#159AFD]">
-                        {item.type || 'Conteúdo'}
+                        {item.category || item.type || 'Conteúdo'}
                       </span>
                       <span className={`rounded-md px-2 py-1 text-xs font-bold ${isDark ? 'bg-[#070A1F] text-slate-300' : 'bg-[#EEF7FF] text-[#0D0F52]'}`}>
                         {item.status || 'Publicado'}
@@ -588,12 +689,14 @@ function CompanyPage({ data }: { data: PageData }) {
                     </div>
                     <h3 className="mt-4 text-xl font-black">{item.title || 'Sem título'}</h3>
                     <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.description || 'Sem descrição.'}</p>
+                    {item.price && <p className="mt-4 text-lg font-black text-[#159AFD]">{item.price}</p>}
                     {item.url && (
                       <a href={item.url} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-black text-[#159AFD] hover:underline">
                         Abrir link
                         <ArrowRight className="h-4 w-4" />
                       </a>
                     )}
+                    </div>
                   </article>
                 ))}
               </div>
