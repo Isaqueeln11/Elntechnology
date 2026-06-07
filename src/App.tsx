@@ -55,6 +55,7 @@ const ProdutosPage = React.lazy(() => import('./pages/CompanyPages').then((modul
 const LojasPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.LojasPage })));
 const VideosFuturoPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.VideosFuturoPage })));
 const NoticiasInovacoesPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.NoticiasInovacoesPage })));
+const ProductDetailPage = React.lazy(() => import('./pages/ProductDetailPage'));
 
 const navLinks = [
   { label: 'Sobre', href: '#sobre' },
@@ -903,6 +904,7 @@ function App() {
               <Route path="/atividades-analise" element={<AtividadesAnalisePage />} />
               <Route path="/desenvolvimentos" element={<DesenvolvimentosPage />} />
               <Route path="/produtos" element={<ProdutosPage />} />
+              <Route path="/produto/:productId" element={<ProductDetailPage />} />
               <Route path="/lojas" element={<LojasPage />} />
               <Route path="/videos-futuro" element={<VideosFuturoPage />} />
               <Route path="/noticias-inovacoes" element={<NoticiasInovacoesPage />} />

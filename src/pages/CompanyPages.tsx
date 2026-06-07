@@ -24,6 +24,7 @@ import { Link } from 'react-router-dom';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
+import { sampleStoreProducts, type StoreProduct } from '../data/storeCatalog';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
 
 type PageData = {
@@ -39,21 +40,6 @@ type PageData = {
     items: string[];
   }>;
   workflow: string[];
-};
-
-type SiteContentItem = {
-  id: string;
-  page?: string;
-  type?: string;
-  title?: string;
-  description?: string;
-  url?: string;
-  status?: string;
-  price?: string;
-  category?: string;
-  imageUrl?: string;
-  availability?: string;
-  featured?: boolean;
 };
 
 const pages: Record<string, PageData> = {
@@ -313,54 +299,14 @@ const quickLinks = [
   { label: 'Notícias', to: '/noticias-inovacoes', icon: Rocket },
 ];
 
-const sampleStoreProducts: SiteContentItem[] = [
-  {
-    id: 'sample-iot',
-    page: 'lojas',
-    type: 'Produto',
-    title: 'Kit IoT ESP32 para automação',
-    description: 'Controlador com ESP32 para protótipos, sensores, acionamentos e projetos conectados.',
-    url: 'https://wa.me/5581997092380?text=Olá,%20quero%20saber%20sobre%20o%20Kit%20IoT%20ESP32',
-    status: 'Publicado',
-    price: 'A partir de R$ 249,00',
-    category: 'IoT e automação',
-    availability: 'Sob encomenda',
-    featured: true,
-  },
-  {
-    id: 'sample-pcb',
-    page: 'lojas',
-    type: 'Serviço',
-    title: 'Projeto de PCB personalizada',
-    description: 'Desenvolvimento de placa eletrônica, revisão de circuito, documentação e preparação para fabricação.',
-    url: 'https://wa.me/5581997092380?text=Olá,%20quero%20um%20orçamento%20de%20PCB%20personalizada',
-    status: 'Publicado',
-    price: 'Orçamento personalizado',
-    category: 'Eletrônica e PCB',
-    availability: 'Sob encomenda',
-  },
-  {
-    id: 'sample-3d',
-    page: 'lojas',
-    type: 'Serviço',
-    title: 'Impressão 3D e protótipo',
-    description: 'Modelagem, impressão 3D, ajustes de encaixe e protótipos para projetos de tecnologia.',
-    url: 'https://wa.me/5581997092380?text=Olá,%20quero%20saber%20sobre%20impressão%203D',
-    status: 'Publicado',
-    price: 'A partir de R$ 35,00',
-    category: 'Impressão 3D',
-    availability: 'Disponível',
-  },
-];
-
 function CompanyPage({ data }: { data: PageData }) {
   const { isDark, toggleTheme } = useTheme();
-  const [contentItems, setContentItems] = useState<SiteContentItem[]>([]);
+  const [contentItems, setContentItems] = useState<StoreProduct[]>([]);
   const [loadError, setLoadError] = useState('');
   const [storeSearch, setStoreSearch] = useState('');
   const [storeCategory, setStoreCategory] = useState('Todos');
   const Icon = data.icon;
-  const isStorePage = data.key === 'lojas';
+  const isStorePage = ['lojas', 'produtos'].includes(data.key);
   const publishedItems = useMemo(
     () => contentItems.filter((item) => item.page === data.key && item.status !== 'Rascunho'),
     [contentItems, data.key],
@@ -401,7 +347,7 @@ function CompanyPage({ data }: { data: PageData }) {
       collection(db, 'siteContent'),
       (snapshot) => {
         setLoadError('');
-        setContentItems(snapshot.docs.map((item) => ({ id: item.id, ...item.data() }) as SiteContentItem));
+        setContentItems(snapshot.docs.map((item) => ({ id: item.id, ...item.data() }) as StoreProduct));
       },
       () => setLoadError('Não foi possível carregar os conteúdos publicados. Confira as regras do Firestore.'),
     );
@@ -604,6 +550,15 @@ function CompanyPage({ data }: { data: PageData }) {
                         Comprar ou consultar
                         <ArrowRight className="h-4 w-4" />
                       </a>
+                      <Link
+                        to={`/produto/${item.id}`}
+                        className={`mt-2 inline-flex items-center justify-center gap-2 rounded-md border px-4 py-3 text-sm font-black transition ${
+                          isDark ? 'border-white/10 text-slate-200 hover:bg-white/5' : 'border-sky-100 bg-white text-[#0D0F52] hover:border-[#159AFD]'
+                        }`}
+                      >
+                        Ver detalhes técnicos
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
                       </div>
                     </article>
                   ))}

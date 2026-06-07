@@ -133,6 +133,10 @@ interface SiteContentRecord extends BaseRecord {
   imageUrl?: string;
   availability?: string;
   featured?: boolean;
+  sku?: string;
+  specifications?: string;
+  features?: string;
+  datasheetUrl?: string;
 }
 
 const tabs = [
@@ -174,6 +178,10 @@ const defaultSiteContentForm = {
   imageUrl: '',
   availability: 'Disponível',
   featured: false,
+  sku: '',
+  specifications: '',
+  features: '',
+  datasheetUrl: '',
 };
 
 const pageLinks: Record<string, string> = {
@@ -633,6 +641,10 @@ const AdminDashboard = () => {
       imageUrl: item.imageUrl || '',
       availability: item.availability || defaultSiteContentForm.availability,
       featured: Boolean(item.featured),
+      sku: item.sku || '',
+      specifications: item.specifications || '',
+      features: item.features || '',
+      datasheetUrl: item.datasheetUrl || '',
     });
     setStatus(`Editando: ${item.title || 'conteúdo sem título'}.`);
   }
@@ -1099,6 +1111,10 @@ const AdminDashboard = () => {
             imageUrl: siteContentForm.imageUrl.trim(),
             availability: siteContentForm.availability,
             featured: siteContentForm.featured,
+            sku: siteContentForm.sku.trim(),
+            specifications: siteContentForm.specifications.trim(),
+            features: siteContentForm.features.trim(),
+            datasheetUrl: siteContentForm.datasheetUrl.trim(),
           };
 
           if (!nextContent.title) {
@@ -1150,7 +1166,11 @@ const AdminDashboard = () => {
                 <Field label="Preço ou valor" value={siteContentForm.price} onChange={(price) => setSiteContentForm({ ...siteContentForm, price })} placeholder="Ex.: R$ 249,00 ou Sob orçamento" required={false} />
                 <Field label="Categoria" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: IoT e automação" required={false} />
                 <Field label="URL da imagem do produto" value={siteContentForm.imageUrl} onChange={(imageUrl) => setSiteContentForm({ ...siteContentForm, imageUrl })} placeholder="https://..." required={false} />
+                <Field label="Código ou SKU" value={siteContentForm.sku} onChange={(sku) => setSiteContentForm({ ...siteContentForm, sku })} placeholder="Ex.: ELN-IOT-ESP32" required={false} />
+                <Field label="Link do datasheet ou manual" value={siteContentForm.datasheetUrl} onChange={(datasheetUrl) => setSiteContentForm({ ...siteContentForm, datasheetUrl })} placeholder="https://..." required={false} />
                 <SelectField label="Disponibilidade" value={siteContentForm.availability} onChange={(availability) => setSiteContentForm({ ...siteContentForm, availability })} options={['Disponível', 'Sob encomenda', 'Indisponível']} />
+                <TextAreaField label="Especificações técnicas, uma por linha" value={siteContentForm.specifications} onChange={(specifications) => setSiteContentForm({ ...siteContentForm, specifications })} placeholder={'Processador: ESP32-S3\nMemória: 4 MB Flash\nConectividade: Wi-Fi + Bluetooth'} />
+                <TextAreaField label="Recursos e aplicações, um por linha" value={siteContentForm.features} onChange={(features) => setSiteContentForm({ ...siteContentForm, features })} placeholder={'Controle de sensores\nAtualização OTA\nPainel web responsivo'} />
                 <label className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-white p-3 text-sm font-semibold text-slate-700 dark:border-white/10 dark:bg-[#070A1F]/70 dark:text-slate-300">
                   Destacar este item na loja
                   <input
@@ -1189,6 +1209,7 @@ const AdminDashboard = () => {
           link: item.url,
           actions: [
             ...(item.page && pageLinks[item.page] ? [{ label: 'Ver página', onClick: () => window.open(pageLinks[item.page], '_blank', 'noopener,noreferrer') }] : []),
+            ...(['produtos', 'lojas'].includes(item.page || '') ? [{ label: 'Ver ficha técnica', onClick: () => window.open(`/produto/${item.id}`, '_blank', 'noopener,noreferrer') }] : []),
             { label: 'Editar', onClick: () => startEditingSiteContent(item) },
             { label: 'Publicar', onClick: () => changeStatus('siteContent', item.id, 'Publicado') },
             { label: 'Rascunho', onClick: () => changeStatus('siteContent', item.id, 'Rascunho') },
