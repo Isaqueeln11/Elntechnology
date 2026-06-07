@@ -1,6 +1,7 @@
 import { ArrowUpRight, Instagram, Mail, MessageCircle, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
+import logoUrl from '../../ELN TECHNOLOGY.svg';
 
 const navigationLinks = [
   { label: 'Início', href: '/' },
@@ -29,7 +30,7 @@ export default function SiteFooter() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.35fr_0.8fr_0.9fr_1.2fr]">
           <div className="max-w-sm">
             <Link to="/" className="inline-flex items-center gap-3" aria-label="Página inicial da ELN Technology">
-              <img src="/favicon.svg" alt="" className="h-11 w-11 rounded-md object-contain" />
+              <img src={logoUrl} alt="" className="h-11 w-20 object-contain" />
               <span className={`notranslate text-lg font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`} translate="no">
                 ELN Technology
               </span>

@@ -400,7 +400,7 @@ function HomePage() {
       <header className={`fixed inset-x-0 top-0 z-50 border-b shadow-sm backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/92' : 'border-sky-100/70 bg-white/90'}`}>
         <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <a href="#inicio" className="flex min-w-0 items-center gap-3" aria-label="ELN Technology">
-            <img src="/favicon.svg" alt="" className="h-10 w-10 flex-none rounded-md object-contain" />
+            <img src={logoUrl} alt="" className="h-10 w-16 flex-none object-contain" />
             <BrandName className={`hidden truncate text-base font-black sm:block ${isDark ? 'text-white' : 'text-[#0D0F52]'}`} />
           </a>
 
