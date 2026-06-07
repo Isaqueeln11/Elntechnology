@@ -36,6 +36,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { db } from './firebase';
 import logoUrl from '../ELN TECHNOLOGY.svg';
+import SiteFooter from './components/SiteFooter';
 
 const ProtectedRoute = React.lazy(() => import('./components/ProtectedRoute'));
 const Login = React.lazy(() => import('./Login'));
@@ -397,27 +398,30 @@ function HomePage() {
   return (
     <div className={`min-h-screen transition-colors ${isDark ? 'bg-[#070A1F] text-white' : 'bg-[#F7FBFF] text-slate-950'}`}>
       <header className={`fixed inset-x-0 top-0 z-50 border-b shadow-sm backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/92' : 'border-sky-100/70 bg-white/90'}`}>
-        <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <a href="#inicio" className="flex items-center gap-3" aria-label="ELN Technology">
-            <img src={logoUrl} alt="ELN Technology" className="h-12 w-28 object-contain sm:w-36" />
+        <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+          <a href="#inicio" className="flex min-w-0 items-center gap-3" aria-label="ELN Technology">
+            <img src="/favicon.svg" alt="" className="h-10 w-10 flex-none rounded-md object-contain" />
+            <BrandName className={`hidden truncate text-base font-black sm:block ${isDark ? 'text-white' : 'text-[#0D0F52]'}`} />
           </a>
 
-          <div className="hidden items-center gap-8 lg:flex">
+          <div className={`hidden items-center gap-1 rounded-md border p-1 min-[1120px]:flex ${
+            isDark ? 'border-white/10 bg-white/[0.03]' : 'border-sky-100 bg-sky-50/70'
+          }`}>
             {navLinks.map((link) => (
               link.href.startsWith('/') ? (
-                <Link key={link.href} to={link.href} className="inline-flex items-center gap-2 rounded-md bg-[#159AFD]/12 px-3 py-2 text-sm font-black text-[#159AFD] transition hover:bg-[#159AFD] hover:text-white">
+                <Link key={link.href} to={link.href} className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-black text-[#159AFD] transition hover:bg-[#159AFD] hover:text-white">
                   <Store className="h-4 w-4" />
                   {navCopy[link.href] || link.label}
                 </Link>
               ) : (
-                <a key={link.href} href={link.href} className={`text-sm font-semibold transition hover:text-sky-500 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                <a key={link.href} href={link.href} className={`rounded-md px-3 py-2 text-sm font-semibold transition hover:bg-[#159AFD]/10 hover:text-[#159AFD] ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   {navCopy[link.href] || link.label}
                 </a>
               )
             ))}
           </div>
 
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden items-center gap-3 min-[1120px]:flex">
             <label className={`inline-flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-bold ${
               isDark ? 'border-white/10 text-slate-200' : 'border-sky-100 text-slate-700'
             }`}>
@@ -443,12 +447,12 @@ function HomePage() {
             >
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
-            <Link to="/login" className={`rounded-md px-4 py-2 text-sm font-semibold transition hover:text-sky-500 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+            <Link to="/login" className={`rounded-md px-2 py-2 text-sm font-semibold transition hover:text-sky-500 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
               {t.login}
             </Link>
             <a
               href="#contato"
-              className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/20 transition hover:bg-[#0D0F52]"
+              className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-sky-500/20 transition hover:bg-[#0D0F52]"
             >
               {t.startProject}
               <ArrowRight className="h-4 w-4" />
@@ -457,7 +461,7 @@ function HomePage() {
 
           <button
             type="button"
-            className={`inline-flex h-11 w-11 items-center justify-center rounded-md border lg:hidden ${isDark ? 'border-white/10 text-white' : 'border-sky-100 text-slate-900'}`}
+            className={`inline-flex h-11 w-11 items-center justify-center rounded-md border min-[1120px]:hidden ${isDark ? 'border-white/10 text-white' : 'border-sky-100 text-slate-900'}`}
             onClick={() => setIsMenuOpen((value) => !value)}
             aria-label="Abrir menu"
           >
@@ -466,7 +470,7 @@ function HomePage() {
         </nav>
 
         {isMenuOpen && (
-          <div className={`border-t px-4 py-4 lg:hidden ${isDark ? 'border-white/10 bg-[#080B24]' : 'border-sky-100 bg-white'}`}>
+          <div className={`border-t px-4 py-4 min-[1120px]:hidden ${isDark ? 'border-white/10 bg-[#080B24]' : 'border-sky-100 bg-white'}`}>
             <div className="mx-auto flex max-w-7xl flex-col gap-2">
               {navLinks.map((link) => (
                 link.href.startsWith('/') ? (
@@ -871,15 +875,7 @@ function HomePage() {
         </section>
       </main>
 
-      <footer className={`border-t py-8 ${isDark ? 'border-white/10 bg-[#070A1F]' : 'border-sky-100 bg-white'}`}>
-        <div className={`mx-auto flex max-w-7xl flex-col justify-between gap-4 px-4 text-sm sm:px-6 lg:flex-row lg:items-center lg:px-8 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-          <div className="flex items-center gap-3">
-            <img src={logoUrl} alt="" className="h-10 w-24 object-contain" />
-            <BrandName className="font-semibold" />
-          </div>
-          <span>(c) 2026 <BrandName />. Todos os direitos reservados.</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

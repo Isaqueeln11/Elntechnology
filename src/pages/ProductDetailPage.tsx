@@ -20,6 +20,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
 import { sampleStoreProducts, type StoreProduct } from '../data/storeCatalog';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
+import SiteFooter from '../components/SiteFooter';
 
 function lines(value?: string) {
   return (value || '').split('\n').map((item) => item.trim()).filter(Boolean);
@@ -203,6 +204,7 @@ export default function ProductDetailPage() {
           </nav>
         </aside>
       </div>
+      <SiteFooter />
     </div>
   );
 }

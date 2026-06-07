@@ -26,6 +26,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
 import { sampleStoreProducts, type StoreProduct } from '../data/storeCatalog';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
+import SiteFooter from '../components/SiteFooter';
 
 type PageData = {
   key: string;
@@ -672,6 +673,7 @@ function CompanyPage({ data }: { data: PageData }) {
           </div>
         </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }
