@@ -598,6 +598,13 @@ const AdminDashboard = () => {
     return { projectRevenue, invoiceRevenue, openTickets, newUsers, pendingInvoices, openOrders };
   }, [invoices, notifications, orders, projects, tickets]);
 
+  const storeContentItems = useMemo(
+    () => siteContent
+      .filter((item) => ['lojas', 'produtos'].includes(item.page || ''))
+      .sort((first, second) => Number(Boolean(second.featured)) - Number(Boolean(first.featured))),
+    [siteContent],
+  );
+
   async function createRecord<T extends object>(collectionName: CollectionName, data: T, reset: () => void, message: string) {
     setStatus('Salvando registro...');
 
@@ -655,6 +662,69 @@ const AdminDashboard = () => {
     } catch (error) {
       setStatus(firestoreErrorMessage(error, 'atualizar status'));
     }
+  }
+
+  function buildSiteContentPayload() {
+    return {
+      page: siteContentForm.page.trim().toLowerCase(),
+      type: siteContentForm.type.trim(),
+      title: siteContentForm.title.trim(),
+      description: siteContentForm.description.trim(),
+      url: siteContentForm.url.trim(),
+      status: siteContentForm.status || 'Publicado',
+      price: siteContentForm.price.trim(),
+      currency: siteContentForm.currency,
+      marketplace: siteContentForm.marketplace.trim(),
+      category: siteContentForm.category.trim(),
+      imageUrl: siteContentForm.imageUrl.trim(),
+      availability: siteContentForm.availability,
+      featured: siteContentForm.featured,
+      sku: siteContentForm.sku.trim(),
+      specifications: siteContentForm.specifications.trim(),
+      features: siteContentForm.features.trim(),
+      datasheetUrl: siteContentForm.datasheetUrl.trim(),
+    };
+  }
+
+  async function saveSiteContent(resetForm: () => void, successMessage: string) {
+    const nextContent = buildSiteContentPayload();
+
+    if (!nextContent.title) {
+      setStatus('Informe um título para salvar o conteúdo.');
+      return;
+    }
+
+    if (editingSiteContentId) {
+      setStatus('Atualizando conteúdo...');
+      try {
+        await updateDoc(doc(db, 'siteContent', editingSiteContentId), {
+          ...nextContent,
+          updatedAt: serverTimestamp(),
+          updatedBy: user?.id || '',
+        });
+        resetForm();
+        setEditingSiteContentId(null);
+        setStatus('Conteúdo atualizado no site.');
+      } catch (error) {
+        setStatus(firestoreErrorMessage(error, 'atualizar conteúdo'));
+      }
+      return;
+    }
+
+    await createRecord('siteContent', nextContent, () => {
+      resetForm();
+      setEditingSiteContentId(null);
+    }, successMessage);
+  }
+
+  function prepareStoreProduct(page: 'lojas' | 'produtos' = 'lojas') {
+    setEditingSiteContentId(null);
+    setSiteContentForm({
+      ...defaultStoreProductForm,
+      page,
+      type: page === 'lojas' ? 'Produto' : 'Produto',
+    });
+    setStatus(page === 'lojas' ? 'Preencha o produto para aparecer na loja.' : 'Preencha o produto para aparecer em produtos.');
   }
 
   function startEditingSiteContent(item: SiteContentRecord) {
@@ -735,6 +805,7 @@ const AdminDashboard = () => {
   const renderActiveTab = () => {
     if (activeTab === 'overview') return renderOverview();
     if (activeTab === 'orders') return renderOrders();
+    if (activeTab === 'store') return renderStoreProducts();
     if (activeTab === 'clients') return renderClients();
     if (activeTab === 'projects') return renderProjects();
     if (activeTab === 'technicians') return renderTechnicians();
