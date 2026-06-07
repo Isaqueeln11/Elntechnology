@@ -44,6 +44,16 @@ service cloud.firestore {
         && request.resource.data.get("clientEmail", "") == request.auth.token.email;
     }
 
+    function canReceiveNotification(data) {
+      return signedIn()
+        && (
+          ownsRecord(data)
+          || data.get("target", "") == "Todos"
+          || (hasRole("client") && data.get("target", "") == "Clientes")
+          || (hasRole("technician") && data.get("target", "") == "Técnicos")
+        );
+    }
+
     match /users/{userId} {
       allow create: if signedIn()
         && request.auth.uid == userId
@@ -134,8 +144,9 @@ service cloud.firestore {
         );
       allow update: if isAdmin()
         || (
-          ownsRecord(resource.data)
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt"])
+          canReceiveNotification(resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["readBy", "updatedAt"])
+          && request.resource.data.readBy.hasAll([request.auth.uid])
         );
       allow delete: if isAdmin();
     }

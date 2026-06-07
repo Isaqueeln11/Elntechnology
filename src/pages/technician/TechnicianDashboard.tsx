@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { notificationIsUnread, useNotifications } from '../../hooks/useNotifications';
 import { 
   Wrench, 
   FolderOpen, 
@@ -18,8 +20,31 @@ import DashboardLayout from '../../components/DashboardLayout';
 
 const TechnicianDashboard = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
   const [selectedTicket, setSelectedTicket] = useState<number | null>(null);
+  const [notificationStatus, setNotificationStatus] = useState('');
+  const { notifications, unreadCount, error: notificationError, markRead } = useNotifications(user?.role, user?.id, user?.email);
+
+  useEffect(() => {
+    const requestedTab = searchParams.get('tab');
+    if (requestedTab && requestedTab !== activeTab) setActiveTab(requestedTab);
+  }, [activeTab, searchParams]);
+
+  function openTab(tab: string) {
+    setActiveTab(tab);
+    setSearchParams({ tab }, { replace: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function markNotificationRead(id: string) {
+    try {
+      await markRead(id);
+      setNotificationStatus('Notificação marcada como lida.');
+    } catch {
+      setNotificationStatus('Não foi possível marcar como lida. Publique as regras atualizadas do Firestore.');
+    }
+  }
 
   const myProjects = [
     {
@@ -466,7 +491,8 @@ const TechnicianDashboard = () => {
     { id: 'projects', label: 'Meus Projetos', icon: FolderOpen },
     { id: 'repairs', label: 'Roteiro de Reparos', icon: Wrench },
     { id: 'messages', label: 'Mensagens', icon: MessageSquare },
-    { id: 'reports', label: 'Relatórios', icon: FileText }
+    { id: 'reports', label: 'Relatórios', icon: FileText },
+    { id: 'notifications', label: 'Notificações', icon: Bell },
   ];
 
   return (
@@ -481,9 +507,9 @@ const TechnicianDashboard = () => {
             <p className="text-gray-400 mt-1">Bem-vindo, {user?.name}</p>
           </div>
           <div className="flex items-center space-x-4">
-            <button className="relative p-2 text-gray-400 hover:text-white transition-colors">
+            <button type="button" onClick={() => openTab('notifications')} className="relative p-2 text-gray-400 hover:text-white transition-colors" title="Notificações">
               <Bell className="w-6 h-6" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+              {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-black text-white">{unreadCount > 9 ? '9+' : unreadCount}</span>}
             </button>
             <img
               src={user?.avatar}
@@ -498,7 +524,7 @@ const TechnicianDashboard = () => {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => openTab(tab.id)}
               className={`flex flex-none items-center whitespace-nowrap rounded-lg px-4 py-2 transition-all ${
                 activeTab === tab.id
                   ? 'bg-[#159AFD] text-white'
@@ -526,6 +552,30 @@ const TechnicianDashboard = () => {
             <div className="text-center py-12">
               <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-400">Relatórios técnicos em desenvolvimento</p>
+            </div>
+          )}
+          {activeTab === 'notifications' && (
+            <div className="space-y-4">
+              {(notificationStatus || notificationError) && <div className="rounded-lg border border-[#159AFD]/30 bg-[#159AFD]/10 p-4 text-sm font-semibold text-sky-200">{notificationError || notificationStatus}</div>}
+              {notifications.length === 0 ? (
+                <div className="rounded-xl border border-[#159AFD]/30 bg-[#0D0F52]/30 py-12 text-center">
+                  <Bell className="mx-auto h-12 w-12 text-gray-400" />
+                  <p className="mt-4 font-bold text-white">Nenhuma notificação disponível.</p>
+                </div>
+              ) : notifications.map((item) => (
+                <article key={item.id} className="flex flex-col gap-4 rounded-xl border border-[#159AFD]/30 bg-[#0D0F52]/30 p-5 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="font-bold text-white">{item.title || 'Notificação'}</h3>
+                      <span className={`rounded-md px-2 py-1 text-xs font-black ${notificationIsUnread(item, user?.id) ? 'bg-[#159AFD]/20 text-[#159AFD]' : 'bg-emerald-500/15 text-emerald-400'}`}>
+                        {notificationIsUnread(item, user?.id) ? 'Nova' : 'Lida'}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-gray-300">{item.message || 'Sem mensagem.'}</p>
+                  </div>
+                  {notificationIsUnread(item, user?.id) && <button type="button" onClick={() => markNotificationRead(item.id)} className="rounded-lg border border-[#159AFD]/30 px-4 py-2 text-sm font-bold text-[#159AFD] transition hover:bg-[#159AFD]/10">Marcar lida</button>}
+                </article>
+              ))}
             </div>
           )}
         </div>

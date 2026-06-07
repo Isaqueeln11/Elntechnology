@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Bell, Home, LogOut, Moon, Sun } from 'lucide-react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { db } from '../firebase';
+import { useNotifications } from '../hooks/useNotifications';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -14,22 +13,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const { user, logout, updateUserProfile } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
-  const [newNotifications, setNewNotifications] = useState(0);
-
-  useEffect(() => {
-    if (!user) return;
-    const targetQuery = user.role === 'admin'
-      ? query(collection(db, 'notifications'), where('target', '==', 'Admin'))
-      : user.role === 'technician'
-        ? query(collection(db, 'notifications'), where('target', 'in', ['Todos', 'Técnicos']))
-        : query(collection(db, 'notifications'), where('target', 'in', ['Todos', 'Clientes']));
-    const unsubscribe = onSnapshot(
-      targetQuery,
-      (snapshot) => setNewNotifications(snapshot.docs.filter((item) => item.data().status !== 'Lida').length),
-      () => setNewNotifications(0),
-    );
-    return unsubscribe;
-  }, [user]);
+  const { unreadCount } = useNotifications(user?.role, user?.id, user?.email);
 
   const handleLogout = () => {
     logout();
@@ -64,7 +48,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               title="Notificações"
             >
               <Bell className="h-5 w-5" />
-              {newNotifications > 0 && <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-black text-white">{newNotifications > 9 ? '9+' : newNotifications}</span>}
+              {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-black text-white">{unreadCount > 9 ? '9+' : unreadCount}</span>}
             </button>
             <button
               type="button"

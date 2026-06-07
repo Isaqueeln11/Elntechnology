@@ -244,6 +244,16 @@ service cloud.firestore {
         && request.resource.data.get("clientEmail", "") == request.auth.token.email;
     }
 
+    function canReceiveNotification(data) {
+      return signedIn()
+        && (
+          ownsRecord(data)
+          || data.get("target", "") == "Todos"
+          || (hasRole("client") && data.get("target", "") == "Clientes")
+          || (hasRole("technician") && data.get("target", "") == "Técnicos")
+        );
+    }
+
     match /users/{userId} {
       allow create: if signedIn()
         && request.auth.uid == userId
@@ -334,8 +344,9 @@ service cloud.firestore {
         );
       allow update: if isAdmin()
         || (
-          ownsRecord(resource.data)
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "updatedAt"])
+          canReceiveNotification(resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["readBy", "updatedAt"])
+          && request.resource.data.readBy.hasAll([request.auth.uid])
         );
       allow delete: if isAdmin();
     }
@@ -493,7 +504,7 @@ const AdminDashboard = () => {
   const [documentForm, setDocumentForm] = useState({ title: '', client: '', clientEmail: '', category: 'Contrato', url: '' });
   const [invoiceForm, setInvoiceForm] = useState({ title: '', client: '', clientEmail: '', amount: '', dueDate: '', status: 'Pendente' });
   const [orderForm, setOrderForm] = useState({ title: '', client: '', clientEmail: '', type: 'Novo projeto', budget: '', status: 'Novo', notes: '' });
-  const [notificationForm, setNotificationForm] = useState({ title: '', message: '', target: 'Todos', status: 'Rascunho' });
+  const [notificationForm, setNotificationForm] = useState({ title: '', message: '', target: 'Todos', status: 'Enviada' });
   const [siteContentForm, setSiteContentForm] = useState(defaultSiteContentForm);
   const [profileForm, setProfileForm] = useState({
     name: user?.name || '',
@@ -1292,7 +1303,7 @@ const AdminDashboard = () => {
       title="Criar notificação"
       onSubmit={(event) => {
         event.preventDefault();
-        createRecord('notifications', notificationForm, () => setNotificationForm({ title: '', message: '', target: 'Todos', status: 'Rascunho' }), 'Notificação criada.');
+        createRecord('notifications', notificationForm, () => setNotificationForm({ title: '', message: '', target: 'Todos', status: 'Enviada' }), 'Notificação enviada.');
       }}
       form={
         <>

@@ -2,11 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   addDoc,
   collection,
-  doc,
   onSnapshot,
   query,
   serverTimestamp,
-  updateDoc,
   where,
 } from 'firebase/firestore';
 import { useSearchParams } from 'react-router-dom';
@@ -28,6 +26,7 @@ import {
 import DashboardLayout from '../../components/DashboardLayout';
 import { useAuth } from '../../contexts/AuthContext';
 import { db } from '../../firebase';
+import { notificationIsUnread, useNotifications } from '../../hooks/useNotifications';
 
 type RecordBase = {
   id: string;
@@ -66,11 +65,6 @@ type OrderRecord = RecordBase & {
   type?: string;
   budget?: string;
   notes?: string;
-};
-
-type NotificationRecord = RecordBase & {
-  message?: string;
-  target?: string;
 };
 
 const tabs = [
@@ -161,9 +155,9 @@ function ClientDashboard() {
   const [documents, setDocuments] = useState<DocumentRecord[]>([]);
   const [invoices, setInvoices] = useState<InvoiceRecord[]>([]);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
-  const [notifications, setNotifications] = useState<NotificationRecord[]>([]);
   const [status, setStatus] = useState('');
   const [loadError, setLoadError] = useState('');
+  const { notifications, unreadCount, error: notificationError, markRead } = useNotifications(user?.role, user?.id, user?.email);
   const [orderForm, setOrderForm] = useState({ title: '', type: 'Novo projeto', budget: '', notes: '' });
   const [ticketForm, setTicketForm] = useState({ title: '', priority: 'Média', message: '' });
   const [profileForm, setProfileForm] = useState({
@@ -229,21 +223,6 @@ function ClientDashboard() {
     subscribeOwned<InvoiceRecord>('invoices', setInvoices);
     subscribeOwned<OrderRecord>('orders', setOrders);
 
-    let publicNotices: NotificationRecord[] = [];
-    let personalNotices: NotificationRecord[] = [];
-    const emitNotifications = () => setNotifications(mergeRecords(publicNotices, personalNotices));
-    const notificationError = () => setLoadError('Alguns dados não puderam ser carregados. Publique as regras atualizadas do Firestore.');
-    subscriptions.push(
-      onSnapshot(query(collection(db, 'notifications'), where('target', 'in', ['Todos', 'Clientes'])), (snapshot) => {
-        publicNotices = recordList<NotificationRecord>(snapshot);
-        emitNotifications();
-      }, notificationError),
-      onSnapshot(query(collection(db, 'notifications'), where('ownerId', '==', user.id)), (snapshot) => {
-        personalNotices = recordList<NotificationRecord>(snapshot);
-        emitNotifications();
-      }, notificationError),
-    );
-
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   }, [user]);
 
@@ -251,8 +230,8 @@ function ClientDashboard() {
     activeProjects: projects.filter((item) => item.status !== 'Concluído').length,
     openTickets: tickets.filter((item) => item.status !== 'Resolvido').length,
     pendingInvoices: invoices.filter((item) => !['Pago', 'Cancelado'].includes(item.status || '')).length,
-    unreadNotifications: notifications.filter((item) => item.status !== 'Lida').length,
-  }), [invoices, notifications, projects, tickets]);
+    unreadNotifications: unreadCount,
+  }), [invoices, projects, tickets, unreadCount]);
 
   async function createClientRecord(collectionName: 'orders' | 'supportTickets', data: object, successMessage: string) {
     if (!user) return;
@@ -272,11 +251,12 @@ function ClientDashboard() {
     }
   }
 
-  async function markNotificationRead(item: NotificationRecord) {
+  async function markNotificationRead(id: string) {
     try {
-      await updateDoc(doc(db, 'notifications', item.id), { status: 'Lida', updatedAt: serverTimestamp() });
+      await markRead(id);
+      setStatus('Notificação marcada como lida.');
     } catch {
-      setStatus('Não foi possível marcar a notificação como lida.');
+      setStatus('Não foi possível marcar a notificação como lida. Publique as regras atualizadas do Firestore.');
     }
   }
 
@@ -511,8 +491,8 @@ function ClientDashboard() {
       <div className="space-y-3">
         {notifications.map((item) => (
           <article key={item.id} className={`${panelClass} flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between`}>
-            <div><div className="flex flex-wrap items-center gap-2"><h3 className="font-black text-slate-950 dark:text-white">{item.title || 'Notificação'}</h3><StatusPill value={item.status} /></div><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{item.message || 'Sem mensagem.'}</p></div>
-            {item.status !== 'Lida' && (item.ownerId === user?.id || item.clientEmail === user?.email.toLowerCase()) && <button type="button" onClick={() => markNotificationRead(item)} className={secondaryButton}>Marcar lida</button>}
+            <div><div className="flex flex-wrap items-center gap-2"><h3 className="font-black text-slate-950 dark:text-white">{item.title || 'Notificação'}</h3><StatusPill value={notificationIsUnread(item, user?.id) ? item.status : 'Lida'} /></div><p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{item.message || 'Sem mensagem.'}</p></div>
+            {notificationIsUnread(item, user?.id) && <button type="button" onClick={() => markNotificationRead(item.id)} className={secondaryButton}>Marcar lida</button>}
           </article>
         ))}
       </div>
@@ -567,7 +547,7 @@ function ClientDashboard() {
           <div className="flex items-center gap-3 rounded-md border border-slate-200 p-3 dark:border-white/10"><img src={user?.avatar} alt={user?.name} className="h-10 w-10 rounded-md object-cover" /><div><p className="text-sm font-black text-slate-950 dark:text-white">{user?.name}</p><p className="text-xs text-slate-500">{user?.email}</p></div></div>
         </header>
 
-        {(status || loadError) && <div role="status" className={`rounded-md border p-3 text-sm font-semibold ${loadError ? 'border-amber-400/30 bg-amber-500/10 text-amber-600 dark:text-amber-200' : 'border-[#159AFD]/30 bg-[#159AFD]/10 text-[#0D0F52] dark:text-sky-200'}`}>{loadError || status}</div>}
+        {(status || loadError || notificationError) && <div role="status" className={`rounded-md border p-3 text-sm font-semibold ${loadError || notificationError ? 'border-amber-400/30 bg-amber-500/10 text-amber-600 dark:text-amber-200' : 'border-[#159AFD]/30 bg-[#159AFD]/10 text-[#0D0F52] dark:text-sky-200'}`}>{loadError || notificationError || status}</div>}
 
         <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
           <aside className={`${panelClass} h-fit p-2 lg:sticky lg:top-24`}>
