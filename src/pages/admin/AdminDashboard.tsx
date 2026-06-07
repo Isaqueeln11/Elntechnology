@@ -25,6 +25,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import type { UserPreferences } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { db } from '../../firebase';
+import { formatStorePrice } from '../../data/storeCatalog';
 import DashboardLayout from '../../components/DashboardLayout';
 import OtaAdminPanel from '../../components/OtaAdminPanel';
 
@@ -146,6 +147,7 @@ interface SiteContentRecord extends BaseRecord {
 const tabs = [
   { id: 'overview', label: 'Visão Geral', icon: BarChart3, description: 'Resumo operacional do sistema' },
   { id: 'orders', label: 'Pedidos', icon: PackagePlus, description: 'Novas demandas e aprovações' },
+  { id: 'store', label: 'Loja', icon: Store, description: 'Produtos, serviços, imagens, links, códigos, preços e vitrine pública' },
   { id: 'clients', label: 'Clientes', icon: Users, description: 'Cadastro e contatos comerciais' },
   { id: 'projects', label: 'Projetos', icon: FolderOpen, description: 'Prazos, valores e andamento' },
   { id: 'technicians', label: 'Técnicos', icon: Users, description: 'Equipe técnica e especialidades' },
@@ -188,6 +190,17 @@ const defaultSiteContentForm = {
   specifications: '',
   features: '',
   datasheetUrl: '',
+};
+
+const defaultStoreProductForm = {
+  ...defaultSiteContentForm,
+  page: 'lojas',
+  type: 'Produto',
+  status: 'Publicado',
+  currency: 'BRL' as 'BRL' | 'USD',
+  marketplace: 'Loja oficial',
+  category: 'IoT e automação',
+  availability: 'Disponível',
 };
 
 const pageLinks: Record<string, string> = {
