@@ -42,7 +42,9 @@ Se o nome criado pelo Cloudflare for diferente, use exatamente o dominio informa
 
 ## Rotas e atualizacao da pagina
 
-O arquivo `public/_redirects` ja envia todas as rotas para `index.html`. Assim, paginas como `/dashboard`, `/lojas` e `/produtos` continuam funcionando quando o usuario atualiza o navegador.
+O arquivo `wrangler.jsonc` configura `not_found_handling` como `single-page-application`. Assim, paginas como `/dashboard`, `/lojas` e `/produtos` continuam funcionando quando o usuario atualiza o navegador.
+
+Nao use uma regra `/* /index.html 200` em `public/_redirects` junto com essa configuracao. No Cloudflare Workers Static Assets, isso cria um loop infinito de redirecionamento.
 
 ## Dominio proprio
 
