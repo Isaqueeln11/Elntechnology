@@ -7,15 +7,15 @@ const navigationLinks = [
   { label: 'Início', href: '/' },
   { label: 'Loja', href: '/lojas' },
   { label: 'Produtos', href: '/produtos' },
+  { label: 'Equipe', href: '/equipe' },
   { label: 'Projetos', href: '/projetos-desenvolvidos' },
-  { label: 'Notícias', href: '/noticias-inovacoes' },
 ];
 
 const solutionLinks = [
   { label: 'Soluções', href: '/explorar-solucoes' },
   { label: 'Placas PCB', href: '/pcbs' },
   { label: 'Desenvolvimentos', href: '/desenvolvimentos' },
-  { label: 'Equipe', href: '/equipe' },
+  { label: 'Notícias e inovação', href: '/noticias-inovacoes' },
 ];
 
 export default function SiteFooter() {
@@ -36,7 +36,7 @@ export default function SiteFooter() {
               </span>
             </Link>
             <p className={`mt-4 text-sm leading-7 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-              Projetos de eletrônica, IoT, automação, impressão 3D e sistemas digitais desenvolvidos para aplicações reais.
+              Eletrônica, IoT, automação, impressão 3D, firmware OTA e sistemas digitais com atendimento direto.
             </p>
             <a
               href="https://wa.me/5581997092380?text=Olá,%20quero%20falar%20sobre%20um%20projeto."

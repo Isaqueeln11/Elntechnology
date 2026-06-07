@@ -7,6 +7,8 @@ export type StoreProduct = {
   url?: string;
   status?: string;
   price?: string;
+  currency?: 'BRL' | 'USD';
+  marketplace?: string;
   category?: string;
   imageUrl?: string;
   availability?: string;
@@ -16,6 +18,17 @@ export type StoreProduct = {
   features?: string;
   datasheetUrl?: string;
 };
+
+export function formatStorePrice(product: StoreProduct) {
+  const rawPrice = (product.price || '').trim();
+
+  if (!rawPrice) return 'Consulte o valor';
+  if (/^(R\$|US\$|USD|BRL)/i.test(rawPrice)) return rawPrice;
+  if (/orcamento|orçamento|consulte|sob consulta|personalizado/i.test(rawPrice)) return rawPrice;
+
+  const currency = product.currency || 'BRL';
+  return currency === 'USD' ? `US$ ${rawPrice}` : `R$ ${rawPrice}`;
+}
 
 export const sampleStoreProducts: StoreProduct[] = [
   {

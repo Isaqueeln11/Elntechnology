@@ -129,6 +129,8 @@ interface SiteContentRecord extends BaseRecord {
   url?: string;
   status?: string;
   price?: string;
+  currency?: 'BRL' | 'USD';
+  marketplace?: string;
   category?: string;
   imageUrl?: string;
   availability?: string;
@@ -147,7 +149,7 @@ const tabs = [
   { id: 'technicians', label: 'Técnicos', icon: Users, description: 'Equipe técnica e especialidades' },
   { id: 'support', label: 'Suporte', icon: MessageSquare, description: 'Tickets e atendimento' },
   { id: 'documents', label: 'Documentos', icon: FileText, description: 'Links, contratos e arquivos' },
-  { id: 'sitePages', label: 'Páginas do site', icon: MonitorPlay, description: 'Conteúdo publicado nas subpáginas' },
+  { id: 'sitePages', label: 'Loja e Site', icon: MonitorPlay, description: 'Produtos, equipe, loja, notícias e subpáginas públicas' },
   { id: 'billing', label: 'Faturamento', icon: CreditCard, description: 'Valores, vencimentos e status' },
   { id: 'notifications', label: 'Notificações', icon: Bell, description: 'Avisos para clientes e equipe' },
   { id: 'ota', label: 'Códigos OTA', icon: UploadCloud, description: 'Versões e firmware dos equipamentos' },
@@ -174,6 +176,8 @@ const defaultSiteContentForm = {
   url: '',
   status: 'Publicado',
   price: '',
+  currency: 'BRL' as 'BRL' | 'USD',
+  marketplace: '',
   category: '',
   imageUrl: '',
   availability: 'Disponível',
@@ -648,6 +652,8 @@ const AdminDashboard = () => {
       url: item.url || '',
       status: item.status || defaultSiteContentForm.status,
       price: item.price || '',
+      currency: item.currency || defaultSiteContentForm.currency,
+      marketplace: item.marketplace || '',
       category: item.category || '',
       imageUrl: item.imageUrl || '',
       availability: item.availability || defaultSiteContentForm.availability,
@@ -981,10 +987,10 @@ const AdminDashboard = () => {
       <div className={`${panelClass} p-5 sm:p-6`}>
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#159AFD]">Produtos, lojas e conteúdos do site</p>
-            <h3 className="mt-2 text-xl font-black text-slate-950 dark:text-white">Cadastre aqui o que deve aparecer nas páginas públicas.</h3>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#159AFD]">Loja, equipe e páginas públicas</p>
+            <h3 className="mt-2 text-xl font-black text-slate-950 dark:text-white">Cadastre produtos reais, membros da equipe, lojas e publicações.</h3>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500 dark:text-slate-400">
-              Para aparecer em /produtos, escolha a página produtos. Para aparecer em /lojas, escolha a página lojas. O status precisa ficar como Publicado.
+              Produto só aparece na vitrine se estiver salvo no Firebase com página produtos ou lojas e status Publicado.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -1000,27 +1006,27 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="mt-5 rounded-md border border-amber-300/30 bg-amber-400/10 p-4 text-sm leading-6 text-amber-100">
-          <p className="font-black text-amber-50">Se aparecer "sem permissão", a regra publicada no Firebase ainda é a antiga.</p>
-          <p className="mt-1 text-amber-100/90">
+        <div className="mt-5 rounded-md border border-amber-300/40 bg-amber-50 p-4 text-sm leading-6 text-amber-800 dark:border-amber-300/30 dark:bg-amber-400/10 dark:text-amber-100">
+          <p className="font-black text-amber-900 dark:text-amber-50">Se aparecer "sem permissão", a regra publicada no Firebase ainda é a antiga.</p>
+          <p className="mt-1 text-amber-800/90 dark:text-amber-100/90">
             A regra precisa ter `siteContent`, `siteSettings`, `systemEvents` e `isAdmin()` reconhecendo seus emails donos. Use os botões abaixo para copiar e abrir o lugar certo.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <button type="button" onClick={copyFirestoreRules} className="rounded-md bg-[#159AFD] px-4 py-3 font-black text-white transition hover:bg-[#0D0F52]">
               Copiar regras corretas
             </button>
-            <a href={firebaseConsoleRulesUrl} target="_blank" rel="noreferrer" className="rounded-md border border-amber-200/30 px-4 py-3 font-black text-amber-50 transition hover:bg-amber-200/10">
+            <a href={firebaseConsoleRulesUrl} target="_blank" rel="noreferrer" className="rounded-md border border-amber-300/60 px-4 py-3 font-black text-amber-900 transition hover:bg-amber-100 dark:border-amber-200/30 dark:text-amber-50 dark:hover:bg-amber-200/10">
               Abrir regras no Firebase
             </a>
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        <div className="mt-5 grid gap-3 lg:grid-cols-2 xl:grid-cols-4">
           <button
             type="button"
             onClick={() => {
               setEditingSiteContentId(null);
-              setSiteContentForm({ ...defaultSiteContentForm, page: 'produtos', type: 'Produto', category: 'Produtos' });
+              setSiteContentForm({ ...defaultSiteContentForm, page: 'produtos', type: 'Produto', category: 'IoT e automação', currency: 'BRL', marketplace: 'Loja oficial' });
             }}
             className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
           >
@@ -1028,8 +1034,8 @@ const AdminDashboard = () => {
               <PackagePlus className="h-5 w-5" />
             </span>
             <span>
-              <span className="block font-black text-slate-950 dark:text-white">Adicionar produto</span>
-              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Prepara o formulário para publicar na página /produtos.</span>
+              <span className="block font-black text-slate-950 dark:text-white">Cadastrar produto real</span>
+              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Imagem, link de compra, código, valor, ficha técnica e estoque.</span>
             </span>
           </button>
 
@@ -1037,7 +1043,7 @@ const AdminDashboard = () => {
             type="button"
             onClick={() => {
               setEditingSiteContentId(null);
-              setSiteContentForm({ ...defaultSiteContentForm, page: 'lojas', type: 'Loja', category: 'Canal oficial' });
+              setSiteContentForm({ ...defaultSiteContentForm, page: 'lojas', type: 'Loja', category: 'Canal oficial', currency: 'BRL', marketplace: 'WhatsApp' });
             }}
             className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
           >
@@ -1045,8 +1051,25 @@ const AdminDashboard = () => {
               <Store className="h-5 w-5" />
             </span>
             <span>
-              <span className="block font-black text-slate-950 dark:text-white">Adicionar loja</span>
-              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Prepara o formulário para publicar na página /lojas.</span>
+              <span className="block font-black text-slate-950 dark:text-white">Cadastrar loja/canal</span>
+              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Shopee, Mercado Livre, WhatsApp, catálogo ou canal oficial.</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setEditingSiteContentId(null);
+              setSiteContentForm({ ...defaultSiteContentForm, page: 'equipe', type: 'Equipe', category: 'Equipe' });
+            }}
+            className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
+          >
+            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
+              <Users className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block font-black text-slate-950 dark:text-white">Cadastrar membro</span>
+              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Nome, cargo, foto/link e responsabilidades da equipe.</span>
             </span>
           </button>
 
@@ -1118,6 +1141,8 @@ const AdminDashboard = () => {
             url: siteContentForm.url.trim(),
             status: siteContentForm.status || 'Publicado',
             price: siteContentForm.price.trim(),
+            currency: siteContentForm.currency,
+            marketplace: siteContentForm.marketplace.trim(),
             category: siteContentForm.category.trim(),
             imageUrl: siteContentForm.imageUrl.trim(),
             availability: siteContentForm.availability,
@@ -1166,15 +1191,29 @@ const AdminDashboard = () => {
               onChange={(type) => setSiteContentForm({ ...siteContentForm, type })}
               options={siteContentTypeOptions}
             />
-            <Field label="Título" value={siteContentForm.title} onChange={(title) => setSiteContentForm({ ...siteContentForm, title })} />
-            <Field label="Link, documento, imagem ou vídeo" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="https://..." required={false} />
+            <Field
+              label={['produtos', 'lojas'].includes(siteContentForm.page) ? 'Nome do produto, serviço ou loja' : siteContentForm.page === 'equipe' ? 'Nome do membro da equipe' : 'Título'}
+              value={siteContentForm.title}
+              onChange={(title) => setSiteContentForm({ ...siteContentForm, title })}
+            />
+            <Field
+              label={['produtos', 'lojas'].includes(siteContentForm.page) ? 'Link de compra ou contato' : siteContentForm.page === 'equipe' ? 'Link de contato ou perfil' : 'Link, documento, imagem ou vídeo'}
+              value={siteContentForm.url}
+              onChange={(url) => setSiteContentForm({ ...siteContentForm, url })}
+              placeholder={['produtos', 'lojas'].includes(siteContentForm.page) ? 'Shopee, Mercado Livre, WhatsApp, catálogo ou site' : 'https://...'}
+              required={false}
+            />
             {['produtos', 'lojas'].includes(siteContentForm.page) && (
               <div className="grid gap-4 rounded-md border border-[#159AFD]/20 bg-[#159AFD]/5 p-4">
                 <div>
                   <p className="font-bold text-slate-950 dark:text-white">Informações comerciais</p>
                   <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Esses dados aparecem na vitrine da loja.</p>
                 </div>
-                <Field label="Preço ou valor" value={siteContentForm.price} onChange={(price) => setSiteContentForm({ ...siteContentForm, price })} placeholder="Ex.: R$ 249,00 ou Sob orçamento" required={false} />
+                <div className="grid gap-4 sm:grid-cols-[0.45fr_1fr]">
+                  <SelectField label="Moeda padrão" value={siteContentForm.currency} onChange={(currency) => setSiteContentForm({ ...siteContentForm, currency: currency as 'BRL' | 'USD' })} options={['BRL', 'USD']} />
+                  <Field label="Preço ou valor" value={siteContentForm.price} onChange={(price) => setSiteContentForm({ ...siteContentForm, price })} placeholder="Ex.: 25,90, R$ 25,90, US$ 5.00 ou Sob orçamento" required={false} />
+                </div>
+                <Field label="Marketplace ou canal" value={siteContentForm.marketplace} onChange={(marketplace) => setSiteContentForm({ ...siteContentForm, marketplace })} placeholder="Ex.: Shopee, Mercado Livre, WhatsApp, Loja oficial" required={false} />
                 <Field label="Categoria" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: IoT e automação" required={false} />
                 <Field label="URL da imagem do produto" value={siteContentForm.imageUrl} onChange={(imageUrl) => setSiteContentForm({ ...siteContentForm, imageUrl })} placeholder="https://..." required={false} />
                 <Field label="Código ou SKU" value={siteContentForm.sku} onChange={(sku) => setSiteContentForm({ ...siteContentForm, sku })} placeholder="Ex.: ELN-IOT-ESP32" required={false} />
@@ -1191,6 +1230,17 @@ const AdminDashboard = () => {
                     className="h-5 w-5 accent-[#159AFD]"
                   />
                 </label>
+              </div>
+            )}
+            {siteContentForm.page === 'equipe' && (
+              <div className="grid gap-4 rounded-md border border-[#159AFD]/20 bg-[#159AFD]/5 p-4">
+                <div>
+                  <p className="font-bold text-slate-950 dark:text-white">Dados da equipe</p>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Esses dados aparecem na página pública /equipe.</p>
+                </div>
+                <Field label="Cargo ou função" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: Administrador, técnico, parceiro" required={false} />
+                <Field label="URL da foto" value={siteContentForm.imageUrl} onChange={(imageUrl) => setSiteContentForm({ ...siteContentForm, imageUrl })} placeholder="https://..." required={false} />
+                <TextAreaField label="Responsabilidades, uma por linha" value={siteContentForm.features} onChange={(features) => setSiteContentForm({ ...siteContentForm, features })} placeholder={'Atendimento ao cliente\nProjetos eletrônicos\nAtualizações OTA'} />
               </div>
             )}
             <SelectField label="Status" value={siteContentForm.status} onChange={(statusValue) => setSiteContentForm({ ...siteContentForm, status: statusValue })} options={['Publicado', 'Rascunho']} />
@@ -1215,7 +1265,7 @@ const AdminDashboard = () => {
           id: item.id,
           title: item.title || 'Conteúdo sem título',
           subtitle: `${item.page || 'sem página'} - ${item.type || 'Conteúdo'} - ${item.status || 'Publicado'}`,
-          meta: [item.price, item.availability, item.category, item.description || item.url].filter(Boolean).join(' · '),
+          meta: [item.price, item.currency, item.marketplace, item.sku, item.availability, item.category, item.description || item.url].filter(Boolean).join(' · '),
           status: item.status,
           link: item.url,
           actions: [
@@ -1399,7 +1449,7 @@ const AdminDashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="admin-dashboard space-y-6">
         <div className={`${panelClass} overflow-hidden`}>
           <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
             <div className="flex min-w-0 items-start gap-4">

@@ -18,7 +18,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { Link, useParams } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
-import { sampleStoreProducts, type StoreProduct } from '../data/storeCatalog';
+import { formatStorePrice, sampleStoreProducts, type StoreProduct } from '../data/storeCatalog';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
 import SiteFooter from '../components/SiteFooter';
 
@@ -49,6 +49,7 @@ export default function ProductDetailPage() {
   const { isDark, toggleTheme } = useTheme();
   const [product, setProduct] = useState<StoreProduct | null>(() => sampleStoreProducts.find((item) => item.id === productId) || null);
   const [isLoading, setIsLoading] = useState(!sampleStoreProducts.some((item) => item.id === productId));
+  const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
     const fallback = sampleStoreProducts.find((item) => item.id === productId) || null;
@@ -65,6 +66,10 @@ export default function ProductDetailPage() {
     );
     return unsubscribe;
   }, [productId]);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [product?.imageUrl]);
 
   const specs = useMemo(() => specificationRows(product?.specifications), [product?.specifications]);
   const features = useMemo(() => lines(product?.features), [product?.features]);
@@ -117,7 +122,19 @@ export default function ProductDetailPage() {
             <Link to="/lojas" className="inline-flex items-center gap-2 text-sm font-black text-[#159AFD] hover:underline"><ArrowLeft className="h-4 w-4" /> Voltar para produtos</Link>
             <div className="mt-8 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
               <div className={`flex aspect-square items-center justify-center overflow-hidden rounded-md border ${isDark ? 'border-white/10 bg-[#0B102C]' : 'border-slate-200 bg-slate-50'}`}>
-                {product.imageUrl ? <img src={product.imageUrl} alt={product.title || 'Produto ELN Technology'} className="h-full w-full object-contain p-4" /> : <Cpu className="h-24 w-24 text-[#159AFD]" />}
+                {product.imageUrl && !imageFailed ? (
+                  <img
+                    src={product.imageUrl}
+                    alt={product.title || 'Produto ELN Technology'}
+                    onError={() => setImageFailed(true)}
+                    className="h-full w-full object-contain p-4"
+                  />
+                ) : (
+                  <div className="text-center">
+                    <Cpu className="mx-auto h-20 w-20 text-[#159AFD]" />
+                    <p className={`mt-3 px-4 text-xs font-black uppercase tracking-widest ${muted}`}>{product.sku || 'ELN Technology'}</p>
+                  </div>
+                )}
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap gap-2">
@@ -126,7 +143,9 @@ export default function ProductDetailPage() {
                   <span className={`rounded-md px-3 py-1 text-xs font-black uppercase ${product.availability === 'Indisponível' ? 'bg-rose-500/15 text-rose-500' : 'bg-emerald-500/15 text-emerald-500'}`}>{product.availability || 'Disponível'}</span>
                 </div>
                 <h1 className={`mt-5 text-3xl font-black leading-tight sm:text-4xl ${isDark ? 'text-white' : 'text-[#101A2E]'}`}>{product.title}</h1>
-                <p className={`mt-2 text-sm font-bold ${muted}`}>{product.type || 'Produto'} {product.sku ? `· ${product.sku}` : ''}</p>
+                <p className={`mt-2 text-sm font-bold ${muted}`}>
+                  {product.type || 'Produto'} {product.sku ? `· ${product.sku}` : ''} {product.marketplace ? `· ${product.marketplace}` : ''}
+                </p>
                 <p className={`mt-5 text-base leading-8 ${muted}`}>{product.description || 'Produto desenvolvido pela ELN Technology.'}</p>
                 <div className="mt-6 flex flex-wrap gap-2">
                   {specs.slice(0, 4).map((item) => <span key={`${item.label}-${item.value}`} className={`rounded-md border px-3 py-2 text-xs font-black ${isDark ? 'border-white/10 bg-[#0B102C] text-slate-200' : 'border-slate-200 bg-slate-50 text-slate-700'}`}>{item.value}</span>)}
@@ -157,7 +176,7 @@ export default function ProductDetailPage() {
 
           <section id="valor" className={`rounded-md border p-5 sm:p-8 ${panel}`}>
             <div className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div><p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Valor e compra</p><p className={`mt-3 text-3xl font-black ${isDark ? 'text-white' : 'text-[#101A2E]'}`}>{product.price || 'Consulte o valor'}</p><p className={`mt-2 text-sm ${muted}`}>{product.availability || 'Disponível para consulta'}</p></div>
+              <div><p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Valor e compra</p><p className={`mt-3 text-3xl font-black ${isDark ? 'text-white' : 'text-[#101A2E]'}`}>{formatStorePrice(product)}</p><p className={`mt-2 text-sm ${muted}`}>{product.marketplace ? `${product.marketplace} · ` : ''}{product.availability || 'Disponível para consulta'}</p></div>
               <a href={purchaseUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0D0F52] px-6 py-4 font-black text-white hover:bg-[#159AFD] dark:bg-[#159AFD]"><ShoppingCart className="h-5 w-5" /> Comprar ou consultar</a>
             </div>
           </section>

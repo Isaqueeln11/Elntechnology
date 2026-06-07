@@ -24,7 +24,7 @@ import { Link } from 'react-router-dom';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
-import { sampleStoreProducts, type StoreProduct } from '../data/storeCatalog';
+import { formatStorePrice, type StoreProduct } from '../data/storeCatalog';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
 import SiteFooter from '../components/SiteFooter';
 
@@ -101,25 +101,25 @@ const pages: Record<string, PageData> = {
   equipe: {
     key: 'equipe',
     eyebrow: 'Equipe',
-    title: 'Página para apresentar quem faz parte da ELN Technology.',
+    title: 'Equipe ELN Technology: pessoas, responsabilidades e atendimento.',
     description:
-      'Aqui você pode mostrar administrador, técnicos, parceiros e funções de cada pessoa no sistema.',
+      'Conheça quem organiza os projetos, acompanha clientes, configura equipamentos e mantém a evolução técnica da ELN Technology.',
     icon: Users,
-    highlight: 'Espaço para foto, cargo, especialidade, contato interno e atividades de cada técnico.',
+    highlight: 'Equipe cadastrada pelo painel admin, com cargo, especialidade, contato e atividades.',
     sections: [
       {
         title: 'Administração',
-        text: 'Informações do responsável pelo painel, clientes, projetos e configurações.',
-        items: ['Nome', 'Foto', 'Contato', 'Permissões'],
+        text: 'Gestão de clientes, projetos, valores, equipe, entregas, atualizações OTA e comunicação.',
+        items: ['Gestão do painel', 'Atendimento', 'Projetos', 'Entregas'],
       },
       {
-        title: 'Técnicos',
-        text: 'Lista de profissionais que podem receber chamados, tarefas e projetos.',
-        items: ['Especialidade', 'Status', 'Projetos ativos', 'Histórico'],
+        title: 'Técnicos e apoio',
+        text: 'Profissionais e parceiros que podem atuar em manutenção, montagem, testes e suporte.',
+        items: ['Especialidade', 'Contato', 'Atividades', 'Histórico'],
       },
       {
         title: 'Parceiros',
-        text: 'Espaço para colaboradores externos, fornecedores e apoio técnico.',
+        text: 'Fornecedores, colaboradores externos e canais que ajudam em hardware, software e produção.',
         items: ['Empresa', 'Serviço', 'Contato', 'Observações'],
       },
     ],
@@ -300,6 +300,54 @@ const quickLinks = [
   { label: 'Notícias', to: '/noticias-inovacoes', icon: Rocket },
 ];
 
+const defaultTeamMembers: StoreProduct[] = [
+  {
+    id: 'team-admin-isaque',
+    page: 'equipe',
+    type: 'Administrador',
+    title: 'Isaque Domingos Santana Silva',
+    description:
+      'Responsável pela organização do painel administrativo, atendimento aos clientes, projetos, valores, técnicos, atualizações OTA e entregas da ELN Technology.',
+    category: 'Administração',
+    status: 'Publicado',
+    features: 'Painel administrativo\nProjetos e clientes\nAtualizações OTA\nComunicação e entregas',
+  },
+];
+
+function StoreProductVisual({ item, isDark }: { item: StoreProduct; isDark: boolean }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const showImage = Boolean(item.imageUrl) && !imageFailed;
+
+  if (showImage) {
+    return (
+      <img
+        src={item.imageUrl}
+        alt={item.title || 'Produto ELN Technology'}
+        loading="lazy"
+        onError={() => setImageFailed(true)}
+        className="aspect-[16/9] w-full border-b border-white/10 object-cover"
+      />
+    );
+  }
+
+  return (
+    <div className={`flex aspect-[16/9] items-center justify-center border-b ${isDark ? 'border-white/10 bg-[#0D0F52]' : 'border-sky-100 bg-[#EEF7FF]'}`}>
+      <div className="text-center">
+        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-md border border-[#159AFD]/30 bg-[#159AFD]/10 text-[#159AFD]">
+          {item.type === 'Serviço' ? <Wrench className="h-10 w-10" /> : <Package className="h-10 w-10" />}
+        </div>
+        <p className={`mt-3 text-xs font-black uppercase tracking-widest ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+          {item.sku || 'ELN Technology'}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function contentLines(value?: string) {
+  return (value || '').split('\n').map((item) => item.trim()).filter(Boolean);
+}
+
 function CompanyPage({ data }: { data: PageData }) {
   const { isDark, toggleTheme } = useTheme();
   const [contentItems, setContentItems] = useState<StoreProduct[]>([]);
@@ -308,16 +356,22 @@ function CompanyPage({ data }: { data: PageData }) {
   const [storeCategory, setStoreCategory] = useState('Todos');
   const Icon = data.icon;
   const isStorePage = ['lojas', 'produtos'].includes(data.key);
+  const isTeamPage = data.key === 'equipe';
   const publishedItems = useMemo(
     () => contentItems.filter((item) => item.page === data.key && item.status !== 'Rascunho'),
     [contentItems, data.key],
   );
+  const teamItems = useMemo(
+    () => {
+      const publishedTeam = contentItems.filter((item) => item.page === 'equipe' && item.status !== 'Rascunho');
+      return publishedTeam.length ? publishedTeam : defaultTeamMembers;
+    },
+    [contentItems],
+  );
   const storeItems = useMemo(() => {
     if (!isStorePage) return [];
     const items = contentItems.filter((item) => ['lojas', 'produtos'].includes(item.page || '') && item.status !== 'Rascunho');
-    const publishedIds = new Set(items.map((item) => item.id));
-    const products = [...items, ...sampleStoreProducts.filter((item) => !publishedIds.has(item.id))];
-    return products.sort((first, second) => Number(Boolean(second.featured)) - Number(Boolean(first.featured)));
+    return items.sort((first, second) => Number(Boolean(second.featured)) - Number(Boolean(first.featured)));
   }, [contentItems, isStorePage]);
   const storeCategories = useMemo(
     () => ['Todos', ...Array.from(new Set(storeItems.map((item) => item.category).filter((category): category is string => Boolean(category))))],
@@ -327,7 +381,7 @@ function CompanyPage({ data }: { data: PageData }) {
     const query = storeSearch.trim().toLocaleLowerCase('pt-BR');
     return storeItems.filter((item) => {
       const matchesCategory = storeCategory === 'Todos' || item.category === storeCategory;
-      const searchableText = [item.title, item.description, item.type, item.category].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
+      const searchableText = [item.title, item.description, item.type, item.category, item.sku, item.marketplace].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
       return matchesCategory && (!query || searchableText.includes(query));
     });
   }, [storeCategory, storeItems, storeSearch]);
@@ -344,6 +398,11 @@ function CompanyPage({ data }: { data: PageData }) {
         { icon: Activity, label: 'Status por etapa' },
         { icon: Rocket, label: 'Pronto para crescer' },
       ];
+  const displayedPublicItems = isTeamPage ? teamItems : publishedItems;
+  const publicSectionTitle = isTeamPage ? 'Equipe cadastrada' : 'Conteúdos adicionados pelo painel';
+  const publicSectionText = isTeamPage
+    ? 'Membros, funções e responsabilidades que você publicar no admin aparecem aqui.'
+    : 'Esta área vai mostrar os documentos, vídeos, produtos e novidades publicados pela ELN Technology.';
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -447,6 +506,25 @@ function CompanyPage({ data }: { data: PageData }) {
                   <ArrowRight className="h-4 w-4" />
                 </a>
               </aside>
+            ) : isTeamPage ? (
+              <aside className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/10' : 'border-sky-100 bg-[#EEF7FF]'}`}>
+                <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
+                  <Users className="h-7 w-7" />
+                </div>
+                <p className="mt-5 text-xs font-black uppercase tracking-widest text-[#159AFD]">Responsável pelo sistema</p>
+                <h2 className="mt-2 text-2xl font-black">Isaque Domingos Santana Silva</h2>
+                <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                  Administração, clientes, valores, projetos, técnicos, OTA e comunicação direta da ELN Technology.
+                </p>
+                <div className="mt-6 grid gap-3">
+                  {['Painel administrativo', 'Projetos e clientes', 'Produtos e loja', 'Suporte e entregas'].map((step) => (
+                    <div key={step} className={`flex items-center gap-3 rounded-md border p-3 ${isDark ? 'border-white/10 bg-[#070A1F]/60' : 'border-sky-100 bg-white'}`}>
+                      <CheckCircle2 className="h-5 w-5 flex-none text-[#159AFD]" />
+                      <span className="font-bold">{step}</span>
+                    </div>
+                  ))}
+                </div>
+              </aside>
             ) : (
               <aside className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/10' : 'border-sky-100 bg-[#EEF7FF]'}`}>
                 <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
@@ -542,15 +620,7 @@ function CompanyPage({ data }: { data: PageData }) {
                 <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                   {filteredStoreItems.map((item) => (
                     <article key={item.id} className={`flex min-h-64 flex-col overflow-hidden rounded-md border transition ${isDark ? 'border-white/10 bg-[#070A1F]/70 hover:bg-[#070A1F]' : 'border-sky-100 bg-[#F7FBFF] hover:bg-white'}`}>
-                      {item.imageUrl ? (
-                        <img src={item.imageUrl} alt={item.title || 'Produto ELN Technology'} loading="lazy" className="aspect-[16/9] w-full border-b border-white/10 object-cover" />
-                      ) : (
-                        <div className={`flex aspect-[16/9] items-center justify-center border-b ${isDark ? 'border-white/10 bg-[#0D0F52]' : 'border-sky-100 bg-[#EEF7FF]'}`}>
-                          <div className="flex h-20 w-20 items-center justify-center rounded-md border border-[#159AFD]/30 bg-[#159AFD]/10 text-[#159AFD]">
-                            {item.type === 'Serviço' ? <Wrench className="h-10 w-10" /> : <Package className="h-10 w-10" />}
-                          </div>
-                        </div>
-                      )}
+                      <StoreProductVisual item={item} isDark={isDark} />
                       <div className="flex flex-1 flex-col p-5">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#159AFD] text-white">
@@ -569,11 +639,17 @@ function CompanyPage({ data }: { data: PageData }) {
                         </div>
                       </div>
                       <h3 className={`mt-5 text-xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{item.title}</h3>
+                      {(item.sku || item.marketplace) && (
+                        <div className={`mt-3 grid gap-2 rounded-md border p-3 text-xs font-bold ${isDark ? 'border-white/10 bg-white/[0.035] text-slate-300' : 'border-sky-100 bg-white text-slate-600'}`}>
+                          {item.sku && <span>Código: {item.sku}</span>}
+                          {item.marketplace && <span>Canal: {item.marketplace}</span>}
+                        </div>
+                      )}
                       <p className={`mt-3 flex-1 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.description}</p>
                       <div className="mt-5 flex flex-wrap items-end justify-between gap-3 border-t border-slate-200 pt-4 dark:border-white/10">
                         <div>
                           <p className="text-xs font-black uppercase text-slate-500">Valor</p>
-                          <p className={`mt-1 text-lg font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{item.price || 'Consulte o valor'}</p>
+                          <p className={`mt-1 text-lg font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{formatStorePrice(item)}</p>
                         </div>
                         <span className={`rounded-md px-3 py-2 text-xs font-black ${
                           item.availability === 'Indisponível'
@@ -589,7 +665,7 @@ function CompanyPage({ data }: { data: PageData }) {
                         rel="noreferrer"
                         className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 font-black text-white transition hover:bg-[#0D0F52]"
                       >
-                        Comprar ou consultar
+                        {item.url ? 'Abrir link de compra' : 'Comprar ou consultar'}
                         <ArrowRight className="h-4 w-4" />
                       </a>
                       <Link
@@ -607,8 +683,10 @@ function CompanyPage({ data }: { data: PageData }) {
                   {filteredStoreItems.length === 0 && (
                     <div className={`rounded-md border p-8 text-center md:col-span-2 lg:col-span-3 ${isDark ? 'border-white/10 bg-[#070A1F]/70' : 'border-sky-100 bg-[#F7FBFF]'}`}>
                       <Search className="mx-auto h-8 w-8 text-[#159AFD]" />
-                      <p className="mt-4 font-black">Nenhum item encontrado.</p>
-                      <p className={`mt-2 text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>Tente outra busca ou selecione a categoria Todos.</p>
+                      <p className="mt-4 font-black">Nenhum produto real publicado ainda.</p>
+                      <p className={`mt-2 text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                        Entre no painel admin, abra Loja e Site, clique em Cadastrar produto real e salve com status Publicado.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -650,11 +728,11 @@ function CompanyPage({ data }: { data: PageData }) {
               <div>
                 <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Publicado pelo admin</p>
                 <h2 className={`mt-2 text-2xl font-black sm:text-3xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
-                  Conteúdos adicionados pelo painel
+                  {publicSectionTitle}
                 </h2>
               </div>
-              <Link to="/noticias-inovacoes" className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
-                Ver notícias
+              <Link to={isTeamPage ? '/#contato' : '/noticias-inovacoes'} className="inline-flex items-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
+                {isTeamPage ? 'Falar com a equipe' : 'Ver notícias'}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -663,18 +741,18 @@ function CompanyPage({ data }: { data: PageData }) {
               <div className={`rounded-md border p-6 ${isDark ? 'border-rose-400/30 bg-rose-500/10 text-rose-100' : 'border-rose-200 bg-rose-50 text-rose-700'}`}>
                 <p className="font-black">{loadError}</p>
               </div>
-            ) : publishedItems.length === 0 ? (
+            ) : displayedPublicItems.length === 0 ? (
               <div className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
                 <p className="font-black">Nenhum conteúdo publicado ainda.</p>
                 <p className={`mt-2 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                  Esta área vai mostrar os documentos, vídeos, produtos e novidades publicados pela ELN Technology.
+                  {publicSectionText}
                 </p>
               </div>
             ) : (
               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                {publishedItems.map((item) => (
+                {displayedPublicItems.map((item) => (
                   <article key={item.id} className={`overflow-hidden rounded-md border ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
-                    {item.imageUrl && <img src={item.imageUrl} alt={item.title || 'Conteúdo ELN Technology'} loading="lazy" className="aspect-[16/9] w-full border-b border-white/10 object-cover" />}
+                    {item.imageUrl && <StoreProductVisual item={item} isDark={isDark} />}
                     <div className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <span className="rounded-md bg-[#159AFD]/15 px-3 py-1 text-xs font-black uppercase text-[#159AFD]">
@@ -685,8 +763,22 @@ function CompanyPage({ data }: { data: PageData }) {
                       </span>
                     </div>
                     <h3 className="mt-4 text-xl font-black">{item.title || 'Sem título'}</h3>
+                    {(item.sku || item.marketplace) && (
+                      <p className={`mt-2 text-xs font-bold uppercase tracking-wide ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                        {[item.sku, item.marketplace].filter(Boolean).join(' · ')}
+                      </p>
+                    )}
                     <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.description || 'Sem descrição.'}</p>
-                    {item.price && <p className="mt-4 text-lg font-black text-[#159AFD]">{item.price}</p>}
+                    {contentLines(item.features).length > 0 && (
+                      <div className="mt-4 grid gap-2">
+                        {contentLines(item.features).slice(0, 4).map((feature) => (
+                          <span key={feature} className={`rounded-md px-3 py-2 text-sm font-bold ${isDark ? 'bg-[#070A1F] text-slate-200' : 'bg-[#EEF7FF] text-[#0D0F52]'}`}>
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {item.price && <p className="mt-4 text-lg font-black text-[#159AFD]">{formatStorePrice(item)}</p>}
                     {item.url && (
                       <a href={item.url} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-black text-[#159AFD] hover:underline">
                         Abrir link

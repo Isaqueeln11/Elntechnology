@@ -570,10 +570,14 @@ function HomePage() {
               </p>
               <div className={`mt-8 rounded-md border p-5 shadow-sm ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white'}`}>
                 <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">{t.admin}</p>
-                <h3 className={`mt-2 text-2xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>Isaque Domingos Santana Silva</h3>
+                <h3 className={`mt-2 text-2xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>Gestão técnica e atendimento direto</h3>
                 <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                   {t.adminText}
                 </p>
+                <Link to="/equipe" className="mt-4 inline-flex items-center gap-2 text-sm font-black text-[#159AFD] hover:underline">
+                  Conhecer equipe
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
             </div>
 

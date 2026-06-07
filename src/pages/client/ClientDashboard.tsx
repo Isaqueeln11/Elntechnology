@@ -245,6 +245,24 @@ function ClientDashboard() {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
+      try {
+        const typedData = data as { title?: string; type?: string; message?: string; notes?: string };
+        const isOrder = collectionName === 'orders';
+        await addDoc(collection(db, 'notifications'), {
+          title: isOrder ? 'Nova solicitação de cliente' : 'Novo ticket de suporte',
+          message: `${user.name} (${user.email}) enviou ${isOrder ? 'uma solicitação' : 'um ticket'}: ${typedData.title || typedData.type || 'Sem título'}. ${typedData.notes || typedData.message || ''}`.trim(),
+          target: 'Admin',
+          status: 'Nova',
+          type: isOrder ? 'client-order' : 'client-support',
+          userId: user.id,
+          ownerId: user.id,
+          clientEmail: user.email.toLowerCase(),
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      } catch {
+        // O pedido principal foi salvo; a notificação depende das regras publicadas.
+      }
       setStatus(successMessage);
     } catch {
       setStatus('Não foi possível salvar. Publique as regras atualizadas do Firestore e tente novamente.');
@@ -538,7 +556,7 @@ function ClientDashboard() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="client-dashboard space-y-6">
         <header className={`${panelClass} flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between`}>
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 flex-none items-center justify-center rounded-md bg-[#159AFD]/15 text-[#159AFD]"><CurrentIcon className="h-6 w-6" /></div>

@@ -79,6 +79,33 @@ textarea:focus-visible {
   color: #172033;
 }
 
+.dashboard-light .admin-dashboard,
+.dashboard-light .client-dashboard {
+  color: #172033;
+}
+
+.dashboard-light .admin-dashboard input,
+.dashboard-light .admin-dashboard select,
+.dashboard-light .admin-dashboard textarea,
+.dashboard-light .client-dashboard input,
+.dashboard-light .client-dashboard select,
+.dashboard-light .client-dashboard textarea {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.dashboard-light .admin-dashboard input::placeholder,
+.dashboard-light .admin-dashboard textarea::placeholder,
+.dashboard-light .client-dashboard input::placeholder,
+.dashboard-light .client-dashboard textarea::placeholder {
+  color: #64748b !important;
+}
+
+.dashboard-light .admin-dashboard article,
+.dashboard-light .client-dashboard article {
+  color: #172033;
+}
+
 .dashboard-light .technician-dashboard [class*="bg-gradient-to-br"] {
   border-color: #d8e2ec !important;
   background: #ffffff !important;
