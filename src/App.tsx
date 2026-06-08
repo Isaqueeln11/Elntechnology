@@ -64,8 +64,8 @@ const navLinks = [
   { label: 'Sobre', href: '#sobre' },
   { label: 'Áreas', href: '#areas' },
   { label: 'Soluções', href: '#servicos' },
-  { label: 'Estudos', href: '/estudos' },
   { label: 'Contato', href: '#contato' },
+  { label: 'Estudos', href: '/estudos' },
   { label: 'Loja', href: '/lojas' },
 ];
 

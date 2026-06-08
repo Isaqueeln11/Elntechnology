@@ -333,8 +333,8 @@ const subpageNavLinks = [
   { label: 'Sobre', to: '/#sobre' },
   { label: 'Áreas', to: '/#areas' },
   { label: 'Soluções', to: '/#servicos' },
-  { label: 'Estudos', to: '/estudos' },
   { label: 'Contato', to: '/#contato' },
+  { label: 'Estudos', to: '/estudos' },
   { label: 'Loja', to: '/lojas' },
 ];
 
