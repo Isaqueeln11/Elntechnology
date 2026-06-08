@@ -176,6 +176,7 @@ const defaultAreasSectionForm = {
 
 const sitePageOptions = ['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'estudos', 'produtos', 'lojas', 'videos', 'noticias'];
 const siteContentTypeOptions = ['Projeto', 'Documento', 'Vídeo', 'Estudo', 'Produto', 'Loja', 'Melhoria', 'Equipe', 'Atividade', 'Notícia', 'Inovação', 'Link'];
+const marketplaceChannelOptions = ['Loja oficial', 'WhatsApp', 'Shopee', 'Mercado Livre', 'AliExpress', 'Instagram', 'Site oficial', 'Catálogo externo', 'Outro canal'];
 const defaultSiteContentForm = {
   page: 'projetos',
   type: 'Projeto',
@@ -673,8 +674,11 @@ const AdminDashboard = () => {
   }
 
   function buildSiteContentPayload() {
+    const normalizedPage = siteContentForm.page.trim().toLowerCase();
+    const normalizedMarketplace = siteContentForm.marketplace.trim() || (['produtos', 'lojas'].includes(normalizedPage) ? 'Loja oficial' : '');
+
     return {
-      page: siteContentForm.page.trim().toLowerCase(),
+      page: normalizedPage,
       type: siteContentForm.type.trim(),
       title: siteContentForm.title.trim(),
       description: siteContentForm.description.trim(),
@@ -682,7 +686,7 @@ const AdminDashboard = () => {
       status: siteContentForm.status || 'Publicado',
       price: siteContentForm.price.trim(),
       currency: siteContentForm.currency,
-      marketplace: siteContentForm.marketplace.trim(),
+      marketplace: normalizedMarketplace,
       category: siteContentForm.category.trim(),
       imageUrl: siteContentForm.imageUrl.trim(),
       availability: siteContentForm.availability,
@@ -1142,7 +1146,7 @@ const AdminDashboard = () => {
             <Field label="Link de compra ou atendimento" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="Shopee, Mercado Livre, WhatsApp, catálogo ou site" required={false} />
             <Field label="Código/SKU do produto" value={siteContentForm.sku} onChange={(sku) => setSiteContentForm({ ...siteContentForm, sku })} placeholder="Ex.: ESP32-S3-001" required={false} />
             <Field label="Categoria" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: IoT e automação" required={false} />
-            <Field label="Marketplace ou canal" value={siteContentForm.marketplace} onChange={(marketplace) => setSiteContentForm({ ...siteContentForm, marketplace })} placeholder="Ex.: Shopee, Mercado Livre, Loja oficial" required={false} />
+            <SelectField label="Marketplace ou canal" value={siteContentForm.marketplace || 'Loja oficial'} onChange={(marketplace) => setSiteContentForm({ ...siteContentForm, marketplace })} options={marketplaceChannelOptions} />
             {marketplaceNotice({ id: editingSiteContentId || 'preview', ...siteContentForm }) && (
               <p className="rounded-md border border-amber-300/50 bg-amber-400/10 p-3 text-xs font-bold leading-5 text-amber-700 dark:border-amber-300/25 dark:text-amber-100">
                 Esse item sera marcado na loja como marketplace externo, com aviso para conferir vendedor, prazo, frete, garantia e politicas da plataforma.
@@ -1427,7 +1431,7 @@ const AdminDashboard = () => {
                   <SelectField label="Moeda padrão" value={siteContentForm.currency} onChange={(currency) => setSiteContentForm({ ...siteContentForm, currency: currency as 'BRL' | 'USD' })} options={['BRL', 'USD']} />
                   <Field label="Preço ou valor" value={siteContentForm.price} onChange={(price) => setSiteContentForm({ ...siteContentForm, price })} placeholder="Ex.: 25,90, R$ 25,90, US$ 5.00 ou Sob orçamento" required={false} />
                 </div>
-                <Field label="Marketplace ou canal" value={siteContentForm.marketplace} onChange={(marketplace) => setSiteContentForm({ ...siteContentForm, marketplace })} placeholder="Ex.: Shopee, Mercado Livre, WhatsApp, Loja oficial" required={false} />
+                <SelectField label="Marketplace ou canal" value={siteContentForm.marketplace || 'Loja oficial'} onChange={(marketplace) => setSiteContentForm({ ...siteContentForm, marketplace })} options={marketplaceChannelOptions} />
                 {marketplaceNotice({ id: editingSiteContentId || 'preview', ...siteContentForm }) && (
                   <p className="rounded-md border border-amber-300/50 bg-amber-400/10 p-3 text-xs font-bold leading-5 text-amber-700 dark:border-amber-300/25 dark:text-amber-100">
                     Esse item sera exibido com aviso de marketplace externo. Use quando o link for Shopee, Mercado Livre ou AliExpress.
