@@ -289,6 +289,37 @@ service cloud.firestore {
         && request.resource.data.get("clientEmail", "") == request.auth.token.email;
     }
 
+    function isPublicOrderRequest() {
+      return request.resource.data.keys().hasOnly([
+          "title",
+          "type",
+          "description",
+          "goals",
+          "requirements",
+          "notes",
+          "deadline",
+          "budget",
+          "client",
+          "company",
+          "clientEmail",
+          "phone",
+          "attachments",
+          "source",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 2
+        && request.resource.data.type is string
+        && request.resource.data.notes is string
+        && request.resource.data.clientEmail is string
+        && request.resource.data.phone is string
+        && request.resource.data.status == "Novo"
+        && request.resource.data.source == "site-iniciar-projeto"
+        && request.resource.data.attachments is list;
+    }
+
     function canReceiveNotification(data) {
       return signedIn()
         && (
@@ -371,7 +402,7 @@ service cloud.firestore {
 
     match /orders/{orderId} {
       allow read: if isAdmin() || ownsRecord(resource.data);
-      allow create: if isAdmin() || createsOwnRecord();
+      allow create: if isAdmin() || createsOwnRecord() || isPublicOrderRequest();
       allow update, delete: if isAdmin();
     }
 
@@ -479,7 +510,7 @@ function firestoreErrorMessage(error: unknown, action = 'salvar') {
   const code = typeof error === 'object' && error && 'code' in error ? String(error.code) : '';
 
   if (code === 'permission-denied') {
-    return `Sem permissão para ${action}. Confira se sua conta está como admin e se as regras do Firestore liberam siteContent, siteSettings e systemEvents.`;
+    return `Sem permissão para ${action}. Confira se sua conta está como admin e se as regras do Firestore liberam siteContent, siteSettings, systemEvents e orders.`;
   }
 
   if (code === 'unavailable' || code === 'deadline-exceeded') {
@@ -1272,7 +1303,7 @@ const AdminDashboard = () => {
         <div className="admin-rules-warning mt-5 rounded-md border p-4 text-sm leading-6">
           <p className="admin-rules-warning-title font-black">Se aparecer "sem permissão", a regra publicada no Firebase ainda é a antiga.</p>
           <p className="admin-rules-warning-text mt-1">
-            A regra precisa ter `siteContent`, `siteSettings`, `systemEvents` e `isAdmin()` reconhecendo seus emails donos. Use os botões abaixo para copiar e abrir o lugar certo.
+            A regra precisa ter `siteContent`, `siteSettings`, `systemEvents`, `orders` e `isAdmin()` reconhecendo seus emails donos. Use os botões abaixo para copiar e abrir o lugar certo.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <button type="button" onClick={copyFirestoreRules} className="rounded-md bg-[#159AFD] px-4 py-3 font-black text-white transition hover:bg-[#0D0F52]">
@@ -1633,7 +1664,7 @@ const AdminDashboard = () => {
         id: order.id,
         title: order.title || 'Pedido sem título',
         subtitle: `${order.client || 'Sem cliente'} - ${order.type || 'Novo projeto'}`,
-        meta: order.budget || 'R$ 0,00',
+        meta: [order.budget || 'R$ 0,00', order.notes].filter(Boolean).join(' | '),
         status: order.status,
         actions: [
           { label: 'Aprovar', onClick: () => changeStatus('orders', order.id, 'Aprovado') },

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Upload, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 
 export default function IniciarProjeto() {
@@ -25,6 +25,13 @@ export default function IniciarProjeto() {
   const [enviando, setEnviando] = useState(false);
   const [erroEnvio, setErroEnvio] = useState('');
 
+  const projectTypeLabels: Record<string, string> = {
+    iot: 'IoT',
+    robotica: 'Robótica',
+    automacao: 'Automação',
+    educacional: 'Educacional',
+  };
+
   const formatCurrency = (value: string) => {
     return (
       'R$ ' +
@@ -45,16 +52,36 @@ export default function IniciarProjeto() {
     try {
       setEnviando(true);
       setErroEnvio('');
-      // Remove the anexos field as File objects can't be stored in Firestore
-      const { orcamento, ...formDataWithoutFiles } = formData;
-      const formDataToSend = {
-        ...formDataWithoutFiles,
-        anexos: formData.anexos.map((file) => file.name),
-        orcamento: orcamento.replace('R$ ', ''),
+      const details = [
+        `Descrição: ${formData.descricao.trim()}`,
+        `Objetivos: ${formData.objetivos.trim()}`,
+        `Requisitos: ${formData.requisitos.trim()}`,
+        `Prazo desejado: ${formData.prazo.trim()}`,
+        `Telefone: ${formData.telefone.trim()}`,
+        formData.anexos.length ? `Anexos informados: ${formData.anexos.map((file) => file.name).join(', ')}` : '',
+      ].filter(Boolean).join(' | ');
+
+      const projectRequest = {
+        title: formData.nome.trim(),
+        type: projectTypeLabels[formData.tipo] || formData.tipo,
+        description: formData.descricao.trim(),
+        goals: formData.objetivos.trim(),
+        requirements: formData.requisitos.trim(),
+        notes: details,
+        deadline: formData.prazo.trim(),
+        budget: formData.orcamento.trim() || 'A definir',
+        client: formData.empresa.trim() || 'Visitante do site',
+        company: formData.empresa.trim(),
+        clientEmail: formData.email.trim().toLowerCase(),
+        phone: formData.telefone.trim(),
+        attachments: formData.anexos.map((file) => file.name),
+        source: 'site-iniciar-projeto',
+        status: 'Novo',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       };
 
-      // Add the document to Firestore
-      await addDoc(collection(db, 'projetos'), formDataToSend);
+      await addDoc(collection(db, 'orders'), projectRequest);
 
       setEnviado(true);
       setTimeout(() => {
@@ -62,7 +89,7 @@ export default function IniciarProjeto() {
         navigate('/');
       }, 3000);
     } catch {
-      setErroEnvio('Ocorreu um erro ao enviar o projeto. Verifique sua conexao e tente novamente.');
+      setErroEnvio('Nao foi possivel enviar a solicitacao. Confira a internet e publique as regras atualizadas do Firestore para liberar pedidos do site.');
     } finally {
       setEnviando(false);
     }
@@ -361,6 +388,9 @@ export default function IniciarProjeto() {
 
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-8">Iniciar Projeto</h1>
+        <p className="mb-6 max-w-3xl text-sm leading-6 text-gray-300">
+          Os dados enviados aqui aparecem no painel administrativo em Pedidos para analise e contato.
+        </p>
 
         {enviado ? (
           <div className="bg-green-500/20 border border-green-500 rounded-lg p-8 text-center">
