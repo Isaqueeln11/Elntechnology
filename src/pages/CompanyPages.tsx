@@ -25,7 +25,7 @@ import { Link } from 'react-router-dom';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
-import { formatStorePrice, isDemoStoreProduct, type StoreProduct } from '../data/storeCatalog';
+import { formatStorePrice, isDemoStoreProduct, marketplaceNotice, type StoreProduct } from '../data/storeCatalog';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
 import SiteFooter from '../components/SiteFooter';
 
@@ -676,6 +676,11 @@ function CompanyPage({ data }: { data: PageData }) {
                         <div className={`mt-3 grid gap-2 rounded-md border p-3 text-xs font-bold ${isDark ? 'border-white/10 bg-white/[0.035] text-slate-300' : 'border-sky-100 bg-white text-slate-600'}`}>
                           {item.sku && <span>Código: {item.sku}</span>}
                           {item.marketplace && <span>Canal: {item.marketplace}</span>}
+                        </div>
+                      )}
+                      {marketplaceNotice(item) && (
+                        <div className={`mt-3 rounded-md border p-3 text-xs font-bold leading-5 ${isDark ? 'border-amber-300/25 bg-amber-400/10 text-amber-100' : 'border-amber-200 bg-amber-50 text-amber-800'}`}>
+                          {marketplaceNotice(item)}
                         </div>
                       )}
                       <p className={`mt-3 flex-1 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.description}</p>

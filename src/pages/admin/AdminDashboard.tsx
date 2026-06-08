@@ -25,7 +25,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import type { UserPreferences } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { db } from '../../firebase';
-import { formatStorePrice } from '../../data/storeCatalog';
+import { formatStorePrice, marketplaceNotice } from '../../data/storeCatalog';
 import DashboardLayout from '../../components/DashboardLayout';
 import OtaAdminPanel from '../../components/OtaAdminPanel';
 
@@ -142,12 +142,16 @@ interface SiteContentRecord extends BaseRecord {
   specifications?: string;
   features?: string;
   datasheetUrl?: string;
+  technicalContent?: string;
+  pinout?: string;
+  setupGuide?: string;
+  relatedProducts?: string;
 }
 
 const tabs = [
   { id: 'overview', label: 'Visão Geral', icon: BarChart3, description: 'Resumo operacional do sistema' },
   { id: 'orders', label: 'Pedidos', icon: PackagePlus, description: 'Novas demandas e aprovações' },
-  { id: 'store', label: 'Loja', icon: Store, description: 'Produtos, serviços, imagens, links, códigos, preços e vitrine pública' },
+  { id: 'store', label: 'Produtos da loja', icon: Store, description: 'Produtos, serviços, imagens, links, códigos, preços e vitrine pública' },
   { id: 'clients', label: 'Clientes', icon: Users, description: 'Cadastro e contatos comerciais' },
   { id: 'projects', label: 'Projetos', icon: FolderOpen, description: 'Prazos, valores e andamento' },
   { id: 'technicians', label: 'Técnicos', icon: Users, description: 'Equipe técnica e especialidades' },
@@ -190,6 +194,10 @@ const defaultSiteContentForm = {
   specifications: '',
   features: '',
   datasheetUrl: '',
+  technicalContent: '',
+  pinout: '',
+  setupGuide: '',
+  relatedProducts: '',
 };
 
 const defaultStoreProductForm = {
@@ -683,6 +691,10 @@ const AdminDashboard = () => {
       specifications: siteContentForm.specifications.trim(),
       features: siteContentForm.features.trim(),
       datasheetUrl: siteContentForm.datasheetUrl.trim(),
+      technicalContent: siteContentForm.technicalContent.trim(),
+      pinout: siteContentForm.pinout.trim(),
+      setupGuide: siteContentForm.setupGuide.trim(),
+      relatedProducts: siteContentForm.relatedProducts.trim(),
     };
   }
 
@@ -748,6 +760,10 @@ const AdminDashboard = () => {
       specifications: item.specifications || '',
       features: item.features || '',
       datasheetUrl: item.datasheetUrl || '',
+      technicalContent: item.technicalContent || '',
+      pinout: item.pinout || '',
+      setupGuide: item.setupGuide || '',
+      relatedProducts: item.relatedProducts || '',
     });
     setStatus(`Editando: ${item.title || 'conteúdo sem título'}.`);
   }
@@ -1127,6 +1143,11 @@ const AdminDashboard = () => {
             <Field label="Código/SKU do produto" value={siteContentForm.sku} onChange={(sku) => setSiteContentForm({ ...siteContentForm, sku })} placeholder="Ex.: ESP32-S3-001" required={false} />
             <Field label="Categoria" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: IoT e automação" required={false} />
             <Field label="Marketplace ou canal" value={siteContentForm.marketplace} onChange={(marketplace) => setSiteContentForm({ ...siteContentForm, marketplace })} placeholder="Ex.: Shopee, Mercado Livre, Loja oficial" required={false} />
+            {marketplaceNotice({ id: editingSiteContentId || 'preview', ...siteContentForm }) && (
+              <p className="rounded-md border border-amber-300/50 bg-amber-400/10 p-3 text-xs font-bold leading-5 text-amber-700 dark:border-amber-300/25 dark:text-amber-100">
+                Esse item sera marcado na loja como marketplace externo, com aviso para conferir vendedor, prazo, frete, garantia e politicas da plataforma.
+              </p>
+            )}
             <SelectField label="Disponibilidade" value={siteContentForm.availability} onChange={(availability) => setSiteContentForm({ ...siteContentForm, availability })} options={['Disponível', 'Sob encomenda', 'Sob consulta', 'Indisponível']} />
             <SelectField label="Status" value={siteContentForm.status} onChange={(statusValue) => setSiteContentForm({ ...siteContentForm, status: statusValue })} options={['Publicado', 'Rascunho']} />
             <Field label="Link do datasheet/manual" value={siteContentForm.datasheetUrl} onChange={(datasheetUrl) => setSiteContentForm({ ...siteContentForm, datasheetUrl })} placeholder="https://..." required={false} />
@@ -1157,7 +1178,7 @@ const AdminDashboard = () => {
           id: item.id,
           title: item.title || 'Produto sem título',
           subtitle: `${item.page || 'lojas'} - ${item.category || item.type || 'Produto'} - ${item.status || 'Publicado'}`,
-          meta: [formatStorePrice(item), item.sku, item.marketplace, item.availability].filter(Boolean).join(' · '),
+          meta: [formatStorePrice(item), item.sku, item.marketplace, marketplaceNotice(item) ? 'Marketplace externo' : '', item.availability].filter(Boolean).join(' · '),
           status: item.status,
           link: item.url,
           actions: [
@@ -1344,25 +1365,7 @@ const AdminDashboard = () => {
         title={editingSiteContentId ? 'Editar conteúdo público' : 'Adicionar conteúdo público'}
         onSubmit={async (event) => {
           event.preventDefault();
-          const nextContent = {
-            page: siteContentForm.page.trim().toLowerCase(),
-            type: siteContentForm.type.trim(),
-            title: siteContentForm.title.trim(),
-            description: siteContentForm.description.trim(),
-            url: siteContentForm.url.trim(),
-            status: siteContentForm.status || 'Publicado',
-            price: siteContentForm.price.trim(),
-            currency: siteContentForm.currency,
-            marketplace: siteContentForm.marketplace.trim(),
-            category: siteContentForm.category.trim(),
-            imageUrl: siteContentForm.imageUrl.trim(),
-            availability: siteContentForm.availability,
-            featured: siteContentForm.featured,
-            sku: siteContentForm.sku.trim(),
-            specifications: siteContentForm.specifications.trim(),
-            features: siteContentForm.features.trim(),
-            datasheetUrl: siteContentForm.datasheetUrl.trim(),
-          };
+          const nextContent = buildSiteContentPayload();
 
           if (!nextContent.title) {
             setStatus('Informe um título para salvar o conteúdo.');
@@ -1425,6 +1428,11 @@ const AdminDashboard = () => {
                   <Field label="Preço ou valor" value={siteContentForm.price} onChange={(price) => setSiteContentForm({ ...siteContentForm, price })} placeholder="Ex.: 25,90, R$ 25,90, US$ 5.00 ou Sob orçamento" required={false} />
                 </div>
                 <Field label="Marketplace ou canal" value={siteContentForm.marketplace} onChange={(marketplace) => setSiteContentForm({ ...siteContentForm, marketplace })} placeholder="Ex.: Shopee, Mercado Livre, WhatsApp, Loja oficial" required={false} />
+                {marketplaceNotice({ id: editingSiteContentId || 'preview', ...siteContentForm }) && (
+                  <p className="rounded-md border border-amber-300/50 bg-amber-400/10 p-3 text-xs font-bold leading-5 text-amber-700 dark:border-amber-300/25 dark:text-amber-100">
+                    Esse item sera exibido com aviso de marketplace externo. Use quando o link for Shopee, Mercado Livre ou AliExpress.
+                  </p>
+                )}
                 <Field label="Categoria" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: IoT e automação" required={false} />
                 <Field label="URL da imagem do produto" value={siteContentForm.imageUrl} onChange={(imageUrl) => setSiteContentForm({ ...siteContentForm, imageUrl })} placeholder="https://..." required={false} />
                 <Field label="Código ou SKU" value={siteContentForm.sku} onChange={(sku) => setSiteContentForm({ ...siteContentForm, sku })} placeholder="Ex.: ELN-IOT-ESP32" required={false} />
@@ -1466,6 +1474,10 @@ const AdminDashboard = () => {
                 <Field label="Datasheet ou manual" value={siteContentForm.datasheetUrl} onChange={(datasheetUrl) => setSiteContentForm({ ...siteContentForm, datasheetUrl })} placeholder="https://..." required={false} />
                 <TextAreaField label="Especificações, uma por linha" value={siteContentForm.specifications} onChange={(specifications) => setSiteContentForm({ ...siteContentForm, specifications })} placeholder={'Chip: ESP32-S3\nCPU: 240 MHz\nFlash: 4 MB\nUSB: USB-C\nDimensões: 18 x 23,5 mm'} />
                 <TextAreaField label="Configuração, testes e notas, uma por linha" value={siteContentForm.features} onChange={(features) => setSiteContentForm({ ...siteContentForm, features })} placeholder={'IDE: Arduino IDE\nBiblioteca: ESP32 by Espressif\nTeste: blink no LED interno\nObservação: conferir tensão antes de alimentar'} />
+                <TextAreaField label="Conteúdo detalhado do estudo" value={siteContentForm.technicalContent} onChange={(technicalContent) => setSiteContentForm({ ...siteContentForm, technicalContent })} placeholder={'Resumo do que foi estudado\nAplicações reais\nPontos fortes\nLimitações encontradas'} />
+                <TextAreaField label="Pinagem e ligações, uma por linha" value={siteContentForm.pinout} onChange={(pinout) => setSiteContentForm({ ...siteContentForm, pinout })} placeholder={'GPIO 2: LED interno\n5V: alimentação USB\nGND: terra\nSDA/SCL: barramento I2C'} />
+                <TextAreaField label="Guia de configuração, uma etapa por linha" value={siteContentForm.setupGuide} onChange={(setupGuide) => setSiteContentForm({ ...siteContentForm, setupGuide })} placeholder={'Instalar Arduino IDE\nAdicionar pacote ESP32 da Espressif\nSelecionar a placa correta\nEnviar sketch de teste'} />
+                <TextAreaField label="Produtos, placas ou módulos relacionados" value={siteContentForm.relatedProducts} onChange={(relatedProducts) => setSiteContentForm({ ...siteContentForm, relatedProducts })} placeholder={'ESP32-S3 Super Mini\nDisplay OLED 0.96\nSensor de temperatura\nFonte 5V'} />
               </div>
             )}
             <SelectField label="Status" value={siteContentForm.status} onChange={(statusValue) => setSiteContentForm({ ...siteContentForm, status: statusValue })} options={['Publicado', 'Rascunho']} />

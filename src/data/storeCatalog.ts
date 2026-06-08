@@ -17,6 +17,10 @@ export type StoreProduct = {
   specifications?: string;
   features?: string;
   datasheetUrl?: string;
+  technicalContent?: string;
+  pinout?: string;
+  setupGuide?: string;
+  relatedProducts?: string;
 };
 
 export function formatStorePrice(product: StoreProduct) {
@@ -68,6 +72,20 @@ export function isDemoStoreProduct(product: StoreProduct) {
   const title = (product.title || '').trim().toLocaleLowerCase('pt-BR');
 
   return demoIds.has(id) || demoSkus.has(sku) || demoTitles.includes(title);
+}
+
+export function isThirdPartyMarketplace(product: StoreProduct) {
+  const source = [product.marketplace, product.url]
+    .filter(Boolean)
+    .join(' ')
+    .toLocaleLowerCase('pt-BR');
+
+  return /shopee|mercado\s*livre|mercadolivre|aliexpress|ali\s*express/.test(source);
+}
+
+export function marketplaceNotice(product: StoreProduct) {
+  if (!isThirdPartyMarketplace(product)) return '';
+  return 'Produto anunciado em marketplace externo. Confira vendedor, prazo, frete, garantia e políticas da plataforma antes de comprar.';
 }
 
 export const sampleStoreProducts: StoreProduct[] = [

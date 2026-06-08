@@ -18,7 +18,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { Link, useParams } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
-import { formatStorePrice, isDemoStoreProduct, type StoreProduct } from '../data/storeCatalog';
+import { formatStorePrice, isDemoStoreProduct, marketplaceNotice, type StoreProduct } from '../data/storeCatalog';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
 import SiteFooter from '../components/SiteFooter';
 
@@ -75,6 +75,7 @@ export default function ProductDetailPage() {
   const specs = useMemo(() => specificationRows(product?.specifications), [product?.specifications]);
   const features = useMemo(() => lines(product?.features), [product?.features]);
   const purchaseUrl = product?.url || `https://wa.me/5581997092380?text=${encodeURIComponent(`Olá, quero saber sobre ${product?.title || 'um produto da ELN Technology'}`)}`;
+  const externalMarketplaceNotice = product ? marketplaceNotice(product) : '';
   const panel = isDark ? 'border-white/10 bg-white/[0.045]' : 'border-slate-200 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.05)]';
   const muted = isDark ? 'text-slate-300' : 'text-slate-600';
 
@@ -178,8 +179,13 @@ export default function ProductDetailPage() {
           <section id="valor" className={`rounded-md border p-5 sm:p-8 ${panel}`}>
             <div className="grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
               <div><p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Valor e compra</p><p className={`mt-3 text-3xl font-black ${isDark ? 'text-white' : 'text-[#101A2E]'}`}>{formatStorePrice(product)}</p><p className={`mt-2 text-sm ${muted}`}>{product.marketplace ? `${product.marketplace} · ` : ''}{product.availability || 'Disponível para consulta'}</p></div>
-              <a href={purchaseUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0D0F52] px-6 py-4 font-black text-white hover:bg-[#159AFD] dark:bg-[#159AFD]"><ShoppingCart className="h-5 w-5" /> Comprar ou consultar</a>
+              <a href={purchaseUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0D0F52] px-6 py-4 font-black text-white hover:bg-[#159AFD] dark:bg-[#159AFD]"><ShoppingCart className="h-5 w-5" /> {externalMarketplaceNotice ? 'Abrir marketplace' : 'Comprar ou consultar'}</a>
             </div>
+            {externalMarketplaceNotice && (
+              <div className={`mt-6 rounded-md border p-4 text-sm font-bold leading-6 ${isDark ? 'border-amber-300/25 bg-amber-400/10 text-amber-100' : 'border-amber-200 bg-amber-50 text-amber-800'}`}>
+                {externalMarketplaceNotice}
+              </div>
+            )}
           </section>
 
           <section id="especificacoes" className={`rounded-md border p-5 sm:p-8 ${panel}`}>

@@ -33,6 +33,7 @@ function rows(value?: string) {
 
 const sections = [
   { id: 'visao-geral', label: 'Visão geral' },
+  { id: 'conteudo', label: 'Conteúdo técnico' },
   { id: 'especificacoes', label: 'Especificações' },
   { id: 'configuracao', label: 'Configuração rápida' },
   { id: 'pinagem', label: 'Pinagem e notas' },
@@ -69,6 +70,10 @@ export default function TechnicalStudyPage() {
 
   const specs = useMemo(() => rows(study?.specifications), [study?.specifications]);
   const notes = useMemo(() => lines(study?.features), [study?.features]);
+  const technicalDetails = useMemo(() => lines(study?.technicalContent), [study?.technicalContent]);
+  const setupSteps = useMemo(() => lines(study?.setupGuide || study?.features), [study?.setupGuide, study?.features]);
+  const pinoutRows = useMemo(() => rows(study?.pinout), [study?.pinout]);
+  const relatedItems = useMemo(() => lines(study?.relatedProducts), [study?.relatedProducts]);
   const panel = isDark ? 'border-white/10 bg-[#0B102C]' : 'border-slate-200 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.05)]';
   const muted = isDark ? 'text-slate-300' : 'text-slate-600';
 
@@ -134,6 +139,16 @@ export default function TechnicalStudyPage() {
             </div>
           </section>
 
+          <section id="conteudo" className={`rounded-md border p-5 sm:p-8 ${panel}`}>
+            <p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Conteúdo técnico</p>
+            <h2 className={`mt-3 text-2xl font-black ${isDark ? 'text-white' : 'text-[#101A2E]'}`}>O que foi estudado</h2>
+            <div className="mt-6 grid gap-3">
+              {(technicalDetails.length ? technicalDetails : [study.description || 'Registre aqui testes, comportamento, pontos fortes, limitações, aplicações e observações importantes.']).map((item) => (
+                <div key={item} className={`rounded-md border p-4 text-sm font-semibold leading-7 ${isDark ? 'border-white/10 bg-white/[0.03]' : 'border-slate-200 bg-slate-50'}`}>{item}</div>
+              ))}
+            </div>
+          </section>
+
           <section id="especificacoes" className={`rounded-md border p-5 sm:p-8 ${panel}`}>
             <p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Ficha técnica</p>
             <h2 className={`mt-3 text-2xl font-black ${isDark ? 'text-white' : 'text-[#101A2E]'}`}>Especificações</h2>
@@ -151,7 +166,7 @@ export default function TechnicalStudyPage() {
             <p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Configuração rápida</p>
             <h2 className={`mt-3 text-2xl font-black ${isDark ? 'text-white' : 'text-[#101A2E]'}`}>Passos e testes</h2>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {(notes.length ? notes : ['Anote aqui bibliotecas, IDE, tensão, drivers, portas, comandos e resultado dos testes.']).map((note) => (
+              {(setupSteps.length ? setupSteps : ['Anote aqui bibliotecas, IDE, tensão, drivers, portas, comandos e resultado dos testes.']).map((note) => (
                 <div key={note} className={`rounded-md border p-4 text-sm font-semibold leading-6 ${isDark ? 'border-white/10 bg-white/[0.03]' : 'border-slate-200 bg-slate-50'}`}>{note}</div>
               ))}
             </div>
@@ -160,9 +175,27 @@ export default function TechnicalStudyPage() {
           <section id="pinagem" className={`rounded-md border p-5 sm:p-8 ${panel}`}>
             <p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Pinagem e notas</p>
             <h2 className={`mt-3 text-2xl font-black ${isDark ? 'text-white' : 'text-[#101A2E]'}`}>Observações práticas</h2>
-            <p className={`mt-4 leading-8 ${muted}`}>
-              Use o campo de especificações para guardar pinagem, dimensões, tensão, comunicação, memória, consumo e limitações encontradas no estudo.
-            </p>
+            {pinoutRows.length ? (
+              <div className="mt-6 overflow-hidden rounded-md border border-slate-200 dark:border-white/10">
+                {pinoutRows.map((item, index) => (
+                  <div key={`${item.label}-${index}`} className={`grid gap-2 px-4 py-4 sm:grid-cols-[190px_1fr] ${index % 2 === 0 ? isDark ? 'bg-white/[0.035]' : 'bg-slate-50' : ''}`}>
+                    <span className="text-sm font-black text-[#159AFD]">{item.label}</span>
+                    <span className={`text-sm font-semibold ${muted}`}>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className={`mt-4 leading-8 ${muted}`}>
+                Use o campo de pinagem para guardar GPIOs, ligações, tensão, comunicação, memória, consumo e limitações encontradas no estudo.
+              </p>
+            )}
+            {notes.length > 0 && (
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                {notes.map((note) => (
+                  <div key={note} className={`rounded-md border p-4 text-sm font-semibold leading-6 ${isDark ? 'border-white/10 bg-white/[0.03]' : 'border-slate-200 bg-slate-50'}`}>{note}</div>
+                ))}
+              </div>
+            )}
           </section>
 
           <section id="links" className={`rounded-md border p-5 sm:p-8 ${panel}`}>
@@ -172,6 +205,16 @@ export default function TechnicalStudyPage() {
               {study.datasheetUrl && <a href={study.datasheetUrl} target="_blank" rel="noreferrer" className={`flex items-center justify-between gap-3 rounded-md border p-4 font-black ${isDark ? 'border-white/10 hover:bg-white/5' : 'border-slate-200 bg-slate-50 hover:bg-white'}`}><span className="inline-flex items-center gap-3"><FileText className="h-5 w-5 text-[#159AFD]" /> Datasheet</span><ExternalLink className="h-4 w-4" /></a>}
               {study.url && <a href={study.url} target="_blank" rel="noreferrer" className={`flex items-center justify-between gap-3 rounded-md border p-4 font-black ${isDark ? 'border-white/10 hover:bg-white/5' : 'border-slate-200 bg-slate-50 hover:bg-white'}`}><span className="inline-flex items-center gap-3"><LinkIcon className="h-5 w-5 text-[#159AFD]" /> Referência principal</span><ExternalLink className="h-4 w-4" /></a>}
             </div>
+            {relatedItems.length > 0 && (
+              <div className={`mt-6 rounded-md border p-4 ${isDark ? 'border-white/10 bg-white/[0.03]' : 'border-slate-200 bg-slate-50'}`}>
+                <p className="text-sm font-black text-[#159AFD]">Produtos e módulos relacionados</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {relatedItems.map((item) => (
+                    <span key={item} className={`rounded-md border px-3 py-2 text-xs font-black ${isDark ? 'border-white/10 bg-[#070A1F] text-slate-200' : 'border-slate-200 bg-white text-slate-700'}`}>{item}</span>
+                  ))}
+                </div>
+              </div>
+            )}
           </section>
         </main>
 

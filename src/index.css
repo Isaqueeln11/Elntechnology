@@ -119,6 +119,53 @@ textarea:focus-visible {
   color: #172033;
 }
 
+.dashboard-light .admin-dashboard [class*="dark:bg-white/"],
+.dashboard-light .admin-dashboard [class*="dark:bg-[#070A1F]"],
+.dashboard-light .admin-dashboard [class*="dark:bg-[#0B102C]"],
+.dashboard-light .client-dashboard [class*="dark:bg-white/"],
+.dashboard-light .client-dashboard [class*="dark:bg-[#070A1F]"],
+.dashboard-light .client-dashboard [class*="dark:bg-[#0B102C]"] {
+  border-color: #d8e2ec !important;
+  background: #ffffff !important;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.045);
+}
+
+.dashboard-light .admin-dashboard :is(h1, h2, h3, h4, h5, h6, p, span, label, li).text-white,
+.dashboard-light .admin-dashboard :is(h1, h2, h3, h4, h5, h6, p, span, label, li)[class*="dark:text-white"],
+.dashboard-light .client-dashboard :is(h1, h2, h3, h4, h5, h6, p, span, label, li).text-white,
+.dashboard-light .client-dashboard :is(h1, h2, h3, h4, h5, h6, p, span, label, li)[class*="dark:text-white"] {
+  color: #172033 !important;
+}
+
+.dashboard-light .admin-dashboard [class*="dark:text-slate"],
+.dashboard-light .admin-dashboard [class*="dark:text-gray"],
+.dashboard-light .client-dashboard [class*="dark:text-slate"],
+.dashboard-light .client-dashboard [class*="dark:text-gray"] {
+  color: #475569 !important;
+}
+
+.dashboard-light .admin-dashboard button[class*="bg-[#159AFD]"],
+.dashboard-light .admin-dashboard a[class*="bg-[#159AFD]"],
+.dashboard-light .admin-dashboard button[class*="bg-[#0D0F52]"],
+.dashboard-light .admin-dashboard a[class*="bg-[#0D0F52]"],
+.dashboard-light .client-dashboard button[class*="bg-[#159AFD]"],
+.dashboard-light .client-dashboard a[class*="bg-[#159AFD]"],
+.dashboard-light .client-dashboard button[class*="bg-[#0D0F52]"],
+.dashboard-light .client-dashboard a[class*="bg-[#0D0F52]"] {
+  color: #ffffff !important;
+}
+
+.dashboard-light .admin-dashboard button[class*="bg-[#159AFD]"] *,
+.dashboard-light .admin-dashboard a[class*="bg-[#159AFD]"] *,
+.dashboard-light .admin-dashboard button[class*="bg-[#0D0F52]"] *,
+.dashboard-light .admin-dashboard a[class*="bg-[#0D0F52]"] *,
+.dashboard-light .client-dashboard button[class*="bg-[#159AFD]"] *,
+.dashboard-light .client-dashboard a[class*="bg-[#159AFD]"] *,
+.dashboard-light .client-dashboard button[class*="bg-[#0D0F52]"] *,
+.dashboard-light .client-dashboard a[class*="bg-[#0D0F52]"] * {
+  color: #ffffff !important;
+}
+
 .dashboard-light .technician-dashboard [class*="bg-gradient-to-br"] {
   border-color: #d8e2ec !important;
   background: #ffffff !important;
