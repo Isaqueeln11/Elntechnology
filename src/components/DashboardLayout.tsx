@@ -27,11 +27,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <div className={`dashboard-shell min-h-screen transition-colors ${isDark ? 'dashboard-dark bg-[#070A1F] text-white' : 'dashboard-light bg-[#F1F5F9] text-slate-950'}`}>
-      <nav className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/92 shadow-sm' : 'border-slate-200 bg-white/95 shadow-[0_1px_12px_rgba(15,23,42,0.06)]'}`}>
+      <nav className={`dashboard-topbar sticky top-0 z-40 border-b backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/94 shadow-sm' : 'border-slate-200 bg-white/95 shadow-[0_1px_12px_rgba(15,23,42,0.06)]'}`}>
         <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
-          <Link to="/" className="flex min-w-0 items-center gap-3" title="Ir para o site normal">
+          <Link to="/" className="dashboard-brand flex min-w-0 items-center gap-3" title="Ir para o site normal">
             <img src={logoUrl} alt="ELN Technology" className="h-10 w-16 flex-none object-contain" />
-            <span className={`notranslate hidden truncate text-lg font-bold sm:block lg:text-xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`} translate="no">ELN Technology</span>
+            <span className="min-w-0">
+              <span className={`notranslate hidden truncate text-lg font-black sm:block lg:text-xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`} translate="no">ELN Technology</span>
+              <span className={`hidden text-xs font-bold uppercase tracking-[0.18em] sm:block ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Painel</span>
+            </span>
           </Link>
 
           <div className="flex items-center gap-1 sm:gap-2">
@@ -45,7 +48,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <button
               type="button"
               onClick={() => navigate('/dashboard?tab=notifications')}
-              className={`relative rounded-md p-2 transition-colors ${isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
+              className={`dashboard-icon-button relative rounded-md p-2 transition-colors ${isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
               title="Notificações"
             >
               <Bell className="h-5 w-5" />
@@ -54,16 +57,16 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <button
               type="button"
               onClick={handleThemeToggle}
-              className={`rounded-md p-2 transition-colors ${isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
+              className={`dashboard-icon-button rounded-md p-2 transition-colors ${isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
               title={isDark ? 'Modo claro' : 'Modo noturno'}
             >
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
-            <button type="button" onClick={() => navigate('/dashboard?tab=settings')} className={`hidden items-center gap-3 rounded-md border p-1.5 pr-3 transition md:flex ${isDark ? 'border-transparent hover:bg-white/5' : 'border-slate-200 bg-slate-50 hover:border-[#159AFD]/35 hover:bg-white'}`}>
+            <button type="button" onClick={() => navigate('/dashboard?tab=settings')} className={`hidden items-center gap-3 rounded-md border p-1.5 pr-3 transition md:flex ${isDark ? 'border-white/10 bg-white/[0.03] hover:bg-white/10' : 'border-slate-200 bg-slate-50 hover:border-[#159AFD]/35 hover:bg-white'}`}>
               <img src={user?.avatar || logoUrl} alt={user?.name || 'Usuário'} className="h-9 w-9 rounded-md border border-[#159AFD]/50 object-cover" />
               <span className="max-w-44 text-left"><span className={`block truncate text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{user?.name}</span><span className={`block truncate text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>{user?.email}</span></span>
             </button>
-            <button type="button" onClick={handleLogout} className={`rounded-md p-2 transition-colors hover:bg-red-500/10 hover:text-red-400 ${isDark ? 'text-gray-400' : 'text-slate-500'}`} title="Sair">
+            <button type="button" onClick={handleLogout} className={`dashboard-icon-button rounded-md p-2 transition-colors hover:bg-red-500/10 hover:text-red-400 ${isDark ? 'text-gray-400' : 'text-slate-500'}`} title="Sair" aria-label="Sair">
               <LogOut className="h-5 w-5" />
             </button>
           </div>

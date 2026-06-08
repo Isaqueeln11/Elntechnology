@@ -21,7 +21,7 @@ import {
   Wrench,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
@@ -389,6 +389,7 @@ function contentLines(value?: string) {
 
 function CompanyPage({ data }: { data: PageData }) {
   const { isDark, toggleTheme } = useTheme();
+  const location = useLocation();
   const [contentItems, setContentItems] = useState<StoreProduct[]>([]);
   const [loadError, setLoadError] = useState('');
   const [storeSearch, setStoreSearch] = useState('');
@@ -446,6 +447,12 @@ function CompanyPage({ data }: { data: PageData }) {
       ? 'Cadastre placas, módulos, links, especificações e observações pelo admin para montar sua base técnica.'
     : 'Esta área vai mostrar os documentos, vídeos, produtos e novidades publicados pela ELN Technology.';
 
+  function navIcon(label: string) {
+    if (label === 'Estudos') return <Cpu className="h-4 w-4" />;
+    if (label === 'Loja') return <Store className="h-4 w-4" />;
+    return null;
+  }
+
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, 'siteContent'),
@@ -461,38 +468,49 @@ function CompanyPage({ data }: { data: PageData }) {
 
   return (
     <div className={`min-h-screen transition-colors ${isDark ? 'bg-[#070A1F] text-white' : 'bg-[#F7FBFF] text-slate-950'}`}>
-      <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/92' : 'border-sky-100 bg-white/92'}`}>
-        <nav className="mx-auto flex min-h-20 max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+      <header className={`public-subpage-header sticky top-0 z-40 border-b backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/94 shadow-[0_10px_30px_rgba(0,0,0,0.18)]' : 'border-sky-100 bg-white/94 shadow-[0_8px_26px_rgba(15,23,42,0.06)]'}`}>
+        <nav className="mx-auto flex min-h-[72px] max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-3">
-            <img src={logoUrl} alt="ELN Technology" className="h-11 w-28 object-contain" />
+            <img src={logoUrl} alt="ELN Technology" className="h-10 w-24 object-contain" />
             <span className="notranslate text-sm font-black sm:text-base" translate="no">
               ELN Technology
             </span>
           </Link>
 
-          <div className={`mobile-scrollbar hidden max-w-2xl items-center gap-1 overflow-x-auto rounded-md border p-1 md:flex ${
-            isDark ? 'border-white/10 bg-white/[0.035]' : 'border-sky-100 bg-sky-50/70'
+          <div className={`public-subpage-nav mobile-scrollbar hidden max-w-2xl items-center gap-1 overflow-x-auto rounded-md border p-1 md:flex ${
+            isDark ? 'border-white/10 bg-white/[0.045]' : 'border-sky-100 bg-sky-50/80'
           }`}>
-            {subpageNavLinks.map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`inline-flex h-9 flex-none items-center rounded-md px-3 text-sm font-bold transition hover:bg-[#159AFD]/10 hover:text-[#159AFD] ${
-                  isDark ? 'text-slate-300' : 'text-slate-700'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {subpageNavLinks.map((link) => {
+              const isActive = link.to === location.pathname;
+              const icon = navIcon(link.label);
+
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`inline-flex h-9 flex-none items-center gap-2 rounded-md px-3 text-sm font-black transition ${
+                    isActive
+                      ? 'bg-[#159AFD] text-white shadow-sm shadow-[#159AFD]/20'
+                      : isDark
+                        ? 'text-slate-300 hover:bg-white/10 hover:text-white'
+                        : 'text-slate-700 hover:bg-white hover:text-[#0D0F52]'
+                  }`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {icon}
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-2">
             <Link
               to="/"
-              className={`inline-flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-bold transition ${isDark ? 'border-white/10 text-slate-200 hover:bg-white/10' : 'border-sky-100 text-slate-700 hover:bg-sky-50'}`}
+              className={`inline-flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-black transition ${isDark ? 'border-white/10 bg-white/[0.03] text-slate-200 hover:bg-white/10' : 'border-sky-100 bg-white text-slate-700 hover:bg-sky-50'}`}
             >
               <Home className="h-4 w-4" />
-              Inicio
+              Início
             </Link>
             <button
               type="button"

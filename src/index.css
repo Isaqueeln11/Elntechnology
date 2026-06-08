@@ -21,11 +21,68 @@ body {
   animation: none !important;
 }
 
+.dashboard-shell {
+  background-attachment: fixed;
+}
+
+.dashboard-dark.dashboard-shell {
+  background-image:
+    linear-gradient(rgba(21, 154, 253, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 154, 253, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at 10% 0%, rgba(21, 154, 253, 0.09), transparent 32%);
+  background-size: 42px 42px, 42px 42px, 100% 520px;
+}
+
+.dashboard-light.dashboard-shell {
+  background-image:
+    linear-gradient(rgba(21, 154, 253, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 154, 253, 0.04) 1px, transparent 1px);
+  background-size: 42px 42px, 42px 42px;
+}
+
+.dashboard-topbar {
+  min-height: 64px;
+}
+
+.dashboard-brand {
+  min-height: 44px;
+}
+
+.dashboard-icon-button {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+}
+
 .dashboard-shell article,
 .dashboard-shell aside,
 .dashboard-shell form,
 .dashboard-shell section {
   border-radius: 8px;
+}
+
+.dashboard-shell aside,
+.dashboard-shell form,
+.dashboard-shell section,
+.dashboard-shell article {
+  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.dashboard-shell aside:hover,
+.dashboard-shell form:hover,
+.dashboard-shell section:hover,
+.dashboard-shell article:hover {
+  border-color: rgba(21, 154, 253, 0.28);
+}
+
+.public-subpage-header {
+  isolation: isolate;
+}
+
+.public-subpage-nav {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 #root {
