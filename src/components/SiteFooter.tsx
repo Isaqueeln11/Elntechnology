@@ -29,6 +29,29 @@ export default function SiteFooter() {
   return (
     <footer className={`border-t ${isDark ? 'border-white/10 bg-[#070A1F]' : 'border-sky-100 bg-white'}`}>
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-14">
+        <div className={`mb-10 flex flex-col justify-between gap-5 rounded-md border p-5 sm:p-6 lg:flex-row lg:items-center ${
+          isDark ? 'border-white/10 bg-white/[0.045]' : 'border-sky-100 bg-[#F7FBFF]'
+        }`}>
+          <div>
+            <p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Atendimento ELN Technology</p>
+            <h2 className={`mt-2 text-2xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
+              Precisa de produto, projeto, estudo técnico ou manutenção?
+            </h2>
+            <p className={`mt-2 max-w-2xl text-sm leading-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+              Fale pelo WhatsApp e envie objetivo, prazo, fotos, links ou especificações para receber orientação.
+            </p>
+          </div>
+          <a
+            href="https://wa.me/5581997092380?text=Olá,%20quero%20falar%20com%20a%20ELN%20Technology."
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex flex-none items-center justify-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 text-sm font-black text-white transition hover:bg-[#0D0F52]"
+          >
+            Chamar no WhatsApp
+            <MessageCircle className="h-4 w-4" />
+          </a>
+        </div>
+
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.35fr_0.8fr_0.9fr_1.2fr]">
           <div className="max-w-sm">
             <Link to="/" className="inline-flex items-center gap-3" aria-label="Página inicial da ELN Technology">

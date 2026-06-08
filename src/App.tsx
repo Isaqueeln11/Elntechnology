@@ -142,6 +142,30 @@ const aboutItems = [
   },
 ];
 
+const heroStats = [
+  { value: 'IoT', label: 'automação e sensores' },
+  { value: 'OTA', label: 'firmware atualizável' },
+  { value: '3D', label: 'protótipo físico' },
+];
+
+const deliveryCards = [
+  {
+    icon: Microscope,
+    title: 'Diagnóstico',
+    text: 'Entendimento da ideia, ambiente, uso real e restrições técnicas.',
+  },
+  {
+    icon: CircuitBoard,
+    title: 'Construção',
+    text: 'Hardware, firmware, painel, documentação e testes trabalhando juntos.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Entrega',
+    text: 'Projeto validado, organizado e pronto para acompanhamento.',
+  },
+];
+
 const siteAreas = [
   {
     icon: CircuitBoard,
@@ -531,21 +555,26 @@ function HomePage() {
 
       <main id="inicio">
         <section className={`relative overflow-hidden pt-28 ${isDark ? 'bg-[#070A1F]' : 'bg-white'}`}>
-          <div className={`absolute inset-0 circuit-grid ${isDark ? 'opacity-15' : 'opacity-35'}`} />
-          <div className="mx-auto max-w-5xl px-4 pb-16 pt-12 text-center sm:px-6 lg:px-8 lg:pb-20 lg:pt-16">
-            <div className="relative z-10">
-              <img src={logoUrl} alt="ELN Technology" className="mx-auto mb-8 h-20 w-48 object-contain sm:h-24 sm:w-60" />
+          <div className={`absolute inset-0 circuit-grid ${isDark ? 'opacity-12' : 'opacity-35'}`} />
+          <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8 lg:pb-20 lg:pt-16">
+            <div className="flex flex-col justify-center">
+              <div className={`inline-flex w-fit items-center gap-2 rounded-md border px-3 py-2 text-xs font-black uppercase tracking-widest ${
+                isDark ? 'border-white/10 bg-white/5 text-sky-100' : 'border-sky-100 bg-sky-50 text-[#0D0F52]'
+              }`}>
+                <Cpu className="h-4 w-4 text-[#159AFD]" />
+                Projetos de eletrônica, IoT e sistemas
+              </div>
 
-              <h1 className={`mx-auto max-w-4xl text-4xl font-black leading-tight sm:text-5xl lg:text-6xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
+              <h1 className={`mt-7 max-w-4xl text-4xl font-black leading-tight sm:text-5xl lg:text-6xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
                 <BrandName />
                 <span className="mt-3 block text-[#159AFD]">{t.heroTitle}</span>
               </h1>
 
-              <p className={`mx-auto mt-6 max-w-2xl text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+              <p className={`mt-6 max-w-2xl text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                 {t.heroText}
               </p>
 
-              <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a
                   href="#contato"
                   className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-6 py-4 font-black text-white shadow-xl shadow-sky-500/20 transition hover:bg-[#0D0F52]"
@@ -554,16 +583,59 @@ function HomePage() {
                   <Send className="h-5 w-5" />
                 </a>
                 <Link
-                  to="/estudos"
+                  to="/lojas"
                   className={`inline-flex items-center justify-center gap-2 rounded-md border px-6 py-4 font-bold transition hover:border-[#159AFD] hover:text-[#159AFD] ${
                     isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52]'
                   }`}
                 >
-                  Base técnica
-                  <Cpu className="h-5 w-5" />
+                  Loja oficial
+                  <Store className="h-5 w-5" />
                 </Link>
               </div>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-3">
+                {heroStats.map((item) => (
+                  <div key={item.value} className={`rounded-md border p-4 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-[#F7FBFF]'}`}>
+                    <p className="text-2xl font-black text-[#159AFD]">{item.value}</p>
+                    <p className={`mt-1 text-sm font-semibold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            <aside className={`rounded-md border p-5 shadow-xl sm:p-6 ${isDark ? 'border-white/10 bg-white/[0.055] shadow-black/20' : 'border-sky-100 bg-[#F7FBFF] shadow-sky-900/10'}`}>
+              <div className="flex items-center justify-between gap-4">
+                <img src={logoUrl} alt="ELN Technology" className="h-14 w-32 object-contain" />
+                <span className="rounded-md bg-emerald-500/15 px-3 py-2 text-xs font-black uppercase text-emerald-500">Atendimento ativo</span>
+              </div>
+
+              <div className="mt-6 grid gap-4">
+                {deliveryCards.map(({ icon: Icon, title, text }) => (
+                  <article key={title} className={`rounded-md border p-4 ${isDark ? 'border-white/10 bg-[#070A1F]/70' : 'border-sky-100 bg-white'}`}>
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h2 className={`font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{title}</h2>
+                        <p className={`mt-1 text-sm leading-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{text}</p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <div className={`mt-5 rounded-md border p-4 ${isDark ? 'border-sky-400/20 bg-sky-400/10' : 'border-sky-100 bg-white'}`}>
+                <p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Canais oficiais</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {['WhatsApp', 'Gmail', 'Instagram', 'GitHub'].map((item) => (
+                    <span key={item} className={`rounded-md px-3 py-2 text-xs font-black ${isDark ? 'bg-[#070A1F] text-slate-200' : 'bg-[#EEF7FF] text-[#0D0F52]'}`}>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </aside>
           </div>
         </section>
 
@@ -610,40 +682,39 @@ function HomePage() {
 
         <section id="areas" className={`${isDark ? 'bg-[#080B24]' : 'bg-white'} py-20`}>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className={`rounded-md border p-6 sm:p-8 lg:p-10 ${isDark ? 'border-white/10 bg-white/[0.03]' : 'border-sky-100 bg-[#F7FBFF]'}`}>
-            <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
-              <div>
+            <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+              <div className="max-w-4xl">
                 <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">{areasSection.eyebrow}</p>
-                <h2 className={`mt-3 max-w-4xl text-3xl font-black leading-tight sm:text-5xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
+                <h2 className={`mt-3 text-3xl font-black leading-tight sm:text-5xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
                   {areasSection.title}
                 </h2>
-                <p className={`mt-5 max-w-3xl text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                <p className={`mt-5 text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                   {areasSection.description}
                 </p>
               </div>
               <Link
                 to={areasSection.buttonHref || '/noticias-inovacoes'}
-                className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 font-black text-white transition hover:bg-[#0D0F52]"
+                className="inline-flex flex-none items-center justify-center gap-2 rounded-md bg-[#159AFD] px-5 py-3 font-black text-white transition hover:bg-[#0D0F52]"
               >
                 {areasSection.buttonLabel || t.areasFallbackButton}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
               {visibleAreas.map(({ icon: Icon, title, text, href }) => (
                 <Link
                   key={href}
                   to={href}
-                  className={`group rounded-md border p-6 transition hover:border-[#159AFD] ${
+                  className={`group flex min-h-56 flex-col rounded-md border p-5 transition hover:-translate-y-0.5 hover:border-[#159AFD] ${
                     isDark ? 'border-white/10 bg-white/5 hover:bg-white/10' : 'border-sky-100 bg-[#F7FBFF] shadow-sm hover:bg-white'
                   }`}
                 >
                   <div className="flex h-12 w-12 items-center justify-center rounded-md bg-[#159AFD] text-white">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className={`mt-5 text-xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{title}</h3>
-                  <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{text}</p>
+                  <h3 className={`mt-5 text-lg font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{title}</h3>
+                  <p className={`mt-3 flex-1 text-sm leading-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{text}</p>
                   <span className="mt-5 inline-flex items-center gap-2 text-sm font-black text-[#159AFD]">
                     {t.openPage}
                     <ChevronRight className="h-4 w-4" />
@@ -662,7 +733,6 @@ function HomePage() {
                 {showAllAreas ? t.showLess : t.showMore}
                 <ChevronRight className={`h-4 w-4 transition ${showAllAreas ? '-rotate-90' : 'rotate-90'}`} />
               </button>
-            </div>
             </div>
           </div>
         </section>

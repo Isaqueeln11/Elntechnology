@@ -329,6 +329,14 @@ const quickLinks = [
   { label: 'Loja', to: '/lojas', icon: Store },
 ];
 
+const subpageNavLinks = [
+  { label: 'Áreas', to: '/#areas' },
+  { label: 'Estudos', to: '/estudos' },
+  { label: 'Produtos', to: '/produtos' },
+  { label: 'Loja', to: '/lojas' },
+  { label: 'Contato', to: '/#contato' },
+];
+
 const defaultTeamMembers: StoreProduct[] = [
   {
     id: 'team-admin-isaque',
@@ -460,6 +468,22 @@ function CompanyPage({ data }: { data: PageData }) {
               ELN Technology
             </span>
           </Link>
+
+          <div className={`mobile-scrollbar hidden max-w-xl items-center gap-1 overflow-x-auto rounded-md border p-1 md:flex ${
+            isDark ? 'border-white/10 bg-white/[0.035]' : 'border-sky-100 bg-sky-50/70'
+          }`}>
+            {subpageNavLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`inline-flex h-9 flex-none items-center rounded-md px-3 text-sm font-bold transition hover:bg-[#159AFD]/10 hover:text-[#159AFD] ${
+                  isDark ? 'text-slate-300' : 'text-slate-700'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
 
           <div className="flex items-center gap-2">
             <Link
@@ -703,7 +727,7 @@ function CompanyPage({ data }: { data: PageData }) {
                         rel="noreferrer"
                         className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-4 py-3 font-black text-white transition hover:bg-[#0D0F52]"
                       >
-                        {item.url ? 'Abrir link de compra' : 'Comprar ou consultar'}
+                        {item.url ? marketplaceNotice(item) ? 'Abrir marketplace externo' : 'Abrir link de compra' : 'Comprar ou consultar'}
                         <ArrowRight className="h-4 w-4" />
                       </a>
                       <Link
