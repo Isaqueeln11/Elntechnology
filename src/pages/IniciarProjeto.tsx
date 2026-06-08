@@ -389,7 +389,7 @@ export default function IniciarProjeto() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-8">Iniciar Projeto</h1>
         <p className="mb-6 max-w-3xl text-sm leading-6 text-gray-300">
-          Os dados enviados aqui aparecem no painel administrativo em Pedidos para analise e contato.
+          Os dados enviados aqui aparecem no painel administrativo em Pedidos. Se voce entrar ou criar conta com o mesmo e-mail informado, a solicitacao tambem aparece na area do cliente.
         </p>
 
         {enviado ? (

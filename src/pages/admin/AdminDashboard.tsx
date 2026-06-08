@@ -1664,7 +1664,7 @@ const AdminDashboard = () => {
         id: order.id,
         title: order.title || 'Pedido sem título',
         subtitle: `${order.client || 'Sem cliente'} - ${order.type || 'Novo projeto'}`,
-        meta: [order.budget || 'R$ 0,00', order.notes].filter(Boolean).join(' | '),
+        meta: [order.clientEmail && `E-mail vinculado: ${order.clientEmail}`, order.budget || 'R$ 0,00', order.notes].filter(Boolean).join(' | '),
         status: order.status,
         actions: [
           { label: 'Aprovar', onClick: () => changeStatus('orders', order.id, 'Aprovado') },
