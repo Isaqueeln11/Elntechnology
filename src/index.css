@@ -119,6 +119,49 @@ textarea:focus-visible {
   color: #172033;
 }
 
+.admin-rules-warning {
+  border-color: rgba(217, 119, 6, 0.4);
+  background: #fffbeb;
+  color: #78350f;
+}
+
+.admin-rules-warning-title {
+  color: #451a03 !important;
+}
+
+.admin-rules-warning-text {
+  color: #78350f !important;
+}
+
+.admin-rules-warning-link {
+  border-color: rgba(146, 64, 14, 0.35);
+  color: #451a03 !important;
+}
+
+.admin-rules-warning-link:hover {
+  background: #fef3c7;
+}
+
+.dashboard-dark .admin-rules-warning {
+  border-color: rgba(252, 211, 77, 0.28);
+  background: rgba(251, 191, 36, 0.1);
+  color: #fef3c7;
+}
+
+.dashboard-dark .admin-rules-warning-title,
+.dashboard-dark .admin-rules-warning-text,
+.dashboard-dark .admin-rules-warning-link {
+  color: #fef3c7 !important;
+}
+
+.dashboard-dark .admin-rules-warning-link {
+  border-color: rgba(253, 230, 138, 0.28);
+}
+
+.dashboard-dark .admin-rules-warning-link:hover {
+  background: rgba(253, 230, 138, 0.12);
+}
+
 .dashboard-light .admin-dashboard [class*="dark:bg-white/"],
 .dashboard-light .admin-dashboard [class*="dark:bg-[#070A1F]"],
 .dashboard-light .admin-dashboard [class*="dark:bg-[#0B102C]"],

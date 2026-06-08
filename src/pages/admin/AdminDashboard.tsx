@@ -1251,16 +1251,16 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="mt-5 rounded-md border border-amber-300/40 bg-amber-50 p-4 text-sm leading-6 text-amber-800 dark:border-amber-300/30 dark:bg-amber-400/10 dark:text-amber-100">
-          <p className="font-black text-amber-900 dark:text-amber-50">Se aparecer "sem permissão", a regra publicada no Firebase ainda é a antiga.</p>
-          <p className="mt-1 text-amber-800/90 dark:text-amber-100/90">
+        <div className="admin-rules-warning mt-5 rounded-md border p-4 text-sm leading-6">
+          <p className="admin-rules-warning-title font-black">Se aparecer "sem permissão", a regra publicada no Firebase ainda é a antiga.</p>
+          <p className="admin-rules-warning-text mt-1">
             A regra precisa ter `siteContent`, `siteSettings`, `systemEvents` e `isAdmin()` reconhecendo seus emails donos. Use os botões abaixo para copiar e abrir o lugar certo.
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <button type="button" onClick={copyFirestoreRules} className="rounded-md bg-[#159AFD] px-4 py-3 font-black text-white transition hover:bg-[#0D0F52]">
               Copiar regras corretas
             </button>
-            <a href={firebaseConsoleRulesUrl} target="_blank" rel="noreferrer" className="rounded-md border border-amber-300/60 px-4 py-3 font-black text-amber-900 transition hover:bg-amber-100 dark:border-amber-200/30 dark:text-amber-50 dark:hover:bg-amber-200/10">
+            <a href={firebaseConsoleRulesUrl} target="_blank" rel="noreferrer" className="admin-rules-warning-link rounded-md border px-4 py-3 font-black transition">
               Abrir regras no Firebase
             </a>
           </div>
