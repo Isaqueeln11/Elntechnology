@@ -324,17 +324,18 @@ const quickLinks = [
   { label: 'Análise', to: '/atividades-analise', icon: BarChart3 },
   { label: 'Estudos', to: '/estudos', icon: Cpu },
   { label: 'Produtos', to: '/produtos', icon: Package },
+  { label: 'Loja', to: '/lojas', icon: Store },
   { label: 'Vídeos', to: '/videos-futuro', icon: MonitorPlay },
   { label: 'Notícias', to: '/noticias-inovacoes', icon: Rocket },
-  { label: 'Loja', to: '/lojas', icon: Store },
 ];
 
 const subpageNavLinks = [
+  { label: 'Sobre', to: '/#sobre' },
   { label: 'Áreas', to: '/#areas' },
+  { label: 'Soluções', to: '/#servicos' },
   { label: 'Estudos', to: '/estudos' },
-  { label: 'Produtos', to: '/produtos' },
-  { label: 'Loja', to: '/lojas' },
   { label: 'Contato', to: '/#contato' },
+  { label: 'Loja', to: '/lojas' },
 ];
 
 const defaultTeamMembers: StoreProduct[] = [
@@ -469,7 +470,7 @@ function CompanyPage({ data }: { data: PageData }) {
             </span>
           </Link>
 
-          <div className={`mobile-scrollbar hidden max-w-xl items-center gap-1 overflow-x-auto rounded-md border p-1 md:flex ${
+          <div className={`mobile-scrollbar hidden max-w-2xl items-center gap-1 overflow-x-auto rounded-md border p-1 md:flex ${
             isDark ? 'border-white/10 bg-white/[0.035]' : 'border-sky-100 bg-sky-50/70'
           }`}>
             {subpageNavLinks.map((link) => (

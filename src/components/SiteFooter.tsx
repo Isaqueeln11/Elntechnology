@@ -7,17 +7,19 @@ const navigationLinks = [
   { label: 'Início', href: '/' },
   { label: 'Projetos', href: '/projetos-desenvolvidos' },
   { label: 'Equipe', href: '/equipe' },
-  { label: 'Estudos', href: '/estudos' },
   { label: 'Produtos', href: '/produtos' },
+  { label: 'Estudos', href: '/estudos' },
   { label: 'Loja', href: '/lojas' },
+  { label: 'Notícias', href: '/noticias-inovacoes' },
 ];
 
 const solutionLinks = [
   { label: 'Soluções', href: '/explorar-solucoes' },
   { label: 'Placas PCB', href: '/pcbs' },
+  { label: 'Melhorias', href: '/melhorias' },
   { label: 'Desenvolvimentos', href: '/desenvolvimentos' },
-  { label: 'Base técnica', href: '/estudos' },
-  { label: 'Notícias e inovação', href: '/noticias-inovacoes' },
+  { label: 'Atividades e análise', href: '/atividades-analise' },
+  { label: 'Vídeos futuros', href: '/videos-futuro' },
 ];
 
 export default function SiteFooter() {
