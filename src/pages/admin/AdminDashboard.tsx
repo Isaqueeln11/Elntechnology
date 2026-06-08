@@ -177,6 +177,22 @@ const defaultAreasSectionForm = {
 const sitePageOptions = ['projetos', 'melhorias', 'equipe', 'atividades', 'desenvolvimentos', 'estudos', 'produtos', 'lojas', 'videos', 'noticias'];
 const siteContentTypeOptions = ['Projeto', 'Documento', 'Vídeo', 'Estudo', 'Produto', 'Loja', 'Melhoria', 'Equipe', 'Atividade', 'Notícia', 'Inovação', 'Link'];
 const marketplaceChannelOptions = ['Loja oficial', 'WhatsApp', 'Shopee', 'Mercado Livre', 'AliExpress', 'Instagram', 'Site oficial', 'Catálogo externo', 'Outro canal'];
+const channelLinkPlaceholders: Record<string, string> = {
+  'Loja oficial': 'https://elntechnology.../produto',
+  WhatsApp: 'https://wa.me/5581997092380?text=Quero%20saber%20sobre...',
+  Shopee: 'https://shopee.com.br/...',
+  'Mercado Livre': 'https://produto.mercadolivre.com.br/...',
+  AliExpress: 'https://www.aliexpress.com/item/...',
+  Instagram: 'https://www.instagram.com/eln_technology/',
+  'Site oficial': 'https://elntechnology...',
+  'Catálogo externo': 'https://...',
+  'Outro canal': 'Cole aqui o link direto de compra ou atendimento',
+};
+
+function channelLinkPlaceholder(channel?: string) {
+  return channelLinkPlaceholders[channel || 'Loja oficial'] || channelLinkPlaceholders['Outro canal'];
+}
+
 const defaultSiteContentForm = {
   page: 'projetos',
   type: 'Projeto',
@@ -402,6 +418,7 @@ function Field({
   value,
   onChange,
   placeholder,
+  helper,
   type = 'text',
   required = true,
 }: {
@@ -409,6 +426,7 @@ function Field({
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  helper?: string;
   type?: string;
   required?: boolean;
 }) {
@@ -416,6 +434,7 @@ function Field({
     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
       {label}
       <input type={type} value={value} onChange={(event) => onChange(event.target.value)} placeholder={placeholder} className={inputClass} required={required} />
+      {helper && <span className="mt-1 block text-xs leading-5 text-slate-500 dark:text-slate-400">{helper}</span>}
     </label>
   );
 }
@@ -1143,15 +1162,22 @@ const AdminDashboard = () => {
               <Field label="Preço ou valor" value={siteContentForm.price} onChange={(price) => setSiteContentForm({ ...siteContentForm, price })} placeholder="Ex.: 25,90, R$ 25,90, US$ 5.00 ou Sob orçamento" required={false} />
             </div>
             <Field label="URL da imagem do produto" value={siteContentForm.imageUrl} onChange={(imageUrl) => setSiteContentForm({ ...siteContentForm, imageUrl })} placeholder="https://..." required={false} />
-            <Field label="Link de compra ou atendimento" value={siteContentForm.url} onChange={(url) => setSiteContentForm({ ...siteContentForm, url })} placeholder="Shopee, Mercado Livre, WhatsApp, catálogo ou site" required={false} />
-            <Field label="Código/SKU do produto" value={siteContentForm.sku} onChange={(sku) => setSiteContentForm({ ...siteContentForm, sku })} placeholder="Ex.: ESP32-S3-001" required={false} />
-            <Field label="Categoria" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: IoT e automação" required={false} />
             <SelectField label="Marketplace ou canal" value={siteContentForm.marketplace || 'Loja oficial'} onChange={(marketplace) => setSiteContentForm({ ...siteContentForm, marketplace })} options={marketplaceChannelOptions} />
             {marketplaceNotice({ id: editingSiteContentId || 'preview', ...siteContentForm }) && (
               <p className="rounded-md border border-amber-300/50 bg-amber-400/10 p-3 text-xs font-bold leading-5 text-amber-700 dark:border-amber-300/25 dark:text-amber-100">
                 Esse item sera marcado na loja como marketplace externo, com aviso para conferir vendedor, prazo, frete, garantia e politicas da plataforma.
               </p>
             )}
+            <Field
+              label="Link direto do canal escolhido"
+              value={siteContentForm.url}
+              onChange={(url) => setSiteContentForm({ ...siteContentForm, url })}
+              placeholder={channelLinkPlaceholder(siteContentForm.marketplace)}
+              helper="Cole aqui a URL real do produto, atendimento ou catálogo. O campo acima serve só para escolher o canal."
+              required={false}
+            />
+            <Field label="Código/SKU do produto" value={siteContentForm.sku} onChange={(sku) => setSiteContentForm({ ...siteContentForm, sku })} placeholder="Ex.: ESP32-S3-001" required={false} />
+            <Field label="Categoria" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: IoT e automação" required={false} />
             <SelectField label="Disponibilidade" value={siteContentForm.availability} onChange={(availability) => setSiteContentForm({ ...siteContentForm, availability })} options={['Disponível', 'Sob encomenda', 'Sob consulta', 'Indisponível']} />
             <SelectField label="Status" value={siteContentForm.status} onChange={(statusValue) => setSiteContentForm({ ...siteContentForm, status: statusValue })} options={['Publicado', 'Rascunho']} />
             <Field label="Link do datasheet/manual" value={siteContentForm.datasheetUrl} onChange={(datasheetUrl) => setSiteContentForm({ ...siteContentForm, datasheetUrl })} placeholder="https://..." required={false} />
@@ -1414,13 +1440,15 @@ const AdminDashboard = () => {
               value={siteContentForm.title}
               onChange={(title) => setSiteContentForm({ ...siteContentForm, title })}
             />
-            <Field
-              label={['produtos', 'lojas'].includes(siteContentForm.page) ? 'Link de compra ou contato' : siteContentForm.page === 'equipe' ? 'Link de contato ou perfil' : siteContentForm.page === 'estudos' ? 'Link principal da referência' : 'Link, documento, imagem ou vídeo'}
-              value={siteContentForm.url}
-              onChange={(url) => setSiteContentForm({ ...siteContentForm, url })}
-              placeholder={['produtos', 'lojas'].includes(siteContentForm.page) ? 'Shopee, Mercado Livre, WhatsApp, catálogo ou site' : siteContentForm.page === 'estudos' ? 'Documentação, artigo, vídeo ou repositório' : 'https://...'}
-              required={false}
-            />
+            {!['produtos', 'lojas'].includes(siteContentForm.page) && (
+              <Field
+                label={siteContentForm.page === 'equipe' ? 'Link de contato ou perfil' : siteContentForm.page === 'estudos' ? 'Link principal da referência' : 'Link, documento, imagem ou vídeo'}
+                value={siteContentForm.url}
+                onChange={(url) => setSiteContentForm({ ...siteContentForm, url })}
+                placeholder={siteContentForm.page === 'estudos' ? 'Documentação, artigo, vídeo ou repositório' : 'https://...'}
+                required={false}
+              />
+            )}
             {['produtos', 'lojas'].includes(siteContentForm.page) && (
               <div className="grid gap-4 rounded-md border border-[#159AFD]/20 bg-[#159AFD]/5 p-4">
                 <div>
@@ -1437,6 +1465,14 @@ const AdminDashboard = () => {
                     Esse item sera exibido com aviso de marketplace externo. Use quando o link for Shopee, Mercado Livre ou AliExpress.
                   </p>
                 )}
+                <Field
+                  label="Link direto do canal escolhido"
+                  value={siteContentForm.url}
+                  onChange={(url) => setSiteContentForm({ ...siteContentForm, url })}
+                  placeholder={channelLinkPlaceholder(siteContentForm.marketplace)}
+                  helper="Cole aqui a URL real do produto, atendimento ou catálogo. O campo acima serve só para escolher o canal."
+                  required={false}
+                />
                 <Field label="Categoria" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: IoT e automação" required={false} />
                 <Field label="URL da imagem do produto" value={siteContentForm.imageUrl} onChange={(imageUrl) => setSiteContentForm({ ...siteContentForm, imageUrl })} placeholder="https://..." required={false} />
                 <Field label="Código ou SKU" value={siteContentForm.sku} onChange={(sku) => setSiteContentForm({ ...siteContentForm, sku })} placeholder="Ex.: ELN-IOT-ESP32" required={false} />
