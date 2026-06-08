@@ -525,7 +525,7 @@ function compressImage(file: File): Promise<string> {
 const AdminDashboard = () => {
   const { user, updateUserProfile } = useAuth();
   const { isDark } = useTheme();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const requestedTab = searchParams.get('tab');
   const [activeTab, setActiveTab] = useState(requestedTab || user?.preferences?.dashboardStartPage || 'overview');
   const [status, setStatus] = useState('');
@@ -588,6 +588,24 @@ const AdminDashboard = () => {
       setActiveTab(user.preferences.dashboardStartPage);
     }
   }, [requestedTab, user?.preferences?.dashboardStartPage]);
+
+  useEffect(() => {
+    if (!tabs.some((tab) => tab.id === activeTab)) {
+      setActiveTab('overview');
+      setSearchParams({ tab: 'overview' }, { replace: true });
+      return;
+    }
+
+    if (requestedTab !== activeTab) {
+      setSearchParams({ tab: activeTab }, { replace: true });
+    }
+  }, [activeTab, requestedTab, setSearchParams]);
+
+  function openTab(tabId: string) {
+    setActiveTab(tabId);
+    setSearchParams({ tab: tabId }, { replace: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   useEffect(() => {
     const subscriptions = [
@@ -863,7 +881,7 @@ const AdminDashboard = () => {
       {totals.newUsers > 0 && (
         <button
           type="button"
-          onClick={() => setActiveTab('notifications')}
+          onClick={() => openTab('notifications')}
           className="flex w-full items-start gap-3 rounded-lg border border-[#159AFD]/30 bg-[#159AFD]/10 p-4 text-left transition hover:bg-[#159AFD]/15"
         >
           <Bell className="mt-0.5 h-5 w-5 flex-none text-[#159AFD]" />
@@ -1288,7 +1306,7 @@ const AdminDashboard = () => {
             type="button"
             onClick={() => {
               prepareStoreProduct('produtos');
-              setActiveTab('store');
+              openTab('store');
             }}
             className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
           >
@@ -1305,7 +1323,7 @@ const AdminDashboard = () => {
             type="button"
             onClick={() => {
               prepareStoreProduct('lojas');
-              setActiveTab('store');
+              openTab('store');
             }}
             className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
           >
@@ -1769,7 +1787,7 @@ const AdminDashboard = () => {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => openTab(tab.id)}
                   className={`flex min-h-12 items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-bold transition-all ${
                     activeTab === tab.id
                       ? isDark
