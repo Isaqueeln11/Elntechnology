@@ -37,6 +37,7 @@ import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { db } from './firebase';
 import logoUrl from '../ELN TECHNOLOGY.svg';
 import SiteFooter from './components/SiteFooter';
+import OfficialChannels from './components/OfficialChannels';
 
 const ProtectedRoute = React.lazy(() => import('./components/ProtectedRoute'));
 const Login = React.lazy(() => import('./Login'));
@@ -625,15 +626,8 @@ function HomePage() {
                 ))}
               </div>
 
-              <div className={`mt-5 rounded-md border p-4 ${isDark ? 'border-sky-400/20 bg-sky-400/10' : 'border-sky-100 bg-white'}`}>
-                <p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Canais oficiais</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {['WhatsApp', 'Gmail', 'Instagram', 'GitHub'].map((item) => (
-                    <span key={item} className={`rounded-md px-3 py-2 text-xs font-black ${isDark ? 'bg-[#070A1F] text-slate-200' : 'bg-[#EEF7FF] text-[#0D0F52]'}`}>
-                      {item}
-                    </span>
-                  ))}
-                </div>
+              <div className="mt-5">
+                <OfficialChannels isDark={isDark} compact />
               </div>
             </aside>
           </div>

@@ -477,7 +477,7 @@ function CompanyPage({ data }: { data: PageData }) {
             </span>
           </Link>
 
-          <div className={`public-subpage-nav mobile-scrollbar hidden max-w-2xl items-center gap-1 overflow-x-auto rounded-md border p-1 md:flex ${
+          <div className={`public-subpage-nav mobile-scrollbar order-3 flex w-full max-w-2xl items-center gap-1 overflow-x-auto rounded-md border p-1 md:order-none md:w-auto ${
             isDark ? 'border-white/10 bg-white/[0.045]' : 'border-sky-100 bg-sky-50/80'
           }`}>
             {subpageNavLinks.map((link) => {
@@ -779,7 +779,17 @@ function CompanyPage({ data }: { data: PageData }) {
         {!isStorePage && (
           <>
         <section id="conteúdos" className="pb-16">
-          <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-6 max-w-3xl">
+              <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Estrutura da área</p>
+              <h2 className={`mt-2 text-2xl font-black sm:text-3xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
+                Informações organizadas para consulta rápida
+              </h2>
+              <p className={`mt-2 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                Cada bloco reúne o essencial desta página. Os conteúdos reais publicados pelo painel aparecem logo abaixo.
+              </p>
+            </div>
+            <div className="grid gap-5 lg:grid-cols-3">
             {data.sections.map((section) => (
               <article key={section.title} className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white shadow-sm'}`}>
                 <div className="flex items-start gap-4">
@@ -800,6 +810,7 @@ function CompanyPage({ data }: { data: PageData }) {
                 </div>
               </article>
             ))}
+            </div>
           </div>
         </section>
 
@@ -881,6 +892,30 @@ function CompanyPage({ data }: { data: PageData }) {
         </section>
           </>
         )}
+
+        <section className={`border-t py-16 ${isDark ? 'border-white/10 bg-[#0B102C]' : 'border-sky-100 bg-[#F7FBFF]'}`}>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl">
+              <p className="text-sm font-black uppercase tracking-widest text-[#159AFD]">Fluxo da área</p>
+              <h2 className={`mt-2 text-2xl font-black sm:text-3xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
+                Como as informações evoluem
+              </h2>
+              <p className={`mt-2 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                Um processo simples para manter dados, arquivos e atualizações organizados.
+              </p>
+            </div>
+            <ol className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {data.workflow.map((step, index) => (
+                <li key={step} className={`rounded-md border p-5 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-white'}`}>
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-[#159AFD] text-sm font-black text-white">
+                    {index + 1}
+                  </span>
+                  <p className={`mt-4 font-black leading-6 ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{step}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
 
         <section className={`border-t py-16 ${isDark ? 'border-white/10 bg-[#080B24]' : 'border-sky-100 bg-white'}`}>
           <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-4 lg:px-8">

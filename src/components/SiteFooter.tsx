@@ -1,4 +1,4 @@
-import { ArrowUpRight, Instagram, Mail, MessageCircle, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, Github, Instagram, Mail, MessageCircle, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
@@ -112,6 +112,10 @@ export default function SiteFooter() {
               <a href="https://instagram.com/eln_technology" target="_blank" rel="noreferrer" className={linkClass}>
                 <Instagram className="h-4 w-4 text-[#159AFD]" />
                 @eln_technology
+              </a>
+              <a href="https://github.com/Isaqueeln11" target="_blank" rel="noreferrer" className={linkClass}>
+                <Github className="h-4 w-4 text-[#159AFD]" />
+                github.com/Isaqueeln11
               </a>
             </div>
           </div>
