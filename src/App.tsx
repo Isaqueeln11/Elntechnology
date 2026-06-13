@@ -37,6 +37,8 @@ import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { db } from './firebase';
 import logoUrl from '../ELN TECHNOLOGY.svg';
 import SiteFooter from './components/SiteFooter';
+import AppErrorBoundary from './components/AppErrorBoundary';
+import ScrollToTop from './components/ScrollToTop';
 
 const ProtectedRoute = React.lazy(() => import('./components/ProtectedRoute'));
 const Login = React.lazy(() => import('./Login'));
@@ -45,7 +47,6 @@ const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Unauthorized = React.lazy(() => import('./pages/Unauthorized'));
 const ExplorarSolucoes = React.lazy(() => import('./pages/ExplorarSolucoes'));
 const IniciarProjeto = React.lazy(() => import('./pages/IniciarProjeto'));
-const Inovacoes = React.lazy(() => import('./pages/Inovacoes'));
 const PCBs = React.lazy(() => import('./pages/PCBs'));
 const ProjetosDesenvolvidos = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.ProjetosDesenvolvidos })));
 const MelhoriasPage = React.lazy(() => import('./pages/CompanyPages').then((module) => ({ default: module.MelhoriasPage })));
@@ -985,14 +986,16 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <Router>
-          <React.Suspense fallback={<PageLoader />}>
-            <Routes>
+          <ScrollToTop />
+          <AppErrorBoundary>
+            <React.Suspense fallback={<PageLoader />}>
+              <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/explorar-solucoes" element={<ExplorarSolucoes />} />
               <Route path="/iniciar-projeto" element={<IniciarProjeto />} />
-              <Route path="/inovacoes" element={<Inovacoes />} />
+              <Route path="/inovacoes" element={<Navigate to="/noticias-inovacoes" replace />} />
               <Route path="/pcbs" element={<PCBs />} />
               <Route path="/projetos-desenvolvidos" element={<ProjetosDesenvolvidos />} />
               <Route path="/melhorias" element={<MelhoriasPage />} />
@@ -1017,8 +1020,9 @@ function App() {
                 }
               />
               <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </React.Suspense>
+              </Routes>
+            </React.Suspense>
+          </AppErrorBoundary>
         </Router>
       </AuthProvider>
     </ThemeProvider>

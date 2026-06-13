@@ -395,8 +395,16 @@ service cloud.firestore {
     }
 
     match /projetos/{projectId} {
-      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow read: if isAdmin() || hasRole("technician") || ownsRecord(resource.data);
       allow create, update, delete: if isAdmin();
+      allow update: if hasRole("technician")
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "status",
+          "progress",
+          "technician",
+          "technicianEmail",
+          "updatedAt"
+        ]);
     }
 
     match /technicians/{technicianId} {
@@ -404,13 +412,20 @@ service cloud.firestore {
     }
 
     match /supportTickets/{ticketId} {
-      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow read: if isAdmin() || hasRole("technician") || ownsRecord(resource.data);
       allow create: if isAdmin() || createsOwnRecord();
       allow update, delete: if isAdmin();
+      allow update: if hasRole("technician")
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "status",
+          "technician",
+          "technicianEmail",
+          "updatedAt"
+        ]);
     }
 
     match /documents/{documentId} {
-      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow read: if isAdmin() || hasRole("technician") || ownsRecord(resource.data);
       allow create, update, delete: if isAdmin();
     }
 

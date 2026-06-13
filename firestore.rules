@@ -44,6 +44,37 @@ service cloud.firestore {
         && request.resource.data.get("clientEmail", "") == request.auth.token.email;
     }
 
+    function isPublicOrderRequest() {
+      return request.resource.data.keys().hasOnly([
+          "title",
+          "type",
+          "description",
+          "goals",
+          "requirements",
+          "notes",
+          "deadline",
+          "budget",
+          "client",
+          "company",
+          "clientEmail",
+          "phone",
+          "attachments",
+          "source",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 2
+        && request.resource.data.type is string
+        && request.resource.data.notes is string
+        && request.resource.data.clientEmail is string
+        && request.resource.data.phone is string
+        && request.resource.data.status == "Novo"
+        && request.resource.data.source == "site-iniciar-projeto"
+        && request.resource.data.attachments is list;
+    }
+
     function canReceiveNotification(data) {
       return signedIn()
         && (
@@ -100,8 +131,16 @@ service cloud.firestore {
     }
 
     match /projetos/{projectId} {
-      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow read: if isAdmin() || hasRole("technician") || ownsRecord(resource.data);
       allow create, update, delete: if isAdmin();
+      allow update: if hasRole("technician")
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "status",
+          "progress",
+          "technician",
+          "technicianEmail",
+          "updatedAt"
+        ]);
     }
 
     match /technicians/{technicianId} {
@@ -109,13 +148,20 @@ service cloud.firestore {
     }
 
     match /supportTickets/{ticketId} {
-      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow read: if isAdmin() || hasRole("technician") || ownsRecord(resource.data);
       allow create: if isAdmin() || createsOwnRecord();
       allow update, delete: if isAdmin();
+      allow update: if hasRole("technician")
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "status",
+          "technician",
+          "technicianEmail",
+          "updatedAt"
+        ]);
     }
 
     match /documents/{documentId} {
-      allow read: if isAdmin() || ownsRecord(resource.data);
+      allow read: if isAdmin() || hasRole("technician") || ownsRecord(resource.data);
       allow create, update, delete: if isAdmin();
     }
 
@@ -126,7 +172,7 @@ service cloud.firestore {
 
     match /orders/{orderId} {
       allow read: if isAdmin() || ownsRecord(resource.data);
-      allow create: if isAdmin() || createsOwnRecord();
+      allow create: if isAdmin() || createsOwnRecord() || isPublicOrderRequest();
       allow update, delete: if isAdmin();
     }
 

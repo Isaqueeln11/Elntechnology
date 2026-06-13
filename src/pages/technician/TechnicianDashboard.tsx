@@ -1,42 +1,156 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { collection, doc, onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { useSearchParams } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { notificationIsUnread, useNotifications } from '../../hooks/useNotifications';
-import { 
-  Wrench, 
-  FolderOpen, 
-  MessageSquare, 
-  Clock, 
-  CheckCircle,
-  User,
-  Calendar,
+import {
+  BarChart3,
   Bell,
-  Play,
-  Pause,
+  CheckCircle2,
   FileText,
-  Camera
+  FolderOpen,
+  Gauge,
+  MessageSquare,
+  Play,
+  UserCheck,
+  Wrench,
 } from 'lucide-react';
 import DashboardLayout from '../../components/DashboardLayout';
+import { useAuth } from '../../contexts/AuthContext';
+import { db } from '../../firebase';
+import { notificationIsUnread, useNotifications } from '../../hooks/useNotifications';
 
-const technicianPanelClass = 'dashboard-surface rounded-md border p-5 sm:p-6';
-const technicianSoftClass = 'dashboard-soft-surface rounded-md border';
-const technicianTitleClass = 'text-slate-950 dark:text-white';
-const technicianMutedClass = 'text-slate-500 dark:text-slate-400';
-const technicianBodyClass = 'text-slate-600 dark:text-slate-300';
-const technicianSecondaryButton = 'rounded-md border border-slate-300 bg-white px-4 py-2 font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#0D0F52] dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:bg-white/[0.08] dark:hover:text-white';
+type BaseRecord = {
+  id: string;
+  title?: string;
+  status?: string;
+  client?: string;
+  clientEmail?: string;
+  technician?: string;
+  technicianEmail?: string;
+};
 
-const TechnicianDashboard = () => {
+type ProjectRecord = BaseRecord & {
+  name?: string;
+  description?: string;
+  deadline?: string;
+  progress?: string;
+  budget?: string;
+};
+
+type TicketRecord = BaseRecord & {
+  priority?: string;
+  message?: string;
+};
+
+type DocumentRecord = BaseRecord & {
+  category?: string;
+  url?: string;
+};
+
+const tabs = [
+  { id: 'overview', label: 'Visão geral', icon: Gauge },
+  { id: 'projects', label: 'Projetos', icon: FolderOpen },
+  { id: 'support', label: 'Suporte', icon: Wrench },
+  { id: 'documents', label: 'Documentos', icon: FileText },
+  { id: 'reports', label: 'Relatórios', icon: BarChart3 },
+  { id: 'notifications', label: 'Notificações', icon: Bell },
+];
+
+const panelClass = 'dashboard-surface rounded-md border shadow-[0_5px_18px_rgba(15,23,42,0.045)] dark:shadow-none';
+const primaryButton = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-[#159AFD] px-4 py-2 text-sm font-black text-white transition hover:bg-[#0D0F52]';
+const secondaryButton = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#0D0F52] dark:border-white/10 dark:bg-transparent dark:text-slate-200 dark:hover:bg-white/5';
+
+function recordList<T extends BaseRecord>(snapshot: { docs: Array<{ id: string; data: () => unknown }> }) {
+  return snapshot.docs.map((item) => ({ id: item.id, ...(item.data() as object) }) as T);
+}
+
+function progressValue(value?: string) {
+  return Math.max(0, Math.min(100, Number(value) || 0));
+}
+
+function formatDate(value?: string) {
+  if (!value) return 'Não informado';
+  const date = new Date(`${value}T12:00:00`);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString('pt-BR');
+}
+
+function StatusPill({ value = 'Novo' }: { value?: string }) {
+  const normalized = value.toLowerCase();
+  const color = normalized.includes('conclu') || normalized.includes('resolvido') || normalized.includes('lida')
+    ? 'bg-emerald-500/15 text-emerald-500'
+    : normalized.includes('urgente') || normalized.includes('atras')
+      ? 'bg-rose-500/15 text-rose-500'
+      : normalized.includes('aguard') || normalized.includes('pendente')
+        ? 'bg-amber-500/15 text-amber-500'
+        : 'bg-[#159AFD]/15 text-[#159AFD]';
+
+  return <span className={`rounded-md px-3 py-1 text-xs font-black ${color}`}>{value}</span>;
+}
+
+function EmptyState({ title, text }: { title: string; text: string }) {
+  return (
+    <div className={`${panelClass} p-8 text-center`}>
+      <p className="font-black text-slate-950 dark:text-white">{title}</p>
+      <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500 dark:text-slate-400">{text}</p>
+    </div>
+  );
+}
+
+export default function TechnicianDashboard() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
-  const [selectedTicket, setSelectedTicket] = useState<number | null>(null);
-  const [notificationStatus, setNotificationStatus] = useState('');
+  const [projects, setProjects] = useState<ProjectRecord[]>([]);
+  const [tickets, setTickets] = useState<TicketRecord[]>([]);
+  const [documents, setDocuments] = useState<DocumentRecord[]>([]);
+  const [status, setStatus] = useState('');
+  const [loadError, setLoadError] = useState('');
   const { notifications, unreadCount, error: notificationError, markRead } = useNotifications(user?.role, user?.id, user?.email);
 
   useEffect(() => {
     const requestedTab = searchParams.get('tab');
-    if (requestedTab && requestedTab !== activeTab) setActiveTab(requestedTab);
+    if (requestedTab && tabs.some((tab) => tab.id === requestedTab) && requestedTab !== activeTab) {
+      setActiveTab(requestedTab);
+      return;
+    }
+    if (!tabs.some((tab) => tab.id === activeTab)) setActiveTab('overview');
   }, [activeTab, searchParams]);
+
+  useEffect(() => {
+    const onError = () => setLoadError('Não foi possível carregar todos os dados. Publique as regras atualizadas do Firestore.');
+    const subscriptions = [
+      onSnapshot(collection(db, 'projetos'), (snapshot) => setProjects(recordList<ProjectRecord>(snapshot)), onError),
+      onSnapshot(collection(db, 'supportTickets'), (snapshot) => setTickets(recordList<TicketRecord>(snapshot)), onError),
+      onSnapshot(collection(db, 'documents'), (snapshot) => setDocuments(recordList<DocumentRecord>(snapshot)), onError),
+    ];
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
+  }, []);
+
+  const visibleProjects = useMemo(() => {
+    const identity = [user?.name, user?.email].filter(Boolean).map((value) => value!.toLowerCase());
+    const assigned = projects.filter((item) => {
+      const technician = `${item.technician || ''} ${item.technicianEmail || ''}`.toLowerCase();
+      return !technician.trim() || identity.some((value) => technician.includes(value));
+    });
+    return assigned.length ? assigned : projects;
+  }, [projects, user?.email, user?.name]);
+
+  const visibleTickets = useMemo(() => {
+    const identity = [user?.name, user?.email].filter(Boolean).map((value) => value!.toLowerCase());
+    return tickets.filter((item) => {
+      const technician = `${item.technician || ''} ${item.technicianEmail || ''}`.toLowerCase();
+      return !technician.trim() || identity.some((value) => technician.includes(value));
+    });
+  }, [tickets, user?.email, user?.name]);
+
+  const totals = useMemo(() => {
+    const activeProjects = visibleProjects.filter((item) => !String(item.status).toLowerCase().includes('conclu')).length;
+    const openTickets = visibleTickets.filter((item) => !String(item.status).toLowerCase().includes('resolvido')).length;
+    const completedProjects = visibleProjects.filter((item) => String(item.status).toLowerCase().includes('conclu')).length;
+    const averageProgress = visibleProjects.length
+      ? Math.round(visibleProjects.reduce((sum, item) => sum + progressValue(item.progress), 0) / visibleProjects.length)
+      : 0;
+    return { activeProjects, openTickets, completedProjects, averageProgress };
+  }, [visibleProjects, visibleTickets]);
 
   function openTab(tab: string) {
     setActiveTab(tab);
@@ -44,551 +158,256 @@ const TechnicianDashboard = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async function markNotificationRead(id: string) {
+  async function updateRecord(collectionName: 'projetos' | 'supportTickets', id: string, data: object, successMessage: string) {
+    setStatus('Salvando atualização...');
     try {
-      await markRead(id);
-      setNotificationStatus('Notificação marcada como lida.');
+      await updateDoc(doc(db, collectionName, id), {
+        ...data,
+        technician: user?.name || '',
+        technicianEmail: user?.email?.toLowerCase() || '',
+        updatedAt: serverTimestamp(),
+      });
+      setStatus(successMessage);
     } catch {
-      setNotificationStatus('Não foi possível marcar como lida. Publique as regras atualizadas do Firestore.');
+      setStatus('Não foi possível salvar. Publique as regras atualizadas do Firestore e tente novamente.');
     }
   }
 
-  const myProjects = [
-    {
-      id: 1,
-      name: 'Sistema IoT Industrial',
-      client: 'TechCorp Ltda',
-      status: 'Em Desenvolvimento',
-      progress: 65,
-      priority: 'Alta',
-      deadline: '2024-03-15',
-      timeSpent: '45h',
-      description: 'Desenvolvimento de sistema de monitoramento industrial com sensores IoT'
-    },
-    {
-      id: 2,
-      name: 'PCB Sensor de Temperatura',
-      client: 'AutoSystems',
-      status: 'Teste',
-      progress: 85,
-      priority: 'Média',
-      deadline: '2024-02-28',
-      timeSpent: '32h',
-      description: 'Design e fabricação de PCB para sensor de temperatura industrial'
+  async function markNotificationRead(id: string) {
+    try {
+      await markRead(id);
+      setStatus('Notificação marcada como lida.');
+    } catch {
+      setStatus('Não foi possível marcar a notificação como lida.');
     }
-  ];
-
-  const repairTickets = [
-    {
-      id: 1,
-      title: 'Problema na conectividade WiFi - Sistema IoT',
-      client: 'TechCorp Ltda',
-      project: 'Sistema IoT Industrial',
-      status: 'Aberto',
-      priority: 'Alta',
-      created: '2024-01-15',
-      description: 'Sistema perdendo conexão WiFi intermitentemente após 2 horas de operação',
-      steps: [
-        { id: 1, description: 'Verificar configurações de rede', completed: true, time: '30min' },
-        { id: 2, description: 'Testar estabilidade do sinal', completed: true, time: '45min' },
-        { id: 3, description: 'Analisar logs do sistema', completed: false, time: '60min' },
-        { id: 4, description: 'Implementar correção no firmware', completed: false, time: '120min' }
-      ]
-    },
-    {
-      id: 2,
-      title: 'Calibração de sensores - PCB Temperatura',
-      client: 'AutoSystems',
-      project: 'PCB Sensor de Temperatura',
-      status: 'Em Andamento',
-      priority: 'Média',
-      created: '2024-01-12',
-      description: 'Sensores apresentando leituras inconsistentes após instalação',
-      steps: [
-        { id: 1, description: 'Verificar soldas dos componentes', completed: true, time: '45min' },
-        { id: 2, description: 'Testar com multímetro', completed: true, time: '30min' },
-        { id: 3, description: 'Recalibrar sensores', completed: false, time: '90min' },
-        { id: 4, description: 'Validar em ambiente real', completed: false, time: '60min' }
-      ]
-    }
-  ];
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Em Desenvolvimento': return 'bg-blue-50 text-blue-700 dark:bg-blue-400/20 dark:text-blue-300';
-      case 'Teste': return 'bg-amber-50 text-amber-700 dark:bg-amber-400/20 dark:text-amber-300';
-      case 'Concluído': return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/20 dark:text-emerald-300';
-      case 'Aberto': return 'bg-red-50 text-red-700 dark:bg-red-400/20 dark:text-red-300';
-      case 'Em Andamento': return 'bg-blue-50 text-blue-700 dark:bg-blue-400/20 dark:text-blue-300';
-      default: return 'bg-slate-100 text-slate-600 dark:bg-slate-400/20 dark:text-slate-300';
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'Alta': return 'text-red-600 dark:text-red-300';
-      case 'Média': return 'text-amber-600 dark:text-amber-300';
-      case 'Baixa': return 'text-emerald-600 dark:text-emerald-300';
-      default: return 'text-slate-500 dark:text-slate-400';
-    }
-  };
+  }
 
   const renderOverview = () => (
-    <div className="space-y-8">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className={technicianPanelClass}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`text-sm ${technicianMutedClass}`}>Projetos Ativos</p>
-              <p className={`text-2xl font-bold ${technicianTitleClass}`}>2</p>
-            </div>
-            <FolderOpen className="w-8 h-8 text-[#159AFD]" />
-          </div>
-        </div>
-        <div className={technicianPanelClass}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`text-sm ${technicianMutedClass}`}>Tickets Abertos</p>
-              <p className={`text-2xl font-bold ${technicianTitleClass}`}>2</p>
-            </div>
-            <Wrench className="w-8 h-8 text-[#159AFD]" />
-          </div>
-        </div>
-        <div className={technicianPanelClass}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`text-sm ${technicianMutedClass}`}>Horas Trabalhadas</p>
-              <p className={`text-2xl font-bold ${technicianTitleClass}`}>77h</p>
-            </div>
-            <Clock className="w-8 h-8 text-[#159AFD]" />
-          </div>
-        </div>
-        <div className={technicianPanelClass}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={`text-sm ${technicianMutedClass}`}>Taxa de Resolução</p>
-              <p className={`text-2xl font-bold ${technicianTitleClass}`}>94%</p>
-            </div>
-            <CheckCircle className="w-8 h-8 text-[#159AFD]" />
-          </div>
-        </div>
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          { label: 'Projetos ativos', value: totals.activeProjects, icon: FolderOpen, tab: 'projects' },
+          { label: 'Tickets abertos', value: totals.openTickets, icon: Wrench, tab: 'support' },
+          { label: 'Projetos concluídos', value: totals.completedProjects, icon: CheckCircle2, tab: 'reports' },
+          { label: 'Progresso médio', value: `${totals.averageProgress}%`, icon: BarChart3, tab: 'reports' },
+        ].map(({ label, value, icon: Icon, tab }) => (
+          <button key={label} type="button" onClick={() => openTab(tab)} className={`${panelClass} p-5 text-left transition hover:border-[#159AFD]/50`}>
+            <Icon className="h-6 w-6 text-[#159AFD]" />
+            <p className="mt-5 text-3xl font-black text-slate-950 dark:text-white">{value}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{label}</p>
+          </button>
+        ))}
       </div>
 
-      {/* Quick Actions */}
-      <div className={technicianPanelClass}>
-        <h3 className={`mb-4 text-xl font-semibold ${technicianTitleClass}`}>Ações Rápidas</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="flex items-center justify-center p-4 bg-[#159AFD]/20 hover:bg-[#159AFD]/30 rounded-lg transition-colors">
-            <Play className="w-5 h-5 text-[#159AFD] mr-2" />
-            <span className={technicianTitleClass}>Iniciar Timer</span>
-          </button>
-          <button className="flex items-center justify-center p-4 bg-green-500/20 hover:bg-green-500/30 rounded-lg transition-colors">
-            <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
-            <span className={technicianTitleClass}>Marcar Concluído</span>
-          </button>
-          <button className="flex items-center justify-center p-4 bg-yellow-500/20 hover:bg-yellow-500/30 rounded-lg transition-colors">
-            <MessageSquare className="w-5 h-5 text-yellow-400 mr-2" />
-            <span className={technicianTitleClass}>Novo Ticket</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Today's Tasks */}
-      <div className={technicianPanelClass}>
-        <h3 className={`mb-4 text-xl font-semibold ${technicianTitleClass}`}>Tarefas de Hoje</h3>
-        <div className="space-y-3">
-          {[
-            { task: 'Analisar logs do sistema IoT', project: 'Sistema IoT Industrial', time: '09:00', status: 'pending' },
-            { task: 'Recalibrar sensores de temperatura', project: 'PCB Sensor', time: '14:00', status: 'pending' },
-            { task: 'Reunião com cliente TechCorp', project: 'Sistema IoT Industrial', time: '16:00', status: 'scheduled' },
-            { task: 'Documentar correções implementadas', project: 'Geral', time: '17:30', status: 'pending' }
-          ].map((task, index) => (
-            <div key={index} className={`${technicianSoftClass} flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between`}>
-              <div className="flex min-w-0 items-center">
-                <div className={`w-3 h-3 rounded-full mr-3 ${
-                  task.status === 'completed' ? 'bg-green-400' : 
-                  task.status === 'scheduled' ? 'bg-yellow-400' : 'bg-gray-400'
-                }`} />
-                <div>
-                  <p className={technicianTitleClass}>{task.task}</p>
-                  <p className={`text-sm ${technicianMutedClass}`}>{task.project}</p>
+      <div className="grid gap-5 lg:grid-cols-[1.3fr_0.7fr]">
+        <section className={`${panelClass} p-5 sm:p-6`}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-black text-slate-950 dark:text-white">Trabalho atual</h2>
+              <p className="mt-1 text-sm text-slate-500">Projetos reais cadastrados e atribuídos pela administração.</p>
+            </div>
+            <button type="button" onClick={() => openTab('projects')} className={secondaryButton}>Ver projetos</button>
+          </div>
+          <div className="mt-5 space-y-3">
+            {visibleProjects.slice(0, 4).map((project) => (
+              <article key={project.id} className="rounded-md border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.035]">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 className="font-black text-slate-950 dark:text-white">{project.name || project.title || 'Projeto sem título'}</h3>
+                    <p className="mt-1 text-sm text-slate-500">{project.client || project.clientEmail || 'Cliente não informado'}</p>
+                  </div>
+                  <StatusPill value={project.status} />
                 </div>
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
+                  <div className="h-full rounded-full bg-[#159AFD]" style={{ width: `${progressValue(project.progress)}%` }} />
+                </div>
+              </article>
+            ))}
+            {visibleProjects.length === 0 && <EmptyState title="Nenhum projeto disponível" text="Quando a administração cadastrar ou atribuir um projeto, ele aparecerá aqui." />}
+          </div>
+        </section>
+
+        <aside className={`${panelClass} p-5 sm:p-6`}>
+          <h2 className="text-xl font-black text-slate-950 dark:text-white">Ações rápidas</h2>
+          <div className="mt-5 grid gap-3">
+            <button type="button" onClick={() => openTab('projects')} className={primaryButton}><Play className="h-4 w-4" /> Atualizar projeto</button>
+            <button type="button" onClick={() => openTab('support')} className={secondaryButton}><MessageSquare className="h-4 w-4" /> Atender suporte</button>
+            <button type="button" onClick={() => openTab('documents')} className={secondaryButton}><FileText className="h-4 w-4" /> Consultar documentos</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+
+  const renderProjects = () => visibleProjects.length === 0
+    ? <EmptyState title="Nenhum projeto encontrado" text="Os projetos cadastrados pela administração aparecem aqui em tempo real." />
+    : (
+      <div className="grid gap-5 xl:grid-cols-2">
+        {visibleProjects.map((project) => {
+          const progress = progressValue(project.progress);
+          return (
+            <article key={project.id} className={`${panelClass} p-5`}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-black text-slate-950 dark:text-white">{project.name || project.title || 'Projeto sem título'}</h2>
+                  <p className="mt-1 text-sm text-slate-500">{project.client || project.clientEmail || 'Cliente não informado'}</p>
+                </div>
+                <StatusPill value={project.status} />
               </div>
-              <span className={`text-sm ${technicianMutedClass}`}>{task.time}</span>
+              <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-300">{project.description || 'Sem descrição cadastrada.'}</p>
+              <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+                <div className="dashboard-soft-surface rounded-md border p-3"><span className="block text-slate-500">Prazo</span><strong className="mt-1 block">{formatDate(project.deadline)}</strong></div>
+                <div className="dashboard-soft-surface rounded-md border p-3"><span className="block text-slate-500">Progresso</span><strong className="mt-1 block">{progress}%</strong></div>
+              </div>
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10"><div className="h-full rounded-full bg-[#159AFD]" style={{ width: `${progress}%` }} /></div>
+              <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                <button type="button" onClick={() => updateRecord('projetos', project.id, { status: 'Em andamento', progress: String(Math.min(100, progress + 10)) }, 'Progresso atualizado.')} className={primaryButton}>Avançar 10%</button>
+                <button type="button" onClick={() => updateRecord('projetos', project.id, { status: 'Concluído', progress: '100' }, 'Projeto concluído.')} className={secondaryButton}>Marcar concluído</button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    );
+
+  const renderSupport = () => visibleTickets.length === 0
+    ? <EmptyState title="Nenhum ticket disponível" text="Novos pedidos de suporte aparecem aqui em tempo real." />
+    : (
+      <div className="grid gap-5 xl:grid-cols-2">
+        {visibleTickets.map((ticket) => (
+          <article key={ticket.id} className={`${panelClass} p-5`}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="font-black text-slate-950 dark:text-white">{ticket.title || 'Ticket sem título'}</h2>
+                <p className="mt-1 text-sm text-slate-500">{ticket.client || ticket.clientEmail || 'Cliente não informado'} · Prioridade {ticket.priority || 'Média'}</p>
+              </div>
+              <StatusPill value={ticket.status} />
+            </div>
+            <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-300">{ticket.message || 'Sem mensagem cadastrada.'}</p>
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
+              <button type="button" onClick={() => updateRecord('supportTickets', ticket.id, { status: 'Em atendimento' }, 'Ticket assumido para atendimento.')} className={primaryButton}><UserCheck className="h-4 w-4" /> Atender</button>
+              <button type="button" onClick={() => updateRecord('supportTickets', ticket.id, { status: 'Resolvido' }, 'Ticket marcado como resolvido.')} className={secondaryButton}><CheckCircle2 className="h-4 w-4" /> Resolver</button>
+            </div>
+          </article>
+        ))}
+      </div>
+    );
+
+  const renderDocuments = () => documents.length === 0
+    ? <EmptyState title="Nenhum documento disponível" text="Manuais, referências e arquivos cadastrados pela administração aparecem aqui." />
+    : (
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {documents.map((item) => (
+          <article key={item.id} className={`${panelClass} p-5`}>
+            <FileText className="h-7 w-7 text-[#159AFD]" />
+            <p className="mt-4 text-xs font-black uppercase text-[#159AFD]">{item.category || 'Documento'}</p>
+            <h2 className="mt-2 font-black text-slate-950 dark:text-white">{item.title || 'Documento sem título'}</h2>
+            <p className="mt-2 text-sm text-slate-500">{item.client || item.clientEmail || 'Documento interno'}</p>
+            {item.url
+              ? <a href={item.url} target="_blank" rel="noreferrer" className={`mt-5 w-full ${primaryButton}`}>Abrir documento</a>
+              : <p className="mt-5 text-sm text-slate-500">Link ainda não adicionado.</p>}
+          </article>
+        ))}
+      </div>
+    );
+
+  const renderReports = () => (
+    <div className="grid gap-5 lg:grid-cols-2">
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <h2 className="text-xl font-black text-slate-950 dark:text-white">Indicadores reais</h2>
+        <div className="mt-5 space-y-4">
+          {[
+            { label: 'Projetos ativos', value: totals.activeProjects },
+            { label: 'Projetos concluídos', value: totals.completedProjects },
+            { label: 'Tickets abertos', value: totals.openTickets },
+            { label: 'Progresso médio', value: `${totals.averageProgress}%` },
+          ].map((item) => (
+            <div key={item.label} className="dashboard-soft-surface flex items-center justify-between rounded-md border p-4">
+              <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">{item.label}</span>
+              <strong className="text-xl text-[#159AFD]">{item.value}</strong>
             </div>
           ))}
         </div>
-      </div>
+      </section>
+      <section className={`${panelClass} p-5 sm:p-6`}>
+        <h2 className="text-xl font-black text-slate-950 dark:text-white">Origem dos dados</h2>
+        <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+          Este painel não usa números de demonstração. Projetos, tickets, documentos e indicadores são calculados diretamente das coleções do Firestore.
+        </p>
+        <div className="mt-5 grid gap-3 text-sm">
+          <div className="dashboard-soft-surface rounded-md border p-4"><strong>{visibleProjects.length}</strong> projeto(s) disponível(is)</div>
+          <div className="dashboard-soft-surface rounded-md border p-4"><strong>{visibleTickets.length}</strong> ticket(s) disponível(is)</div>
+          <div className="dashboard-soft-surface rounded-md border p-4"><strong>{documents.length}</strong> documento(s) disponível(is)</div>
+        </div>
+      </section>
     </div>
   );
 
-  const renderProjects = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className={`text-2xl font-bold ${technicianTitleClass}`}>Meus Projetos</h3>
-        <div className="flex items-center space-x-2">
-          <button className="bg-[#159AFD]/20 hover:bg-[#159AFD]/30 text-[#159AFD] px-4 py-2 rounded-lg transition-colors">
-            Filtrar
-          </button>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {myProjects.map((project) => (
-          <div key={project.id} className={technicianPanelClass}>
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <h4 className={`text-xl font-semibold ${technicianTitleClass}`}>{project.name}</h4>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(project.priority)}`}>
-                  {project.priority}
-                </span>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
-                  {project.status}
-                </span>
-              </div>
+  const renderNotifications = () => notifications.length === 0
+    ? <EmptyState title="Nenhuma notificação" text="Avisos direcionados à equipe técnica aparecem aqui." />
+    : (
+      <div className="space-y-3">
+        {notifications.map((item) => (
+          <article key={item.id} className={`${panelClass} flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between`}>
+            <div>
+              <div className="flex flex-wrap items-center gap-2"><h2 className="font-black text-slate-950 dark:text-white">{item.title || 'Notificação'}</h2><StatusPill value={notificationIsUnread(item, user?.id) ? item.status : 'Lida'} /></div>
+              <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{item.message || 'Sem mensagem.'}</p>
             </div>
-            
-            <p className={`mb-4 ${technicianBodyClass}`}>{project.description}</p>
-            
-            <div className="space-y-3 mb-4">
-              <div className={`flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between ${technicianBodyClass}`}>
-                <span className="flex items-center">
-                  <User className="w-4 h-4 mr-2" />
-                  Cliente
-                </span>
-                <span>{project.client}</span>
-              </div>
-              <div className={`flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between ${technicianBodyClass}`}>
-                <span className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Prazo
-                </span>
-                <span>{project.deadline}</span>
-              </div>
-              <div className={`flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between ${technicianBodyClass}`}>
-                <span className="flex items-center">
-                  <Clock className="w-4 h-4 mr-2" />
-                  Tempo Gasto
-                </span>
-                <span>{project.timeSpent}</span>
-              </div>
-            </div>
-            
-            <div className="mb-4">
-              <div className={`mb-1 flex justify-between text-sm ${technicianMutedClass}`}>
-                <span>Progresso</span>
-                <span>{project.progress}%</span>
-              </div>
-              <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-white/10">
-                <div 
-                  className="bg-[#159AFD] h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${project.progress}%` }}
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <button className="flex-1 bg-[#159AFD] hover:bg-[#508AD0] text-white py-2 rounded-lg transition-colors flex items-center justify-center">
-                <Play className="w-4 h-4 mr-2" />
-                Continuar
-              </button>
-              <button className={technicianSecondaryButton}>
-                Detalhes
-              </button>
-            </div>
-          </div>
+            {notificationIsUnread(item, user?.id) && <button type="button" onClick={() => markNotificationRead(item.id)} className={secondaryButton}>Marcar lida</button>}
+          </article>
         ))}
       </div>
-    </div>
-  );
+    );
 
-  const renderRepairTickets = () => (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className={`text-2xl font-bold ${technicianTitleClass}`}>Roteiro de Reparos</h3>
-        <button className="w-full rounded-lg bg-[#159AFD] px-4 py-2 text-white transition-colors hover:bg-[#508AD0] sm:w-auto">
-          Novo Ticket
-        </button>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {repairTickets.map((ticket) => (
-          <div key={ticket.id} className={technicianPanelClass}>
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <h4 className={`text-lg font-semibold ${technicianTitleClass}`}>{ticket.title}</h4>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
-                  {ticket.priority}
-                </span>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(ticket.status)}`}>
-                  {ticket.status}
-                </span>
-              </div>
-            </div>
-            
-            <div className="space-y-2 mb-4 text-sm">
-              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-                <span className={technicianMutedClass}>Cliente:</span>
-                <span className={technicianTitleClass}>{ticket.client}</span>
-              </div>
-              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-                <span className={technicianMutedClass}>Projeto:</span>
-                <span className={technicianTitleClass}>{ticket.project}</span>
-              </div>
-              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-                <span className={technicianMutedClass}>Criado:</span>
-                <span className={technicianTitleClass}>{ticket.created}</span>
-              </div>
-            </div>
-            
-            <p className={`mb-4 text-sm ${technicianBodyClass}`}>{ticket.description}</p>
-            
-            <div className="space-y-2 mb-4">
-              <h5 className={`text-sm font-medium ${technicianTitleClass}`}>Etapas do Reparo:</h5>
-              {ticket.steps.map((step) => (
-                <div key={step.id} className={`${technicianSoftClass} flex flex-col gap-2 p-2 sm:flex-row sm:items-center sm:justify-between`}>
-                  <div className="flex min-w-0 items-center">
-                    <div className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${
-                      step.completed ? 'bg-green-400' : 'bg-gray-400'
-                    }`}>
-                      {step.completed && <CheckCircle className="w-3 h-3 text-white" />}
-                    </div>
-                    <span className={`break-words text-sm ${step.completed ? 'text-slate-400 line-through dark:text-slate-500' : technicianTitleClass}`}>
-                      {step.description}
-                    </span>
-                  </div>
-                  <span className={`text-xs ${technicianMutedClass}`}>{step.time}</span>
-                </div>
-              ))}
-            </div>
-            
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <button 
-                onClick={() => setSelectedTicket(ticket.id)}
-                className="flex-1 bg-[#159AFD] hover:bg-[#508AD0] text-white py-2 rounded-lg transition-colors text-sm"
-              >
-                Trabalhar
-              </button>
-              <button className={`${technicianSecondaryButton} flex-1 text-sm`}>
-                Histórico
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Repair Work Modal */}
-      {selectedTicket && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
-          <div className="dashboard-surface max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-md border p-4 shadow-2xl sm:p-8">
-            <div className="mb-6 flex items-start justify-between gap-3">
-              <h2 className={`text-xl font-bold sm:text-2xl ${technicianTitleClass}`}>
-                Roteiro de Reparo - Ticket #{selectedTicket}
-              </h2>
-              <button
-                onClick={() => setSelectedTicket(null)}
-                className={`${technicianMutedClass} hover:text-[#159AFD]`}
-              >
-                ✕
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column - Steps */}
-              <div>
-                <h3 className={`mb-4 text-lg font-semibold ${technicianTitleClass}`}>Etapas do Reparo</h3>
-                <div className="space-y-3">
-                  {repairTickets.find(t => t.id === selectedTicket)?.steps.map((step) => (
-                    <div key={step.id} className={`${technicianSoftClass} p-4`}>
-                      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex min-w-0 items-center">
-                          <button className={`w-6 h-6 rounded-full mr-3 flex items-center justify-center ${
-                            step.completed ? 'bg-green-400' : 'bg-gray-600 hover:bg-[#159AFD]'
-                          } transition-colors`}>
-                            {step.completed && <CheckCircle className="w-4 h-4 text-white" />}
-                          </button>
-                          <span className={`${step.completed ? 'text-slate-400 line-through dark:text-slate-500' : technicianTitleClass} break-words`}>
-                            {step.description}
-                          </span>
-                        </div>
-                        <span className={`text-sm ${technicianMutedClass}`}>{step.time}</span>
-                      </div>
-                      {!step.completed && (
-                        <div className="ml-9 flex space-x-2">
-                          <button className="bg-[#159AFD] hover:bg-[#508AD0] text-white px-3 py-1 rounded text-sm transition-colors">
-                            Iniciar
-                          </button>
-                          <button className={`${technicianSecondaryButton} px-3 py-1 text-sm`}>
-                            Pular
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Right Column - Documentation */}
-              <div>
-                <h3 className={`mb-4 text-lg font-semibold ${technicianTitleClass}`}>Documentação</h3>
-                <div className="space-y-4">
-                  <div className={`${technicianSoftClass} p-4`}>
-                    <h4 className={`mb-2 font-medium ${technicianTitleClass}`}>Notas do Técnico</h4>
-                    <textarea
-                      className="dashboard-control h-32 w-full resize-none rounded-md border p-3"
-                      placeholder="Adicione suas observações sobre o reparo..."
-                    />
-                  </div>
-                  
-                  <div className={`${technicianSoftClass} p-4`}>
-                    <h4 className={`mb-2 font-medium ${technicianTitleClass}`}>Anexar Evidências</h4>
-                    <div className="rounded-md border-2 border-dashed border-slate-300 p-6 text-center dark:border-white/15">
-                      <Camera className={`mx-auto mb-2 h-8 w-8 ${technicianMutedClass}`} />
-                      <p className={`text-sm ${technicianMutedClass}`}>Clique para adicionar fotos ou documentos</p>
-                    </div>
-                  </div>
-                  
-                  <div className={`${technicianSoftClass} p-4`}>
-                    <h4 className={`mb-2 font-medium ${technicianTitleClass}`}>Tempo Gasto</h4>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="number"
-                        placeholder="Horas"
-                        className="dashboard-control flex-1 rounded-md border p-2"
-                      />
-                      <span className={technicianMutedClass}>:</span>
-                      <input
-                        type="number"
-                        placeholder="Min"
-                        className="dashboard-control flex-1 rounded-md border p-2"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between">
-              <button
-                onClick={() => setSelectedTicket(null)}
-                className={technicianSecondaryButton}
-              >
-                Salvar e Fechar
-              </button>
-              <div className="grid grid-cols-1 gap-2 sm:flex sm:space-x-2">
-                <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center">
-                  <Pause className="w-4 h-4 mr-2" />
-                  Pausar
-                </button>
-                <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors flex items-center">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Concluir
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  const tabs = [
-    { id: 'overview', label: 'Visão Geral', icon: Clock },
-    { id: 'projects', label: 'Meus Projetos', icon: FolderOpen },
-    { id: 'repairs', label: 'Roteiro de Reparos', icon: Wrench },
-    { id: 'messages', label: 'Mensagens', icon: MessageSquare },
-    { id: 'reports', label: 'Relatórios', icon: FileText },
-    { id: 'notifications', label: 'Notificações', icon: Bell },
-  ];
+  const currentTab = tabs.find((tab) => tab.id === activeTab) || tabs[0];
+  const CurrentIcon = currentTab.icon;
 
   return (
     <DashboardLayout>
-      <div className="technician-dashboard space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h1 className={`text-2xl font-bold sm:text-3xl ${technicianTitleClass}`}>
-              Painel Técnico
-            </h1>
-            <p className={`mt-1 ${technicianMutedClass}`}>Bem-vindo, {user?.name}</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button type="button" onClick={() => openTab('notifications')} className={`relative rounded-md p-2 transition-colors hover:bg-[#159AFD]/10 hover:text-[#159AFD] ${technicianMutedClass}`} title="Notificações">
-              <Bell className="w-6 h-6" />
-              {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-black text-white">{unreadCount > 9 ? '9+' : unreadCount}</span>}
-            </button>
-            <img
-              src={user?.avatar}
-              alt={user?.name}
-              className="w-10 h-10 rounded-full border-2 border-[#159AFD]"
-            />
-          </div>
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="dashboard-surface mobile-scrollbar flex space-x-1 overflow-x-auto rounded-md border p-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => openTab(tab.id)}
-              className={`flex flex-none items-center whitespace-nowrap rounded-lg px-4 py-2 transition-all ${
-                activeTab === tab.id
-                  ? 'bg-[#159AFD] text-white'
-                  : 'text-slate-600 hover:bg-[#159AFD]/10 hover:text-[#0D0F52] dark:text-slate-300 dark:hover:bg-[#159AFD]/20 dark:hover:text-white'
-              }`}
-            >
-              <tab.icon className="w-4 h-4 mr-2" />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Content */}
-        <div>
-          {activeTab === 'overview' && renderOverview()}
-          {activeTab === 'projects' && renderProjects()}
-          {activeTab === 'repairs' && renderRepairTickets()}
-          {activeTab === 'messages' && (
-            <div className="text-center py-12">
-              <MessageSquare className={`mx-auto mb-4 h-16 w-16 ${technicianMutedClass}`} />
-              <p className={technicianMutedClass}>Sistema de mensagens em desenvolvimento</p>
+      <div className="technician-dashboard space-y-6">
+        <header className={`${panelClass} flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between`}>
+          <div className="flex items-start gap-4">
+            <span className="flex h-12 w-12 flex-none items-center justify-center rounded-md bg-[#159AFD]/15 text-[#159AFD]"><CurrentIcon className="h-6 w-6" /></span>
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#159AFD]">Painel técnico</p>
+              <h1 className="mt-2 text-2xl font-black text-slate-950 dark:text-white">{currentTab.label}</h1>
+              <p className="mt-1 text-sm text-slate-500">Olá, {user?.name}. Dados sincronizados com o Firestore.</p>
             </div>
-          )}
-          {activeTab === 'reports' && (
-            <div className="text-center py-12">
-              <FileText className={`mx-auto mb-4 h-16 w-16 ${technicianMutedClass}`} />
-              <p className={technicianMutedClass}>Relatórios técnicos em desenvolvimento</p>
-            </div>
-          )}
-          {activeTab === 'notifications' && (
-            <div className="space-y-4">
-              {(notificationStatus || notificationError) && <div className="rounded-md border border-[#159AFD]/30 bg-[#159AFD]/10 p-4 text-sm font-semibold text-sky-700 dark:text-sky-200">{notificationError || notificationStatus}</div>}
-              {notifications.length === 0 ? (
-                <div className="dashboard-surface rounded-md border py-12 text-center">
-                  <Bell className={`mx-auto h-12 w-12 ${technicianMutedClass}`} />
-                  <p className={`mt-4 font-bold ${technicianTitleClass}`}>Nenhuma notificação disponível.</p>
-                </div>
-              ) : notifications.map((item) => (
-                <article key={item.id} className="dashboard-surface flex flex-col gap-4 rounded-md border p-5 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className={`font-bold ${technicianTitleClass}`}>{item.title || 'Notificação'}</h3>
-                      <span className={`rounded-md px-2 py-1 text-xs font-black ${notificationIsUnread(item, user?.id) ? 'bg-[#159AFD]/20 text-[#159AFD]' : 'bg-emerald-500/15 text-emerald-400'}`}>
-                        {notificationIsUnread(item, user?.id) ? 'Nova' : 'Lida'}
-                      </span>
-                    </div>
-                    <p className={`mt-2 text-sm leading-6 ${technicianBodyClass}`}>{item.message || 'Sem mensagem.'}</p>
-                  </div>
-                  {notificationIsUnread(item, user?.id) && <button type="button" onClick={() => markNotificationRead(item.id)} className="rounded-lg border border-[#159AFD]/30 px-4 py-2 text-sm font-bold text-[#159AFD] transition hover:bg-[#159AFD]/10">Marcar lida</button>}
-                </article>
+          </div>
+          <button type="button" onClick={() => openTab('notifications')} className="relative flex items-center gap-2 rounded-md border border-slate-200 px-4 py-3 text-sm font-bold text-slate-600 transition hover:border-[#159AFD] dark:border-white/10 dark:text-slate-300">
+            <Bell className="h-5 w-5" />
+            Notificações
+            {unreadCount > 0 && <span className="rounded-full bg-red-500 px-2 py-0.5 text-xs font-black text-white">{unreadCount > 9 ? '9+' : unreadCount}</span>}
+          </button>
+        </header>
+
+        {(status || loadError || notificationError) && (
+          <div role="status" className={`rounded-md border p-3 text-sm font-semibold ${loadError || notificationError ? 'border-amber-400/30 bg-amber-500/10 text-amber-700 dark:text-amber-200' : 'border-[#159AFD]/30 bg-[#159AFD]/10 text-[#0D0F52] dark:text-sky-200'}`}>
+            {loadError || notificationError || status}
+          </div>
+        )}
+
+        <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)]">
+          <aside className={`${panelClass} h-fit p-2 lg:sticky lg:top-24`}>
+            <nav className="mobile-scrollbar flex gap-1 overflow-x-auto lg:block lg:space-y-1 lg:overflow-visible">
+              {tabs.map(({ id, label, icon: Icon }) => (
+                <button key={id} type="button" onClick={() => openTab(id)} className={`flex min-h-11 flex-none items-center gap-3 rounded-md px-3 py-2 text-sm font-bold transition lg:w-full ${activeTab === id ? 'bg-[#0D0F52] text-white shadow-sm dark:bg-[#159AFD]' : 'text-slate-600 hover:bg-slate-100 hover:text-[#0D0F52] dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white'}`}>
+                  <Icon className="h-4 w-4" />
+                  {label}
+                </button>
               ))}
-            </div>
-          )}
+            </nav>
+          </aside>
+          <main className="min-w-0">
+            {activeTab === 'projects' && renderProjects()}
+            {activeTab === 'support' && renderSupport()}
+            {activeTab === 'documents' && renderDocuments()}
+            {activeTab === 'reports' && renderReports()}
+            {activeTab === 'notifications' && renderNotifications()}
+            {activeTab === 'overview' && renderOverview()}
+          </main>
         </div>
       </div>
     </DashboardLayout>
   );
-};
-
-export default TechnicianDashboard;
+}
