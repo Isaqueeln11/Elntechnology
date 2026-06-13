@@ -164,8 +164,14 @@ const tabs = [
   { id: 'settings', label: 'Meu Perfil', icon: Settings, description: 'Dados do administrador' },
 ];
 
-const inputClass = 'mt-2 w-full rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10 dark:border-white/10 dark:bg-[#070A1F]/70 dark:text-white dark:placeholder:text-slate-500';
-const panelClass = 'rounded-md border border-[#D8E2EC] bg-white shadow-[0_6px_20px_rgba(15,23,42,0.045)] dark:border-white/10 dark:bg-white/[0.045] dark:shadow-none';
+const tabGroups = [
+  { label: 'Operação', ids: ['overview', 'orders', 'clients', 'projects', 'technicians'] },
+  { label: 'Atendimento e financeiro', ids: ['support', 'documents', 'billing', 'notifications'] },
+  { label: 'Site e sistema', ids: ['store', 'sitePages', 'ota', 'settings'] },
+];
+
+const inputClass = 'mt-2 w-full rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10 dark:border-[#25304A] dark:bg-[#080D1C] dark:text-white dark:placeholder:text-slate-500';
+const panelClass = 'rounded-md border border-[#D8E2EC] bg-white shadow-[0_4px_16px_rgba(15,23,42,0.04)] dark:border-[#25304A] dark:bg-[#0E1428] dark:shadow-none';
 const defaultAreasSectionForm = {
   eyebrow: 'Espaços do site',
   title: 'Áreas da ELN Technology para acompanhar projetos, equipe, produtos e novidades.',
@@ -240,6 +246,19 @@ const pageLinks: Record<string, string> = {
   videos: '/videos-futuro',
   noticias: '/noticias-inovacoes',
 };
+
+const sitePageAdminDefinitions = [
+  { page: 'projetos', label: 'Projetos desenvolvidos', type: 'Projeto', category: 'Projetos', icon: FolderOpen, description: 'Resultados, fotos, componentes, arquivos e entregas.' },
+  { page: 'melhorias', label: 'Melhorias', type: 'Melhoria', category: 'Melhorias', icon: Settings, description: 'Correções, prioridades, segurança e próximas versões.' },
+  { page: 'equipe', label: 'Equipe', type: 'Equipe', category: 'Equipe', icon: Users, description: 'Membros, cargos, fotos, contatos e responsabilidades.' },
+  { page: 'atividades', label: 'Atividades e análise', type: 'Atividade', category: 'Análise', icon: Activity, description: 'Indicadores, eventos, resultados e relatórios.' },
+  { page: 'desenvolvimentos', label: 'Desenvolvimentos', type: 'Projeto', category: 'Em desenvolvimento', icon: UploadCloud, description: 'Firmware, hardware, sistemas, versões e progresso.' },
+  { page: 'estudos', label: 'Base técnica', type: 'Estudo', category: 'ESP32 e placas', icon: Cpu, description: 'Placas, módulos, datasheets, pinagem, setup e notas.' },
+  { page: 'produtos', label: 'Produtos', type: 'Produto', category: 'IoT e automação', icon: PackagePlus, description: 'Produtos, serviços, códigos, imagens, preços e estoque.' },
+  { page: 'videos', label: 'Vídeos e futuro', type: 'Vídeo', category: 'Vídeos', icon: MonitorPlay, description: 'Demonstrações, links, roadmap e próximos lançamentos.' },
+  { page: 'noticias', label: 'Notícias e inovações', type: 'Notícia', category: 'Notícias', icon: Bell, description: 'Novidades, comunicados, mídia e lançamentos.' },
+  { page: 'lojas', label: 'Loja e canais', type: 'Loja', category: 'Canal oficial', icon: Store, description: 'Loja oficial, marketplaces, contatos e parceiros.' },
+] as const;
 
 const firebaseConsoleRulesUrl = 'https://console.firebase.google.com/u/0/project/elntechnology/firestore/rules';
 
@@ -574,6 +593,7 @@ const AdminDashboard = () => {
   const [systemEvents, setSystemEvents] = useState<SystemEventRecord[]>([]);
   const [siteContent, setSiteContent] = useState<SiteContentRecord[]>([]);
   const [editingSiteContentId, setEditingSiteContentId] = useState<string | null>(null);
+  const [sitePageFilter, setSitePageFilter] = useState('all');
   const [areasSectionForm, setAreasSectionForm] = useState(defaultAreasSectionForm);
 
   const [clientForm, setClientForm] = useState({ name: '', email: '', phone: '', company: '' });
@@ -680,6 +700,11 @@ const AdminDashboard = () => {
       .filter((item) => ['lojas', 'produtos'].includes(item.page || ''))
       .sort((first, second) => Number(Boolean(second.featured)) - Number(Boolean(first.featured))),
     [siteContent],
+  );
+
+  const filteredSiteContent = useMemo(
+    () => sitePageFilter === 'all' ? siteContent : siteContent.filter((item) => item.page === sitePageFilter),
+    [siteContent, sitePageFilter],
   );
 
   async function createRecord<T extends object>(collectionName: CollectionName, data: T, reset: () => void, message: string) {
@@ -803,12 +828,30 @@ const AdminDashboard = () => {
 
   function prepareStoreProduct(page: 'lojas' | 'produtos' = 'lojas') {
     setEditingSiteContentId(null);
+    setSitePageFilter(page);
     setSiteContentForm({
       ...defaultStoreProductForm,
       page,
       type: page === 'lojas' ? 'Produto' : 'Produto',
     });
     setStatus(page === 'lojas' ? 'Preencha o produto para aparecer na loja.' : 'Preencha o produto para aparecer em produtos.');
+  }
+
+  function prepareSitePageContent(page: string) {
+    const definition = sitePageAdminDefinitions.find((item) => item.page === page);
+    if (!definition) return;
+
+    setEditingSiteContentId(null);
+    setSitePageFilter(page);
+    setSiteContentForm({
+      ...defaultSiteContentForm,
+      page: definition.page,
+      type: definition.type,
+      category: definition.category,
+      marketplace: ['produtos', 'lojas'].includes(definition.page) ? 'Loja oficial' : '',
+    });
+    setStatus(`Formulário preparado para cadastrar em ${definition.label}.`);
+    window.setTimeout(() => document.getElementById('site-content-editor')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   }
 
   function startEditingSiteContent(item: SiteContentRecord) {
@@ -837,7 +880,9 @@ const AdminDashboard = () => {
       setupGuide: item.setupGuide || '',
       relatedProducts: item.relatedProducts || '',
     });
+    setSitePageFilter(item.page || 'all');
     setStatus(`Editando: ${item.title || 'conteúdo sem título'}.`);
+    window.setTimeout(() => document.getElementById('site-content-editor')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
   }
 
   async function copyFirestoreRules() {
@@ -925,17 +970,40 @@ const AdminDashboard = () => {
         </button>
       )}
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-5">
+      <div className={`${panelClass} p-4 sm:p-5`}>
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#159AFD]">Ações rápidas</p>
+            <h2 className="mt-1 text-lg font-black text-slate-950 dark:text-white">Acesse as tarefas mais usadas sem procurar no menu.</h2>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:flex lg:flex-wrap lg:justify-end">
+            {[
+              { label: 'Novo pedido', tab: 'orders', icon: PackagePlus },
+              { label: 'Adicionar cliente', tab: 'clients', icon: UserPlus },
+              { label: 'Criar projeto', tab: 'projects', icon: FolderOpen },
+              { label: 'Publicar conteúdo', tab: 'sitePages', icon: MonitorPlay },
+              { label: 'Cadastrar produto', tab: 'store', icon: Store },
+            ].map(({ label, tab, icon: ActionIcon }) => (
+              <button key={tab} type="button" onClick={() => openTab(tab)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm font-black text-slate-700 transition hover:border-[#159AFD] hover:bg-white hover:text-[#159AFD] dark:border-white/10 dark:bg-white/[0.035] dark:text-slate-200 dark:hover:bg-white/[0.07]">
+                <ActionIcon className="h-4 w-4 text-[#159AFD]" />
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
         {stats.map((stat) => (
-          <div key={stat.label} className={`${panelClass} p-5`}>
-            <div className="mb-5 flex items-center justify-between gap-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-md bg-[#159AFD]/15 text-[#159AFD]">
+          <div key={stat.label} className={`${panelClass} p-4 sm:p-5`}>
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#159AFD]/15 text-[#159AFD]">
                 <stat.icon className="h-6 w-6" />
               </div>
-              <span className="rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500 dark:bg-white/5 dark:text-slate-400">{stat.hint}</span>
+              <span className="truncate rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-500 dark:bg-white/5 dark:text-slate-400">{stat.hint}</span>
             </div>
-            <p className="mb-1 truncate text-2xl font-black text-slate-950 dark:text-white">{stat.value}</p>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</p>
+            <p className="truncate text-2xl font-black text-slate-950 dark:text-white">{stat.value}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-500 dark:text-slate-400">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -1315,91 +1383,52 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-2 xl:grid-cols-5">
-          <button
-            type="button"
-            onClick={() => {
-              setEditingSiteContentId(null);
-              setSiteContentForm({ ...defaultSiteContentForm, page: 'estudos', type: 'Estudo', category: 'ESP32 e placas' });
-            }}
-            className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
-          >
-            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
-              <Cpu className="h-5 w-5" />
-            </span>
-            <span>
-              <span className="block font-black text-slate-950 dark:text-white">Cadastrar estudo</span>
-              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Placa, módulo, datasheet, pinagem, setup e anotações.</span>
-            </span>
-          </button>
+        <div className="mt-6 border-t border-slate-200 pt-5 dark:border-white/10">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[#159AFD]">Gerenciar páginas públicas</p>
+              <h4 className="mt-2 text-lg font-black text-slate-950 dark:text-white">Escolha uma área para cadastrar, revisar ou publicar dados.</h4>
+              <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">Cada cartão abre o formulário já configurado e filtra os registros daquela página.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSitePageFilter('all')}
+              className={`rounded-md border px-4 py-3 text-sm font-black transition ${sitePageFilter === 'all' ? 'border-[#159AFD] bg-[#159AFD] text-white' : 'border-slate-200 text-slate-700 hover:border-[#159AFD] dark:border-white/10 dark:text-slate-200'}`}
+            >
+              Ver todos os registros ({siteContent.length})
+            </button>
+          </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              prepareStoreProduct('produtos');
-              openTab('store');
-            }}
-            className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
-          >
-            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
-              <PackagePlus className="h-5 w-5" />
-            </span>
-            <span>
-              <span className="block font-black text-slate-950 dark:text-white">Cadastrar produto real</span>
-              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Imagem, link de compra, código, valor, ficha técnica e estoque.</span>
-            </span>
-          </button>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
+            {sitePageAdminDefinitions.map(({ page, label, description, icon: PageIcon }) => {
+              const pageItems = siteContent.filter((item) => item.page === page);
+              const publishedCount = pageItems.filter((item) => item.status !== 'Rascunho').length;
+              const draftCount = pageItems.filter((item) => item.status === 'Rascunho').length;
 
-          <button
-            type="button"
-            onClick={() => {
-              prepareStoreProduct('lojas');
-              openTab('store');
-            }}
-            className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
-          >
-            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
-              <Store className="h-5 w-5" />
-            </span>
-            <span>
-              <span className="block font-black text-slate-950 dark:text-white">Cadastrar loja/canal</span>
-              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Shopee, Mercado Livre, WhatsApp, catálogo ou canal oficial.</span>
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setEditingSiteContentId(null);
-              setSiteContentForm({ ...defaultSiteContentForm, page: 'equipe', type: 'Equipe', category: 'Equipe' });
-            }}
-            className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
-          >
-            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
-              <Users className="h-5 w-5" />
-            </span>
-            <span>
-              <span className="block font-black text-slate-950 dark:text-white">Cadastrar membro</span>
-              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Nome, cargo, foto/link e responsabilidades da equipe.</span>
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setEditingSiteContentId(null);
-              setSiteContentForm({ ...defaultSiteContentForm, page: 'noticias', type: 'Notícia', category: 'Notícias' });
-            }}
-            className="flex items-start gap-4 rounded-md border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#159AFD] hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]"
-          >
-            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
-              <MonitorPlay className="h-5 w-5" />
-            </span>
-            <span>
-              <span className="block font-black text-slate-950 dark:text-white">Adicionar publicação</span>
-              <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">Prepara o formulário para publicar em notícias e inovações.</span>
-            </span>
-          </button>
+              return (
+                <article key={page} className={`flex min-h-64 flex-col rounded-md border p-4 transition ${sitePageFilter === page ? 'border-[#159AFD] bg-[#159AFD]/8 ring-2 ring-[#159AFD]/15' : 'border-slate-200 bg-slate-50 hover:border-[#159AFD]/50 hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.06]'}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
+                      <PageIcon className="h-5 w-5" />
+                    </span>
+                    <a href={pageLinks[page]} target="_blank" rel="noreferrer" className="rounded-md border border-slate-200 px-2 py-1 text-xs font-black text-slate-600 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-300">
+                      Ver página
+                    </a>
+                  </div>
+                  <h5 className="mt-4 font-black text-slate-950 dark:text-white">{label}</h5>
+                  <p className="mt-2 flex-1 text-sm leading-6 text-slate-500 dark:text-slate-400">{description}</p>
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <span className="rounded-md bg-emerald-500/10 px-2 py-2 text-center text-xs font-black text-emerald-600 dark:text-emerald-300">{publishedCount} publicado(s)</span>
+                    <span className="rounded-md bg-amber-500/10 px-2 py-2 text-center text-xs font-black text-amber-700 dark:text-amber-300">{draftCount} rascunho(s)</span>
+                  </div>
+                  <button type="button" onClick={() => prepareSitePageContent(page)} className="mt-3 inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#159AFD] px-3 text-sm font-black text-white transition hover:bg-[#0D0F52]">
+                    <Plus className="h-4 w-4" />
+                    Adicionar conteúdo
+                  </button>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -1440,8 +1469,28 @@ const AdminDashboard = () => {
         </button>
       </form>
 
+      <div id="site-content-editor" className="scroll-mt-28 space-y-4">
+      <div className={`${panelClass} flex flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center`}>
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.2em] text-[#159AFD]">Área selecionada</p>
+          <p className="mt-1 font-black text-slate-950 dark:text-white">
+            {sitePageFilter === 'all' ? 'Todos os conteúdos públicos' : sitePageAdminDefinitions.find((item) => item.page === sitePageFilter)?.label || sitePageFilter}
+          </p>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{filteredSiteContent.length} registro(s) sendo exibido(s).</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {sitePageFilter !== 'all' && (
+            <a href={pageLinks[sitePageFilter]} target="_blank" rel="noreferrer" className="rounded-md border border-slate-200 px-4 py-3 text-sm font-black text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200">
+              Abrir página pública
+            </a>
+          )}
+          <button type="button" onClick={() => setSitePageFilter('all')} className="rounded-md border border-slate-200 px-4 py-3 text-sm font-black text-slate-700 transition hover:border-[#159AFD] hover:text-[#159AFD] dark:border-white/10 dark:text-slate-200">
+            Mostrar todos
+          </button>
+        </div>
+      </div>
       <CrudPanel
-        title={editingSiteContentId ? 'Editar conteúdo público' : 'Adicionar conteúdo público'}
+        title={editingSiteContentId ? 'Editar conteúdo público' : `Adicionar conteúdo público${sitePageFilter !== 'all' ? ` em ${sitePageAdminDefinitions.find((item) => item.page === sitePageFilter)?.label || sitePageFilter}` : ''}`}
         onSubmit={async (event) => {
           event.preventDefault();
           const nextContent = buildSiteContentPayload();
@@ -1475,7 +1524,10 @@ const AdminDashboard = () => {
             <SelectField
               label="Subpágina"
               value={siteContentForm.page}
-              onChange={(page) => setSiteContentForm({ ...siteContentForm, page })}
+              onChange={(page) => {
+                setSitePageFilter(page);
+                setSiteContentForm({ ...siteContentForm, page });
+              }}
               options={sitePageOptions}
             />
             <SelectField
@@ -1497,6 +1549,19 @@ const AdminDashboard = () => {
                 placeholder={siteContentForm.page === 'estudos' ? 'Documentação, artigo, vídeo ou repositório' : 'https://...'}
                 required={false}
               />
+            )}
+            {!['produtos', 'lojas', 'equipe', 'estudos'].includes(siteContentForm.page) && (
+              <div className="grid gap-4 rounded-md border border-[#159AFD]/20 bg-[#159AFD]/5 p-4">
+                <div>
+                  <p className="font-bold text-slate-950 dark:text-white">Detalhes da publicação</p>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Use estes campos para deixar a página completa, organizada e fácil de consultar.</p>
+                </div>
+                <Field label="Categoria ou etapa" value={siteContentForm.category} onChange={(category) => setSiteContentForm({ ...siteContentForm, category })} placeholder="Ex.: Concluído, Em teste, Próxima versão" required={false} />
+                <Field label="URL da imagem ou capa" value={siteContentForm.imageUrl} onChange={(imageUrl) => setSiteContentForm({ ...siteContentForm, imageUrl })} placeholder="https://..." required={false} />
+                <TextAreaField label="Destaques, resultados ou responsabilidades, um por linha" value={siteContentForm.features} onChange={(features) => setSiteContentForm({ ...siteContentForm, features })} placeholder={'Resultado principal\nTecnologia utilizada\nPróximo passo\nResponsável'} />
+                <TextAreaField label="Informações técnicas ou dados, um por linha" value={siteContentForm.specifications} onChange={(specifications) => setSiteContentForm({ ...siteContentForm, specifications })} placeholder={'Versão: 1.0\nStatus: Em andamento\nPrazo: 30 dias\nProgresso: 60%'} />
+                <TextAreaField label="Conteúdo detalhado" value={siteContentForm.technicalContent} onChange={(technicalContent) => setSiteContentForm({ ...siteContentForm, technicalContent })} placeholder={'Contexto da publicação\nO que foi realizado\nResultados obtidos\nPróximas ações'} />
+              </div>
             )}
             {['produtos', 'lojas'].includes(siteContentForm.page) && (
               <div className="grid gap-4 rounded-md border border-[#159AFD]/20 bg-[#159AFD]/5 p-4">
@@ -1587,7 +1652,7 @@ const AdminDashboard = () => {
           </>
         }
         emptyText="Nenhum conteúdo publicado nas subpáginas."
-        items={siteContent.map((item) => ({
+        items={filteredSiteContent.map((item) => ({
           id: item.id,
           title: item.title || 'Conteúdo sem título',
           subtitle: `${item.page || 'sem página'} - ${item.type || 'Conteúdo'} - ${item.status || 'Publicado'}`,
@@ -1605,6 +1670,7 @@ const AdminDashboard = () => {
           remove: () => removeRecord('siteContent', item.id),
         }))}
       />
+      </div>
     </div>
   );
 
@@ -1783,8 +1849,8 @@ const AdminDashboard = () => {
   return (
     <DashboardLayout>
       <div className="admin-dashboard space-y-6">
-        <div className={`${panelClass} overflow-hidden`}>
-          <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div className="border-b border-slate-200 pb-5 dark:border-white/10">
+          <div className="flex items-start justify-between gap-5">
             <div className="flex min-w-0 items-start gap-4">
               <div className="flex h-12 w-12 flex-none items-center justify-center rounded-md bg-[#159AFD]/12 text-[#159AFD] ring-1 ring-[#159AFD]/15">
                 <CurrentTabIcon className="h-6 w-6" />
@@ -1795,13 +1861,9 @@ const AdminDashboard = () => {
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">{currentTab.description}</p>
               </div>
             </div>
-
-            <div className="flex items-center gap-3 rounded-md border border-slate-200 bg-[#F7FBFF] p-3 dark:border-white/10 dark:bg-white/[0.035]">
-              <img src={user?.avatar} alt={user?.name} className="h-11 w-11 rounded-md border border-[#159AFD]/50 object-cover" />
-              <div className="min-w-0">
-                <p className="truncate text-sm font-bold text-slate-950 dark:text-white">{user?.name}</p>
-                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-500">{user?.role}</p>
-              </div>
+            <div className="hidden items-center gap-2 rounded-md border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs font-black text-emerald-700 dark:text-emerald-300 sm:flex">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              Dados sincronizados
             </div>
           </div>
         </div>
@@ -1812,14 +1874,14 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        <div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           <aside className={`${panelClass} h-fit p-2 lg:sticky lg:top-24`}>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-1">
+            <div className="mobile-scrollbar flex gap-2 overflow-x-auto lg:hidden">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => openTab(tab.id)}
-                  className={`flex min-h-12 items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-bold transition-all ${
+                  className={`flex min-h-11 flex-none items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-bold transition-all ${
                     activeTab === tab.id
                       ? isDark
                         ? 'bg-[#159AFD] text-white shadow-md shadow-[#159AFD]/15'
@@ -1832,6 +1894,33 @@ const AdminDashboard = () => {
                   <tab.icon className="h-4 w-4 flex-none" />
                   <span className="min-w-0 truncate">{tab.label}</span>
                 </button>
+              ))}
+            </div>
+            <div className="hidden space-y-5 lg:block">
+              {tabGroups.map((group) => (
+                <div key={group.label}>
+                  <p className="mb-2 px-3 text-[11px] font-black uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">{group.label}</p>
+                  <div className="grid gap-1">
+                    {tabs.filter((tab) => group.ids.includes(tab.id)).map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => openTab(tab.id)}
+                        className={`flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-bold transition-all ${
+                          activeTab === tab.id
+                            ? isDark
+                              ? 'bg-[#159AFD] text-white shadow-md shadow-[#159AFD]/15'
+                              : 'bg-[#0D0F52] text-white shadow-md shadow-slate-900/10'
+                            : isDark
+                              ? 'text-slate-300 hover:bg-white/7 hover:text-white'
+                              : 'text-slate-600 hover:bg-[#F7FBFF] hover:text-[#0D0F52]'
+                        }`}
+                      >
+                        <tab.icon className="h-4 w-4 flex-none" />
+                        <span className="min-w-0 truncate">{tab.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </aside>
@@ -1868,7 +1957,7 @@ function CrudPanel({
   emptyText: string;
 }) {
   return (
-    <div className="grid gap-6 lg:grid-cols-[0.78fr_1.22fr]">
+    <div className="grid gap-6 xl:grid-cols-[minmax(360px,0.85fr)_minmax(0,1.55fr)]">
       <form onSubmit={onSubmit} className={`${panelClass} p-5 sm:p-6`}>
         <div className="mb-5 border-b border-slate-200 pb-4 dark:border-white/10">
           <h3 className="text-xl font-bold text-slate-950 dark:text-white">{title}</h3>

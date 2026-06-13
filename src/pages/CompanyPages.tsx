@@ -861,6 +861,21 @@ function CompanyPage({ data }: { data: PageData }) {
                       </p>
                     )}
                     <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.description || 'Sem descrição.'}</p>
+                    {item.technicalContent && (
+                      <p className={`mt-4 whitespace-pre-line rounded-md border p-3 text-sm leading-6 ${isDark ? 'border-white/10 bg-[#070A1F]/60 text-slate-300' : 'border-sky-100 bg-[#F7FBFF] text-slate-600'}`}>
+                        {item.technicalContent}
+                      </p>
+                    )}
+                    {contentLines(item.specifications).length > 0 && (
+                      <div className="mt-4 grid gap-2">
+                        <p className="text-xs font-black uppercase tracking-widest text-[#159AFD]">Dados e especificações</p>
+                        {contentLines(item.specifications).slice(0, 5).map((specification) => (
+                          <span key={specification} className={`rounded-md border px-3 py-2 text-sm font-bold ${isDark ? 'border-white/10 bg-[#070A1F] text-slate-200' : 'border-sky-100 bg-[#F7FBFF] text-[#0D0F52]'}`}>
+                            {specification}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     {contentLines(item.features).length > 0 && (
                       <div className="mt-4 grid gap-2">
                         {contentLines(item.features).slice(0, 4).map((feature) => (

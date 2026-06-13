@@ -28,7 +28,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   return (
     <div className={`dashboard-shell min-h-screen transition-colors ${isDark ? 'dashboard-dark bg-[#070A1F] text-white' : 'dashboard-light bg-[#F1F5F9] text-slate-950'}`}>
       <nav className={`dashboard-topbar sticky top-0 z-40 border-b backdrop-blur-xl ${isDark ? 'border-white/10 bg-[#080B24]/94 shadow-sm' : 'border-slate-200 bg-white/95 shadow-[0_1px_12px_rgba(15,23,42,0.06)]'}`}>
-        <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-16 max-w-[1600px] items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <Link to="/" className="dashboard-brand flex min-w-0 items-center gap-3" title="Ir para o site normal">
             <img src={logoUrl} alt="ELN Technology" className="h-10 w-16 flex-none object-contain" />
             <span className="min-w-0">
@@ -73,7 +73,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         </div>
       </nav>
 
-      <main className={`mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 ${user?.preferences?.dashboardDensity === 'compact' ? 'py-4 sm:py-5' : 'py-6 sm:py-8'}`}>
+      <main className={`mx-auto w-full max-w-[1600px] px-4 sm:px-6 lg:px-8 ${user?.preferences?.dashboardDensity === 'compact' ? 'py-4 sm:py-5' : 'py-6 sm:py-8'}`}>
         {children}
       </main>
     </div>

@@ -26,18 +26,13 @@ body {
 }
 
 .dashboard-dark.dashboard-shell {
-  background-image:
-    linear-gradient(rgba(21, 154, 253, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(21, 154, 253, 0.035) 1px, transparent 1px),
-    radial-gradient(circle at 10% 0%, rgba(21, 154, 253, 0.09), transparent 32%);
-  background-size: 42px 42px, 42px 42px, 100% 520px;
+  background-color: #080c18;
+  background-image: none;
 }
 
 .dashboard-light.dashboard-shell {
-  background-image:
-    linear-gradient(rgba(21, 154, 253, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(21, 154, 253, 0.04) 1px, transparent 1px);
-  background-size: 42px 42px, 42px 42px;
+  background-color: #f3f6fa;
+  background-image: none;
 }
 
 .dashboard-topbar {
@@ -70,9 +65,6 @@ body {
   transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
 }
 
-.dashboard-shell aside:hover,
-.dashboard-shell form:hover,
-.dashboard-shell section:hover,
 .dashboard-shell article:hover {
   border-color: rgba(21, 154, 253, 0.28);
 }
