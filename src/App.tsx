@@ -37,7 +37,6 @@ import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { db } from './firebase';
 import logoUrl from '../ELN TECHNOLOGY.svg';
 import SiteFooter from './components/SiteFooter';
-import OfficialChannels from './components/OfficialChannels';
 
 const ProtectedRoute = React.lazy(() => import('./components/ProtectedRoute'));
 const Login = React.lazy(() => import('./Login'));
@@ -144,26 +143,35 @@ const aboutItems = [
 ];
 
 const heroStats = [
-  { value: 'IoT', label: 'automação e sensores' },
-  { value: 'OTA', label: 'firmware atualizável' },
-  { value: '3D', label: 'protótipo físico' },
+  { value: 'Sob medida', label: 'solução pensada para o uso real' },
+  { value: 'Acompanhável', label: 'etapas, decisões e evolução claras' },
+  { value: 'Validado', label: 'testes, orientação e suporte técnico' },
 ];
 
-const deliveryCards = [
+const entryPaths = [
   {
-    icon: Microscope,
-    title: 'Diagnóstico',
-    text: 'Entendimento da ideia, ambiente, uso real e restrições técnicas.',
+    icon: Rocket,
+    eyebrow: 'Tenho uma ideia',
+    title: 'Iniciar um projeto',
+    text: 'Explique o objetivo, prazo e aplicação. A ELN organiza o próximo passo com você.',
+    href: '#contato',
+    action: 'Solicitar análise',
   },
   {
-    icon: CircuitBoard,
-    title: 'Construção',
-    text: 'Hardware, firmware, painel, documentação e testes trabalhando juntos.',
+    icon: Cpu,
+    eyebrow: 'Quero aprender',
+    title: 'Consultar estudos técnicos',
+    text: 'Placas, módulos, pinagem, datasheets e anotações organizadas para consulta.',
+    href: '/estudos',
+    action: 'Abrir base técnica',
   },
   {
-    icon: ShieldCheck,
-    title: 'Entrega',
-    text: 'Projeto validado, organizado e pronto para acompanhamento.',
+    icon: Store,
+    eyebrow: 'Quero comprar',
+    title: 'Explorar produtos e serviços',
+    text: 'Equipamentos, componentes, serviços e canais externos identificados com clareza.',
+    href: '/lojas',
+    action: 'Visitar loja',
   },
 ];
 
@@ -555,81 +563,96 @@ function HomePage() {
       </header>
 
       <main id="inicio">
-        <section className={`relative overflow-hidden pt-28 ${isDark ? 'bg-[#070A1F]' : 'bg-white'}`}>
-          <div className={`absolute inset-0 circuit-grid ${isDark ? 'opacity-12' : 'opacity-35'}`} />
-          <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:px-8 lg:pb-20 lg:pt-16">
-            <div className="flex flex-col justify-center">
-              <div className={`inline-flex w-fit items-center gap-2 rounded-md border px-3 py-2 text-xs font-black uppercase tracking-widest ${
-                isDark ? 'border-white/10 bg-white/5 text-sky-100' : 'border-sky-100 bg-sky-50 text-[#0D0F52]'
-              }`}>
-                <Cpu className="h-4 w-4 text-[#159AFD]" />
-                Projetos de eletrônica, IoT e sistemas
+        <section className="public-hero relative min-h-[610px] overflow-hidden bg-[#050818] pt-20 text-white">
+          <img
+            src="/Eln technology.png"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-[62%_center] opacity-30"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,8,24,0.99)_0%,rgba(5,8,24,0.93)_48%,rgba(5,8,24,0.54)_100%)]" />
+          <div className="absolute inset-0 circuit-grid opacity-15" />
+
+          <div className="relative z-10 mx-auto flex min-h-[530px] max-w-7xl items-center px-4 py-12 sm:px-6 lg:px-8">
+            <div className="max-w-2xl">
+              <div className="inline-flex w-fit items-center gap-2 rounded-md border border-sky-300/20 bg-sky-300/10 px-3 py-2 text-xs font-black uppercase tracking-widest text-sky-100">
+                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                Engenharia aplicada a projetos reais
               </div>
 
-              <h1 className={`mt-7 max-w-4xl text-4xl font-black leading-tight sm:text-5xl lg:text-6xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
+              <h1 className="mt-7 text-4xl font-black leading-tight text-white sm:text-5xl lg:text-6xl">
                 <BrandName />
-                <span className="mt-3 block text-[#159AFD]">{t.heroTitle}</span>
+                <span className="mt-2 block text-[#159AFD]">{t.heroTitle}</span>
               </h1>
 
-              <p className={`mt-6 max-w-2xl text-lg leading-8 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-200 sm:text-xl">
                 {t.heroText}
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a
                   href="#contato"
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-6 py-4 font-black text-white shadow-xl shadow-sky-500/20 transition hover:bg-[#0D0F52]"
+                  className="inline-flex items-center justify-center gap-2 rounded-md bg-[#159AFD] px-6 py-4 font-black text-white shadow-xl shadow-sky-500/25 transition hover:bg-white hover:text-[#0D0F52]"
                 >
                   {t.quote}
                   <Send className="h-5 w-5" />
                 </a>
                 <Link
-                  to="/lojas"
-                  className={`inline-flex items-center justify-center gap-2 rounded-md border px-6 py-4 font-bold transition hover:border-[#159AFD] hover:text-[#159AFD] ${
-                    isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52]'
-                  }`}
+                  to="/projetos-desenvolvidos"
+                  className="inline-flex items-center justify-center gap-2 rounded-md border border-white/20 bg-white/5 px-6 py-4 font-bold text-white transition hover:border-[#159AFD] hover:bg-[#159AFD]/10"
                 >
-                  Loja oficial
-                  <Store className="h-5 w-5" />
+                  Ver projetos desenvolvidos
+                  <ArrowRight className="h-5 w-5" />
                 </Link>
               </div>
+            </div>
+          </div>
+        </section>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                {heroStats.map((item) => (
-                  <div key={item.value} className={`rounded-md border p-4 ${isDark ? 'border-white/10 bg-white/5' : 'border-sky-100 bg-[#F7FBFF]'}`}>
-                    <p className="text-2xl font-black text-[#159AFD]">{item.value}</p>
-                    <p className={`mt-1 text-sm font-semibold ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{item.label}</p>
-                  </div>
-                ))}
-              </div>
+        <section className={`${isDark ? 'bg-[#080B24]' : 'bg-white'} border-b ${isDark ? 'border-white/10' : 'border-sky-100'} py-12 sm:py-14`}>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className={`mb-10 grid border-b pb-8 sm:grid-cols-3 ${isDark ? 'border-white/10' : 'border-sky-100'}`}>
+              {heroStats.map((item, index) => (
+                <div key={item.value} className={`py-3 sm:px-5 ${index > 0 ? `border-t sm:border-l sm:border-t-0 ${isDark ? 'border-white/10' : 'border-sky-100'}` : ''}`}>
+                  <p className={`text-base font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{item.value}</p>
+                  <p className={`mt-1 text-sm leading-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{item.label}</p>
+                </div>
+              ))}
             </div>
 
-            <aside className={`rounded-md border p-5 shadow-xl sm:p-6 ${isDark ? 'border-white/10 bg-white/[0.055] shadow-black/20' : 'border-sky-100 bg-[#F7FBFF] shadow-sky-900/10'}`}>
-              <div className="flex items-center justify-between gap-4">
-                <img src={logoUrl} alt="ELN Technology" className="h-14 w-32 object-contain" />
-                <span className="rounded-md bg-emerald-500/15 px-3 py-2 text-xs font-black uppercase text-emerald-500">Atendimento ativo</span>
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.2em] text-[#159AFD]">Escolha seu caminho</p>
+                <h2 className={`mt-2 text-2xl font-black sm:text-3xl ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>
+                  Encontre rapidamente o que você precisa.
+                </h2>
               </div>
+              <p className={`max-w-xl text-sm leading-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                Projeto, conhecimento técnico ou compra: cada área leva direto para a próxima ação.
+              </p>
+            </div>
 
-              <div className="mt-6 grid gap-4">
-                {deliveryCards.map(({ icon: Icon, title, text }) => (
-                  <article key={title} className={`rounded-md border p-4 ${isDark ? 'border-white/10 bg-[#070A1F]/70' : 'border-sky-100 bg-white'}`}>
-                    <div className="flex items-start gap-4">
-                      <div className="flex h-11 w-11 flex-none items-center justify-center rounded-md bg-[#159AFD] text-white">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h2 className={`font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{title}</h2>
-                        <p className={`mt-1 text-sm leading-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{text}</p>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-
-              <div className="mt-5">
-                <OfficialChannels isDark={isDark} compact />
-              </div>
-            </aside>
+            <div className="mt-8 grid gap-4 lg:grid-cols-3">
+              {entryPaths.map(({ icon: Icon, eyebrow, title, text, href, action }) => (
+                <Link
+                  key={title}
+                  to={href}
+                  className={`group flex min-h-56 flex-col rounded-md border p-5 transition hover:border-[#159AFD] ${
+                    isDark ? 'border-white/10 bg-white/[0.035] hover:bg-white/[0.065]' : 'border-sky-100 bg-[#F7FBFF] shadow-sm hover:bg-white'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-md bg-[#159AFD] text-white">
+                      <Icon className="h-6 w-6" />
+                    </span>
+                    <ArrowRight className="h-5 w-5 text-slate-400 transition group-hover:translate-x-1 group-hover:text-[#159AFD]" />
+                  </div>
+                  <p className="mt-5 text-xs font-black uppercase tracking-[0.18em] text-[#159AFD]">{eyebrow}</p>
+                  <h3 className={`mt-2 text-xl font-black ${isDark ? 'text-white' : 'text-[#0D0F52]'}`}>{title}</h3>
+                  <p className={`mt-3 flex-1 text-sm leading-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{text}</p>
+                  <span className="mt-5 text-sm font-black text-[#159AFD]">{action}</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
 

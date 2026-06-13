@@ -582,39 +582,44 @@ function CompanyPage({ data }: { data: PageData }) {
                   <ArrowRight className="h-4 w-4" />
                 </a>
               </aside>
-            ) : isTeamPage ? (
-              <aside className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/10' : 'border-sky-100 bg-[#EEF7FF]'}`}>
-                <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
-                  <Users className="h-7 w-7" />
-                </div>
-                <p className="mt-5 text-xs font-black uppercase tracking-widest text-[#159AFD]">Equipe publicada pelo painel</p>
-                <h2 className="mt-2 text-2xl font-black">Responsabilidades, contatos e funções em um só lugar</h2>
-                <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                  Cadastre membros no admin para mostrar quem atende, quem executa projetos e quais áreas cada pessoa acompanha.
-                </p>
-                <div className="mt-6 grid gap-3">
-                  {['Administração', 'Técnicos', 'Parceiros', 'Atendimento e suporte'].map((step) => (
-                    <div key={step} className={`flex items-center gap-3 rounded-md border p-3 ${isDark ? 'border-white/10 bg-[#070A1F]/60' : 'border-sky-100 bg-white'}`}>
-                      <CheckCircle2 className="h-5 w-5 flex-none text-[#159AFD]" />
-                      <span className="font-bold">{step}</span>
-                    </div>
-                  ))}
-                </div>
-              </aside>
             ) : (
-              <aside className={`rounded-md border p-6 ${isDark ? 'border-white/10 bg-white/10' : 'border-sky-100 bg-[#EEF7FF]'}`}>
-                <div className="flex h-14 w-14 items-center justify-center rounded-md bg-[#159AFD] text-white">
-                  <Icon className="h-7 w-7" />
+              <aside className={`overflow-hidden rounded-md border ${isDark ? 'border-white/10 bg-white/10' : 'border-sky-100 bg-[#EEF7FF]'}`}>
+                <div className="bg-[#159AFD] p-6 text-white">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-md bg-white/15">
+                      <Icon className="h-7 w-7" />
+                    </div>
+                    <span className="rounded-md bg-emerald-400/20 px-3 py-2 text-xs font-black uppercase text-emerald-100">Área ativa</span>
+                  </div>
+                  <p className="mt-8 text-xs font-black uppercase tracking-[0.18em] text-sky-100">
+                    {isTeamPage ? 'Pessoas e responsabilidades' : isStudyPage ? 'Conhecimento técnico' : 'Conteúdo ELN Technology'}
+                  </p>
+                  <h2 className="mt-2 text-2xl font-black leading-tight">{data.highlight}</h2>
                 </div>
-                <h2 className="mt-5 text-2xl font-black">Resumo da área</h2>
-                <p className={`mt-3 leading-7 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>{data.highlight}</p>
-                <div className="mt-6 grid gap-3">
-                  {data.sections.map((section) => (
-                    <div key={section.title} className={`flex items-center gap-3 rounded-md border p-3 ${isDark ? 'border-white/10 bg-[#070A1F]/60' : 'border-sky-100 bg-white'}`}>
-                      <CheckCircle2 className="h-5 w-5 flex-none text-[#159AFD]" />
-                      <span className="font-bold">{section.title}</span>
+
+                <div className="grid grid-cols-3 gap-px bg-sky-200/20">
+                  {[
+                    { value: displayedPublicItems.length, label: 'publicados' },
+                    { value: data.sections.length, label: 'categorias' },
+                    { value: 'Direto', label: 'contato' },
+                  ].map((item) => (
+                    <div key={item.label} className={`px-3 py-5 text-center ${isDark ? 'bg-[#080B24]' : 'bg-white'}`}>
+                      <p className="text-xl font-black text-[#159AFD]">{item.value}</p>
+                      <p className={`mt-1 text-xs font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{item.label}</p>
                     </div>
                   ))}
+                </div>
+
+                <div className="p-5">
+                  <a
+                    href="#conteúdos"
+                    className={`inline-flex w-full items-center justify-center gap-2 rounded-md border px-4 py-3 text-sm font-black transition ${
+                      isDark ? 'border-white/10 text-white hover:bg-white/10' : 'border-sky-200 bg-white text-[#0D0F52] hover:border-[#159AFD]'
+                    }`}
+                  >
+                    Explorar esta área
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
                 </div>
               </aside>
             )}
