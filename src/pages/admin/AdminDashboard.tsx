@@ -1984,28 +1984,29 @@ function CrudPanel({
         <div className="space-y-3">
         {items.length === 0 && <EmptyState title={emptyText} text="Cadastre o primeiro registro pelo formulario ao lado." />}
         {items.map((item) => (
-          <article key={item.id} className="rounded-md border border-slate-200 bg-slate-50 p-4 transition hover:border-[#159AFD]/35 hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.055]">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h4 className="font-semibold text-slate-950 dark:text-white">{item.title}</h4>
-                  {item.status && <StatusPill value={item.status} />}
-                </div>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{item.subtitle}</p>
-                {item.meta && <p className="mt-1 break-words text-sm text-slate-500">{item.meta}</p>}
-                {item.link && (
-                  <a href={item.link} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm font-semibold text-[#159AFD] hover:text-[#0D0F52] dark:hover:text-white">
-                    Abrir documento
-                  </a>
-                )}
+          <article key={item.id} className="crud-record-card rounded-md border border-slate-200 bg-slate-50 p-4 transition hover:border-[#159AFD]/35 hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:hover:bg-white/[0.055]">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <h4 className="max-w-2xl font-semibold leading-6 text-slate-950 dark:text-white">{item.title}</h4>
+                {item.status && <StatusPill value={item.status} />}
               </div>
-              <div className="flex flex-wrap gap-2">
+              <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{item.subtitle}</p>
+              {item.meta && <p className="mt-1 break-words text-sm leading-6 text-slate-500">{item.meta}</p>}
+              {item.link && (
+                <a href={item.link} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-10 items-center rounded-md text-sm font-bold text-[#087CCB] transition hover:text-[#0D0F52] dark:text-sky-300 dark:hover:text-white">
+                  Abrir link cadastrado
+                </a>
+              )}
+            </div>
+            <div className="mt-4 border-t border-slate-200 pt-4 dark:border-white/10">
+              <p className="mb-2 text-xs font-black uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Ações do registro</p>
+              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {item.actions?.map((action) => (
-                  <button key={action.label} type="button" onClick={action.onClick} className="rounded-md border border-[#159AFD]/25 px-3 py-2 text-sm font-semibold text-[#0D0F52] transition hover:bg-[#159AFD]/10 dark:text-sky-200">
+                  <button key={action.label} type="button" onClick={action.onClick} className="crud-action-button inline-flex min-h-10 w-full items-center justify-center rounded-md border border-[#159AFD]/35 bg-white px-3 py-2 text-sm font-bold text-[#0D0F52] transition hover:border-[#159AFD] hover:bg-sky-50 dark:bg-transparent dark:text-sky-200 dark:hover:bg-[#159AFD]/10">
                     {action.label}
                   </button>
                 ))}
-                <button type="button" onClick={item.remove} className="inline-flex items-center justify-center gap-2 rounded-md border border-red-300 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:border-red-400/25 dark:text-red-300 dark:hover:bg-red-500/10">
+                <button type="button" onClick={item.remove} className="crud-remove-button inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-bold text-red-600 transition hover:border-red-400 hover:bg-red-50 dark:border-red-400/25 dark:bg-transparent dark:text-red-300 dark:hover:bg-red-500/10">
                   <Trash2 className="h-4 w-4" />
                   Remover
                 </button>
