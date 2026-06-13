@@ -79,8 +79,8 @@ const tabs = [
 ];
 
 const inputClass =
-  'mt-2 w-full rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-950 outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10 dark:border-white/10 dark:bg-[#070A1F]/70 dark:text-white';
-const panelClass = 'rounded-md border border-[#D8E2EC] bg-white shadow-[0_6px_20px_rgba(15,23,42,0.045)] dark:border-white/10 dark:bg-white/[0.045] dark:shadow-none';
+  'dashboard-control mt-2 w-full rounded-md border p-3 text-sm outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10';
+const panelClass = 'dashboard-surface rounded-md border shadow-[0_6px_20px_rgba(15,23,42,0.045)] dark:shadow-none';
 
 function formatDate(value?: string) {
   if (!value) return 'Não informado';

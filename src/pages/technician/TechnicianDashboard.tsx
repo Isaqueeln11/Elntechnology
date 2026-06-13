@@ -18,6 +18,13 @@ import {
 } from 'lucide-react';
 import DashboardLayout from '../../components/DashboardLayout';
 
+const technicianPanelClass = 'dashboard-surface rounded-md border p-5 sm:p-6';
+const technicianSoftClass = 'dashboard-soft-surface rounded-md border';
+const technicianTitleClass = 'text-slate-950 dark:text-white';
+const technicianMutedClass = 'text-slate-500 dark:text-slate-400';
+const technicianBodyClass = 'text-slate-600 dark:text-slate-300';
+const technicianSecondaryButton = 'rounded-md border border-slate-300 bg-white px-4 py-2 font-bold text-slate-700 transition hover:border-[#159AFD] hover:text-[#0D0F52] dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:bg-white/[0.08] dark:hover:text-white';
+
 const TechnicianDashboard = () => {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -108,21 +115,21 @@ const TechnicianDashboard = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Em Desenvolvimento': return 'text-blue-400 bg-blue-400/20';
-      case 'Teste': return 'text-yellow-400 bg-yellow-400/20';
-      case 'Concluído': return 'text-green-400 bg-green-400/20';
-      case 'Aberto': return 'text-red-400 bg-red-400/20';
-      case 'Em Andamento': return 'text-blue-400 bg-blue-400/20';
-      default: return 'text-gray-400 bg-gray-400/20';
+      case 'Em Desenvolvimento': return 'bg-blue-50 text-blue-700 dark:bg-blue-400/20 dark:text-blue-300';
+      case 'Teste': return 'bg-amber-50 text-amber-700 dark:bg-amber-400/20 dark:text-amber-300';
+      case 'Concluído': return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/20 dark:text-emerald-300';
+      case 'Aberto': return 'bg-red-50 text-red-700 dark:bg-red-400/20 dark:text-red-300';
+      case 'Em Andamento': return 'bg-blue-50 text-blue-700 dark:bg-blue-400/20 dark:text-blue-300';
+      default: return 'bg-slate-100 text-slate-600 dark:bg-slate-400/20 dark:text-slate-300';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'Alta': return 'text-red-400';
-      case 'Média': return 'text-yellow-400';
-      case 'Baixa': return 'text-green-400';
-      default: return 'text-gray-400';
+      case 'Alta': return 'text-red-600 dark:text-red-300';
+      case 'Média': return 'text-amber-600 dark:text-amber-300';
+      case 'Baixa': return 'text-emerald-600 dark:text-emerald-300';
+      default: return 'text-slate-500 dark:text-slate-400';
     }
   };
 
@@ -130,38 +137,38 @@ const TechnicianDashboard = () => {
     <div className="space-y-8">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm p-6 rounded-xl border border-[#159AFD]/30">
+        <div className={technicianPanelClass}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Projetos Ativos</p>
-              <p className="text-2xl font-bold text-white">2</p>
+              <p className={`text-sm ${technicianMutedClass}`}>Projetos Ativos</p>
+              <p className={`text-2xl font-bold ${technicianTitleClass}`}>2</p>
             </div>
             <FolderOpen className="w-8 h-8 text-[#159AFD]" />
           </div>
         </div>
-        <div className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm p-6 rounded-xl border border-[#159AFD]/30">
+        <div className={technicianPanelClass}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Tickets Abertos</p>
-              <p className="text-2xl font-bold text-white">2</p>
+              <p className={`text-sm ${technicianMutedClass}`}>Tickets Abertos</p>
+              <p className={`text-2xl font-bold ${technicianTitleClass}`}>2</p>
             </div>
             <Wrench className="w-8 h-8 text-[#159AFD]" />
           </div>
         </div>
-        <div className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm p-6 rounded-xl border border-[#159AFD]/30">
+        <div className={technicianPanelClass}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Horas Trabalhadas</p>
-              <p className="text-2xl font-bold text-white">77h</p>
+              <p className={`text-sm ${technicianMutedClass}`}>Horas Trabalhadas</p>
+              <p className={`text-2xl font-bold ${technicianTitleClass}`}>77h</p>
             </div>
             <Clock className="w-8 h-8 text-[#159AFD]" />
           </div>
         </div>
-        <div className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm p-6 rounded-xl border border-[#159AFD]/30">
+        <div className={technicianPanelClass}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Taxa de Resolução</p>
-              <p className="text-2xl font-bold text-white">94%</p>
+              <p className={`text-sm ${technicianMutedClass}`}>Taxa de Resolução</p>
+              <p className={`text-2xl font-bold ${technicianTitleClass}`}>94%</p>
             </div>
             <CheckCircle className="w-8 h-8 text-[#159AFD]" />
           </div>
@@ -169,27 +176,27 @@ const TechnicianDashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm rounded-xl border border-[#159AFD]/30 p-6">
-        <h3 className="text-xl font-semibold text-white mb-4">Ações Rápidas</h3>
+      <div className={technicianPanelClass}>
+        <h3 className={`mb-4 text-xl font-semibold ${technicianTitleClass}`}>Ações Rápidas</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <button className="flex items-center justify-center p-4 bg-[#159AFD]/20 hover:bg-[#159AFD]/30 rounded-lg transition-colors">
             <Play className="w-5 h-5 text-[#159AFD] mr-2" />
-            <span className="text-white">Iniciar Timer</span>
+            <span className={technicianTitleClass}>Iniciar Timer</span>
           </button>
           <button className="flex items-center justify-center p-4 bg-green-500/20 hover:bg-green-500/30 rounded-lg transition-colors">
             <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
-            <span className="text-white">Marcar Concluído</span>
+            <span className={technicianTitleClass}>Marcar Concluído</span>
           </button>
           <button className="flex items-center justify-center p-4 bg-yellow-500/20 hover:bg-yellow-500/30 rounded-lg transition-colors">
             <MessageSquare className="w-5 h-5 text-yellow-400 mr-2" />
-            <span className="text-white">Novo Ticket</span>
+            <span className={technicianTitleClass}>Novo Ticket</span>
           </button>
         </div>
       </div>
 
       {/* Today's Tasks */}
-      <div className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm rounded-xl border border-[#159AFD]/30 p-6">
-        <h3 className="text-xl font-semibold text-white mb-4">Tarefas de Hoje</h3>
+      <div className={technicianPanelClass}>
+        <h3 className={`mb-4 text-xl font-semibold ${technicianTitleClass}`}>Tarefas de Hoje</h3>
         <div className="space-y-3">
           {[
             { task: 'Analisar logs do sistema IoT', project: 'Sistema IoT Industrial', time: '09:00', status: 'pending' },
@@ -197,18 +204,18 @@ const TechnicianDashboard = () => {
             { task: 'Reunião com cliente TechCorp', project: 'Sistema IoT Industrial', time: '16:00', status: 'scheduled' },
             { task: 'Documentar correções implementadas', project: 'Geral', time: '17:30', status: 'pending' }
           ].map((task, index) => (
-            <div key={index} className="flex flex-col gap-2 rounded-lg bg-black/20 p-3 sm:flex-row sm:items-center sm:justify-between">
+            <div key={index} className={`${technicianSoftClass} flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between`}>
               <div className="flex min-w-0 items-center">
                 <div className={`w-3 h-3 rounded-full mr-3 ${
                   task.status === 'completed' ? 'bg-green-400' : 
                   task.status === 'scheduled' ? 'bg-yellow-400' : 'bg-gray-400'
                 }`} />
                 <div>
-                  <p className="text-white">{task.task}</p>
-                  <p className="text-gray-400 text-sm">{task.project}</p>
+                  <p className={technicianTitleClass}>{task.task}</p>
+                  <p className={`text-sm ${technicianMutedClass}`}>{task.project}</p>
                 </div>
               </div>
-              <span className="text-gray-400 text-sm">{task.time}</span>
+              <span className={`text-sm ${technicianMutedClass}`}>{task.time}</span>
             </div>
           ))}
         </div>
@@ -219,7 +226,7 @@ const TechnicianDashboard = () => {
   const renderProjects = () => (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-2xl font-bold text-white">Meus Projetos</h3>
+        <h3 className={`text-2xl font-bold ${technicianTitleClass}`}>Meus Projetos</h3>
         <div className="flex items-center space-x-2">
           <button className="bg-[#159AFD]/20 hover:bg-[#159AFD]/30 text-[#159AFD] px-4 py-2 rounded-lg transition-colors">
             Filtrar
@@ -229,9 +236,9 @@ const TechnicianDashboard = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {myProjects.map((project) => (
-          <div key={project.id} className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm rounded-xl border border-[#159AFD]/30 p-6">
+          <div key={project.id} className={technicianPanelClass}>
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <h4 className="text-xl font-semibold text-white">{project.name}</h4>
+              <h4 className={`text-xl font-semibold ${technicianTitleClass}`}>{project.name}</h4>
               <div className="flex flex-wrap items-center gap-2">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(project.priority)}`}>
                   {project.priority}
@@ -242,24 +249,24 @@ const TechnicianDashboard = () => {
               </div>
             </div>
             
-            <p className="text-gray-300 mb-4">{project.description}</p>
+            <p className={`mb-4 ${technicianBodyClass}`}>{project.description}</p>
             
             <div className="space-y-3 mb-4">
-              <div className="flex flex-col gap-1 text-gray-300 sm:flex-row sm:items-center sm:justify-between">
+              <div className={`flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between ${technicianBodyClass}`}>
                 <span className="flex items-center">
                   <User className="w-4 h-4 mr-2" />
                   Cliente
                 </span>
                 <span>{project.client}</span>
               </div>
-              <div className="flex flex-col gap-1 text-gray-300 sm:flex-row sm:items-center sm:justify-between">
+              <div className={`flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between ${technicianBodyClass}`}>
                 <span className="flex items-center">
                   <Calendar className="w-4 h-4 mr-2" />
                   Prazo
                 </span>
                 <span>{project.deadline}</span>
               </div>
-              <div className="flex flex-col gap-1 text-gray-300 sm:flex-row sm:items-center sm:justify-between">
+              <div className={`flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between ${technicianBodyClass}`}>
                 <span className="flex items-center">
                   <Clock className="w-4 h-4 mr-2" />
                   Tempo Gasto
@@ -269,11 +276,11 @@ const TechnicianDashboard = () => {
             </div>
             
             <div className="mb-4">
-              <div className="flex justify-between text-sm text-gray-400 mb-1">
+              <div className={`mb-1 flex justify-between text-sm ${technicianMutedClass}`}>
                 <span>Progresso</span>
                 <span>{project.progress}%</span>
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-2">
+              <div className="h-2 w-full rounded-full bg-slate-200 dark:bg-white/10">
                 <div 
                   className="bg-[#159AFD] h-2 rounded-full transition-all duration-500"
                   style={{ width: `${project.progress}%` }}
@@ -286,7 +293,7 @@ const TechnicianDashboard = () => {
                 <Play className="w-4 h-4 mr-2" />
                 Continuar
               </button>
-              <button className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-lg transition-colors">
+              <button className={technicianSecondaryButton}>
                 Detalhes
               </button>
             </div>
@@ -299,7 +306,7 @@ const TechnicianDashboard = () => {
   const renderRepairTickets = () => (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-2xl font-bold text-white">Roteiro de Reparos</h3>
+        <h3 className={`text-2xl font-bold ${technicianTitleClass}`}>Roteiro de Reparos</h3>
         <button className="w-full rounded-lg bg-[#159AFD] px-4 py-2 text-white transition-colors hover:bg-[#508AD0] sm:w-auto">
           Novo Ticket
         </button>
@@ -307,9 +314,9 @@ const TechnicianDashboard = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {repairTickets.map((ticket) => (
-          <div key={ticket.id} className="bg-gradient-to-br from-[#0D0F52]/40 to-[#0D0F52]/20 backdrop-blur-sm rounded-xl border border-[#159AFD]/30 p-6">
+          <div key={ticket.id} className={technicianPanelClass}>
             <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <h4 className="text-lg font-semibold text-white">{ticket.title}</h4>
+              <h4 className={`text-lg font-semibold ${technicianTitleClass}`}>{ticket.title}</h4>
               <div className="flex flex-wrap items-center gap-2">
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(ticket.priority)}`}>
                   {ticket.priority}
@@ -322,36 +329,36 @@ const TechnicianDashboard = () => {
             
             <div className="space-y-2 mb-4 text-sm">
               <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-                <span className="text-gray-400">Cliente:</span>
-                <span className="text-white">{ticket.client}</span>
+                <span className={technicianMutedClass}>Cliente:</span>
+                <span className={technicianTitleClass}>{ticket.client}</span>
               </div>
               <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-                <span className="text-gray-400">Projeto:</span>
-                <span className="text-white">{ticket.project}</span>
+                <span className={technicianMutedClass}>Projeto:</span>
+                <span className={technicianTitleClass}>{ticket.project}</span>
               </div>
               <div className="flex flex-col gap-1 sm:flex-row sm:justify-between">
-                <span className="text-gray-400">Criado:</span>
-                <span className="text-white">{ticket.created}</span>
+                <span className={technicianMutedClass}>Criado:</span>
+                <span className={technicianTitleClass}>{ticket.created}</span>
               </div>
             </div>
             
-            <p className="text-gray-300 mb-4 text-sm">{ticket.description}</p>
+            <p className={`mb-4 text-sm ${technicianBodyClass}`}>{ticket.description}</p>
             
             <div className="space-y-2 mb-4">
-              <h5 className="text-white font-medium text-sm">Etapas do Reparo:</h5>
+              <h5 className={`text-sm font-medium ${technicianTitleClass}`}>Etapas do Reparo:</h5>
               {ticket.steps.map((step) => (
-                <div key={step.id} className="flex flex-col gap-2 rounded bg-black/20 p-2 sm:flex-row sm:items-center sm:justify-between">
+                <div key={step.id} className={`${technicianSoftClass} flex flex-col gap-2 p-2 sm:flex-row sm:items-center sm:justify-between`}>
                   <div className="flex min-w-0 items-center">
                     <div className={`w-4 h-4 rounded-full mr-2 flex items-center justify-center ${
                       step.completed ? 'bg-green-400' : 'bg-gray-400'
                     }`}>
                       {step.completed && <CheckCircle className="w-3 h-3 text-white" />}
                     </div>
-                    <span className={`text-sm ${step.completed ? 'text-gray-400 line-through' : 'text-white'} break-words`}>
+                    <span className={`break-words text-sm ${step.completed ? 'text-slate-400 line-through dark:text-slate-500' : technicianTitleClass}`}>
                       {step.description}
                     </span>
                   </div>
-                  <span className="text-gray-400 text-xs">{step.time}</span>
+                  <span className={`text-xs ${technicianMutedClass}`}>{step.time}</span>
                 </div>
               ))}
             </div>
@@ -363,7 +370,7 @@ const TechnicianDashboard = () => {
               >
                 Trabalhar
               </button>
-              <button className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-lg transition-colors text-sm">
+              <button className={`${technicianSecondaryButton} flex-1 text-sm`}>
                 Histórico
               </button>
             </div>
@@ -373,15 +380,15 @@ const TechnicianDashboard = () => {
 
       {/* Repair Work Modal */}
       {selectedTicket && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-xl border border-[#159AFD]/20 bg-[#0D0F52] p-4 sm:p-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm">
+          <div className="dashboard-surface max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-md border p-4 shadow-2xl sm:p-8">
             <div className="mb-6 flex items-start justify-between gap-3">
-              <h2 className="text-xl font-bold text-white sm:text-2xl">
+              <h2 className={`text-xl font-bold sm:text-2xl ${technicianTitleClass}`}>
                 Roteiro de Reparo - Ticket #{selectedTicket}
               </h2>
               <button
                 onClick={() => setSelectedTicket(null)}
-                className="text-gray-400 hover:text-white"
+                className={`${technicianMutedClass} hover:text-[#159AFD]`}
               >
                 ✕
               </button>
@@ -390,10 +397,10 @@ const TechnicianDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Column - Steps */}
               <div>
-                <h3 className="text-lg font-semibold text-white mb-4">Etapas do Reparo</h3>
+                <h3 className={`mb-4 text-lg font-semibold ${technicianTitleClass}`}>Etapas do Reparo</h3>
                 <div className="space-y-3">
                   {repairTickets.find(t => t.id === selectedTicket)?.steps.map((step) => (
-                    <div key={step.id} className="bg-black/20 p-4 rounded-lg">
+                    <div key={step.id} className={`${technicianSoftClass} p-4`}>
                       <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex min-w-0 items-center">
                           <button className={`w-6 h-6 rounded-full mr-3 flex items-center justify-center ${
@@ -401,18 +408,18 @@ const TechnicianDashboard = () => {
                           } transition-colors`}>
                             {step.completed && <CheckCircle className="w-4 h-4 text-white" />}
                           </button>
-                          <span className={`${step.completed ? 'text-gray-400 line-through' : 'text-white'} break-words`}>
+                          <span className={`${step.completed ? 'text-slate-400 line-through dark:text-slate-500' : technicianTitleClass} break-words`}>
                             {step.description}
                           </span>
                         </div>
-                        <span className="text-gray-400 text-sm">{step.time}</span>
+                        <span className={`text-sm ${technicianMutedClass}`}>{step.time}</span>
                       </div>
                       {!step.completed && (
                         <div className="ml-9 flex space-x-2">
                           <button className="bg-[#159AFD] hover:bg-[#508AD0] text-white px-3 py-1 rounded text-sm transition-colors">
                             Iniciar
                           </button>
-                          <button className="bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm transition-colors">
+                          <button className={`${technicianSecondaryButton} px-3 py-1 text-sm`}>
                             Pular
                           </button>
                         </div>
@@ -424,37 +431,37 @@ const TechnicianDashboard = () => {
               
               {/* Right Column - Documentation */}
               <div>
-                <h3 className="text-lg font-semibold text-white mb-4">Documentação</h3>
+                <h3 className={`mb-4 text-lg font-semibold ${technicianTitleClass}`}>Documentação</h3>
                 <div className="space-y-4">
-                  <div className="bg-black/20 p-4 rounded-lg">
-                    <h4 className="text-white font-medium mb-2">Notas do Técnico</h4>
+                  <div className={`${technicianSoftClass} p-4`}>
+                    <h4 className={`mb-2 font-medium ${technicianTitleClass}`}>Notas do Técnico</h4>
                     <textarea
-                      className="w-full h-32 bg-gray-800 border border-gray-600 rounded p-3 text-white placeholder-gray-400 resize-none"
+                      className="dashboard-control h-32 w-full resize-none rounded-md border p-3"
                       placeholder="Adicione suas observações sobre o reparo..."
                     />
                   </div>
                   
-                  <div className="bg-black/20 p-4 rounded-lg">
-                    <h4 className="text-white font-medium mb-2">Anexar Evidências</h4>
-                    <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center">
-                      <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-gray-400 text-sm">Clique para adicionar fotos ou documentos</p>
+                  <div className={`${technicianSoftClass} p-4`}>
+                    <h4 className={`mb-2 font-medium ${technicianTitleClass}`}>Anexar Evidências</h4>
+                    <div className="rounded-md border-2 border-dashed border-slate-300 p-6 text-center dark:border-white/15">
+                      <Camera className={`mx-auto mb-2 h-8 w-8 ${technicianMutedClass}`} />
+                      <p className={`text-sm ${technicianMutedClass}`}>Clique para adicionar fotos ou documentos</p>
                     </div>
                   </div>
                   
-                  <div className="bg-black/20 p-4 rounded-lg">
-                    <h4 className="text-white font-medium mb-2">Tempo Gasto</h4>
+                  <div className={`${technicianSoftClass} p-4`}>
+                    <h4 className={`mb-2 font-medium ${technicianTitleClass}`}>Tempo Gasto</h4>
                     <div className="flex items-center space-x-2">
                       <input
                         type="number"
                         placeholder="Horas"
-                        className="flex-1 bg-gray-800 border border-gray-600 rounded p-2 text-white"
+                        className="dashboard-control flex-1 rounded-md border p-2"
                       />
-                      <span className="text-gray-400">:</span>
+                      <span className={technicianMutedClass}>:</span>
                       <input
                         type="number"
                         placeholder="Min"
-                        className="flex-1 bg-gray-800 border border-gray-600 rounded p-2 text-white"
+                        className="dashboard-control flex-1 rounded-md border p-2"
                       />
                     </div>
                   </div>
@@ -465,7 +472,7 @@ const TechnicianDashboard = () => {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between">
               <button
                 onClick={() => setSelectedTicket(null)}
-                className="bg-gray-700 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                className={technicianSecondaryButton}
               >
                 Salvar e Fechar
               </button>
@@ -501,13 +508,13 @@ const TechnicianDashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-white sm:text-3xl">
+            <h1 className={`text-2xl font-bold sm:text-3xl ${technicianTitleClass}`}>
               Painel Técnico
             </h1>
-            <p className="text-gray-400 mt-1">Bem-vindo, {user?.name}</p>
+            <p className={`mt-1 ${technicianMutedClass}`}>Bem-vindo, {user?.name}</p>
           </div>
           <div className="flex items-center space-x-4">
-            <button type="button" onClick={() => openTab('notifications')} className="relative p-2 text-gray-400 hover:text-white transition-colors" title="Notificações">
+            <button type="button" onClick={() => openTab('notifications')} className={`relative rounded-md p-2 transition-colors hover:bg-[#159AFD]/10 hover:text-[#159AFD] ${technicianMutedClass}`} title="Notificações">
               <Bell className="w-6 h-6" />
               {unreadCount > 0 && <span className="absolute -right-1 -top-1 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-black text-white">{unreadCount > 9 ? '9+' : unreadCount}</span>}
             </button>
@@ -520,7 +527,7 @@ const TechnicianDashboard = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="mobile-scrollbar flex space-x-1 overflow-x-auto rounded-xl border border-[#159AFD]/30 bg-[#0D0F52]/30 p-1">
+        <div className="dashboard-surface mobile-scrollbar flex space-x-1 overflow-x-auto rounded-md border p-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -528,7 +535,7 @@ const TechnicianDashboard = () => {
               className={`flex flex-none items-center whitespace-nowrap rounded-lg px-4 py-2 transition-all ${
                 activeTab === tab.id
                   ? 'bg-[#159AFD] text-white'
-                  : 'text-gray-400 hover:text-white hover:bg-[#159AFD]/20'
+                  : 'text-slate-600 hover:bg-[#159AFD]/10 hover:text-[#0D0F52] dark:text-slate-300 dark:hover:bg-[#159AFD]/20 dark:hover:text-white'
               }`}
             >
               <tab.icon className="w-4 h-4 mr-2" />
@@ -544,34 +551,34 @@ const TechnicianDashboard = () => {
           {activeTab === 'repairs' && renderRepairTickets()}
           {activeTab === 'messages' && (
             <div className="text-center py-12">
-              <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-400">Sistema de mensagens em desenvolvimento</p>
+              <MessageSquare className={`mx-auto mb-4 h-16 w-16 ${technicianMutedClass}`} />
+              <p className={technicianMutedClass}>Sistema de mensagens em desenvolvimento</p>
             </div>
           )}
           {activeTab === 'reports' && (
             <div className="text-center py-12">
-              <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-400">Relatórios técnicos em desenvolvimento</p>
+              <FileText className={`mx-auto mb-4 h-16 w-16 ${technicianMutedClass}`} />
+              <p className={technicianMutedClass}>Relatórios técnicos em desenvolvimento</p>
             </div>
           )}
           {activeTab === 'notifications' && (
             <div className="space-y-4">
-              {(notificationStatus || notificationError) && <div className="rounded-lg border border-[#159AFD]/30 bg-[#159AFD]/10 p-4 text-sm font-semibold text-sky-200">{notificationError || notificationStatus}</div>}
+              {(notificationStatus || notificationError) && <div className="rounded-md border border-[#159AFD]/30 bg-[#159AFD]/10 p-4 text-sm font-semibold text-sky-700 dark:text-sky-200">{notificationError || notificationStatus}</div>}
               {notifications.length === 0 ? (
-                <div className="rounded-xl border border-[#159AFD]/30 bg-[#0D0F52]/30 py-12 text-center">
-                  <Bell className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="mt-4 font-bold text-white">Nenhuma notificação disponível.</p>
+                <div className="dashboard-surface rounded-md border py-12 text-center">
+                  <Bell className={`mx-auto h-12 w-12 ${technicianMutedClass}`} />
+                  <p className={`mt-4 font-bold ${technicianTitleClass}`}>Nenhuma notificação disponível.</p>
                 </div>
               ) : notifications.map((item) => (
-                <article key={item.id} className="flex flex-col gap-4 rounded-xl border border-[#159AFD]/30 bg-[#0D0F52]/30 p-5 sm:flex-row sm:items-start sm:justify-between">
+                <article key={item.id} className="dashboard-surface flex flex-col gap-4 rounded-md border p-5 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-bold text-white">{item.title || 'Notificação'}</h3>
+                      <h3 className={`font-bold ${technicianTitleClass}`}>{item.title || 'Notificação'}</h3>
                       <span className={`rounded-md px-2 py-1 text-xs font-black ${notificationIsUnread(item, user?.id) ? 'bg-[#159AFD]/20 text-[#159AFD]' : 'bg-emerald-500/15 text-emerald-400'}`}>
                         {notificationIsUnread(item, user?.id) ? 'Nova' : 'Lida'}
                       </span>
                     </div>
-                    <p className="mt-2 text-sm leading-6 text-gray-300">{item.message || 'Sem mensagem.'}</p>
+                    <p className={`mt-2 text-sm leading-6 ${technicianBodyClass}`}>{item.message || 'Sem mensagem.'}</p>
                   </div>
                   {notificationIsUnread(item, user?.id) && <button type="button" onClick={() => markNotificationRead(item.id)} className="rounded-lg border border-[#159AFD]/30 px-4 py-2 text-sm font-bold text-[#159AFD] transition hover:bg-[#159AFD]/10">Marcar lida</button>}
                 </article>

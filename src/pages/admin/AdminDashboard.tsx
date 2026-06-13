@@ -170,8 +170,8 @@ const tabGroups = [
   { label: 'Site e sistema', ids: ['store', 'sitePages', 'ota', 'settings'] },
 ];
 
-const inputClass = 'mt-2 w-full rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10 dark:border-[#25304A] dark:bg-[#080D1C] dark:text-white dark:placeholder:text-slate-500';
-const panelClass = 'rounded-md border border-[#D8E2EC] bg-white shadow-[0_4px_16px_rgba(15,23,42,0.04)] dark:border-[#25304A] dark:bg-[#0E1428] dark:shadow-none';
+const inputClass = 'dashboard-control mt-2 w-full rounded-md border p-3 text-sm outline-none transition focus:border-[#159AFD] focus:ring-4 focus:ring-[#159AFD]/10';
+const panelClass = 'dashboard-surface rounded-md border shadow-[0_4px_16px_rgba(15,23,42,0.04)] dark:shadow-none';
 const defaultAreasSectionForm = {
   eyebrow: 'Espaços do site',
   title: 'Áreas da ELN Technology para acompanhar projetos, equipe, produtos e novidades.',
@@ -521,7 +521,9 @@ function EmptyState({ title, text }: { title: string; text: string }) {
 }
 
 function StatusPill({ value }: { value?: string }) {
-  const color = value === 'Pago' || value === 'Concluído' || value === 'Resolvido' || value === 'Enviada' ? 'border-emerald-400/20 bg-emerald-500/10 text-emerald-200' : 'border-sky-400/20 bg-sky-500/10 text-sky-200';
+  const color = value === 'Pago' || value === 'Concluído' || value === 'Resolvido' || value === 'Enviada'
+    ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-200'
+    : 'border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-400/20 dark:bg-sky-500/10 dark:text-sky-200';
   return <span className={`rounded-md border px-3 py-1 text-xs font-bold ${color}`}>{value || 'Aberto'}</span>;
 }
 
@@ -1992,7 +1994,7 @@ function CrudPanel({
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{item.subtitle}</p>
                 {item.meta && <p className="mt-1 break-words text-sm text-slate-500">{item.meta}</p>}
                 {item.link && (
-                  <a href={item.link} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm font-semibold text-[#159AFD] hover:text-white">
+                  <a href={item.link} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm font-semibold text-[#159AFD] hover:text-[#0D0F52] dark:hover:text-white">
                     Abrir documento
                   </a>
                 )}
@@ -2003,7 +2005,7 @@ function CrudPanel({
                     {action.label}
                   </button>
                 ))}
-                <button type="button" onClick={item.remove} className="inline-flex items-center justify-center gap-2 rounded-md border border-red-400/25 px-3 py-2 text-sm font-semibold text-red-300 transition hover:bg-red-500/10">
+                <button type="button" onClick={item.remove} className="inline-flex items-center justify-center gap-2 rounded-md border border-red-300 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:border-red-400/25 dark:text-red-300 dark:hover:bg-red-500/10">
                   <Trash2 className="h-4 w-4" />
                   Remover
                 </button>
