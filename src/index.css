@@ -89,19 +89,23 @@ body {
   color: var(--dash-muted) !important;
 }
 
-.dashboard-light .crud-action-button {
+.dashboard-light .crud-action-button,
+.dashboard-light .crud-action-button * {
   color: #0d0f52 !important;
 }
 
-.dashboard-dark .crud-action-button {
+.dashboard-dark .crud-action-button,
+.dashboard-dark .crud-action-button * {
   color: #bae6fd !important;
 }
 
-.dashboard-light .crud-remove-button {
+.dashboard-light .crud-remove-button,
+.dashboard-light .crud-remove-button * {
   color: #dc2626 !important;
 }
 
-.dashboard-dark .crud-remove-button {
+.dashboard-dark .crud-remove-button,
+.dashboard-dark .crud-remove-button * {
   color: #fca5a5 !important;
 }
 

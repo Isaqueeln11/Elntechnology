@@ -26,6 +26,7 @@ import type { UserPreferences } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { db } from '../../firebase';
 import { formatStorePrice, isPublishedStoreProduct, isStoreProductPage, marketplaceNotice, normalizeContentValue } from '../../data/storeCatalog';
+import { isActionableNotification } from '../../hooks/useNotifications';
 import DashboardLayout from '../../components/DashboardLayout';
 import OtaAdminPanel from '../../components/OtaAdminPanel';
 
@@ -536,9 +537,11 @@ function EmptyState({ title, text }: { title: string; text: string }) {
 }
 
 function StatusPill({ value }: { value?: string }) {
-  const color = value === 'Pago' || value === 'Concluído' || value === 'Resolvido' || value === 'Enviada'
-    ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-200'
-    : 'border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-400/20 dark:bg-sky-500/10 dark:text-sky-200';
+  const color = value === 'Lida'
+    ? 'border-slate-300 bg-slate-100 text-slate-700 dark:border-slate-400/20 dark:bg-slate-500/10 dark:text-slate-200'
+    : value === 'Pago' || value === 'Concluído' || value === 'Resolvido' || value === 'Enviada'
+      ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-200'
+      : 'border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-400/20 dark:bg-sky-500/10 dark:text-sky-200';
   return <span className={`rounded-md border px-3 py-1 text-xs font-bold ${color}`}>{value || 'Aberto'}</span>;
 }
 
@@ -684,7 +687,11 @@ const AdminDashboard = () => {
       onSnapshot(collection(db, 'documents'), (snapshot) => setDocuments(asList<DocumentRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar documentos'))),
       onSnapshot(collection(db, 'invoices'), (snapshot) => setInvoices(asList<InvoiceRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar faturamento'))),
       onSnapshot(collection(db, 'orders'), (snapshot) => setOrders(asList<OrderRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar pedidos'))),
-      onSnapshot(collection(db, 'notifications'), (snapshot) => setNotifications(asList<NotificationRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar notificações'))),
+      onSnapshot(
+        collection(db, 'notifications'),
+        (snapshot) => setNotifications(asList<NotificationRecord>(snapshot).filter(isActionableNotification)),
+        (error) => setStatus(firestoreErrorMessage(error, 'carregar notificações')),
+      ),
       onSnapshot(collection(db, 'users'), (snapshot) => setRegisteredUsers(asList<UserRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar usuários'))),
       onSnapshot(collection(db, 'systemEvents'), (snapshot) => setSystemEvents(asList<SystemEventRecord>(snapshot)), (error) => setStatus(firestoreErrorMessage(error, 'carregar atividades'))),
       onSnapshot(
@@ -761,7 +768,7 @@ const AdminDashboard = () => {
   async function changeStatus(collectionName: CollectionName, id: string, nextStatus: string) {
     try {
       await updateDoc(doc(db, collectionName, id), { status: nextStatus, updatedAt: serverTimestamp() });
-      if (user?.preferences?.notifyStatusChanges !== false) {
+      if (collectionName !== 'notifications' && user?.preferences?.notifyStatusChanges !== false) {
         try {
           await addDoc(collection(db, 'notifications'), {
             title: 'Status atualizado',
@@ -1787,8 +1794,12 @@ const AdminDashboard = () => {
         meta: notification.message || '',
         status: notification.status,
         actions: [
-          { label: 'Enviar', onClick: () => changeStatus('notifications', notification.id, 'Enviada') },
-          { label: 'Marcar lida', onClick: () => changeStatus('notifications', notification.id, 'Lida') },
+          ...(notification.status === 'Rascunho' || notification.status === 'Nova'
+            ? [{ label: 'Enviar', onClick: () => changeStatus('notifications', notification.id, 'Enviada') }]
+            : []),
+          ...(notification.status !== 'Lida'
+            ? [{ label: 'Marcar lida', onClick: () => changeStatus('notifications', notification.id, 'Lida') }]
+            : []),
         ],
         remove: () => removeRecord('notifications', notification.id),
       }))}
@@ -2018,12 +2029,12 @@ function CrudPanel({
               <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {item.actions?.map((action) => (
                   <button key={action.label} type="button" onClick={action.onClick} className="crud-action-button inline-flex min-h-10 w-full items-center justify-center rounded-md border border-[#159AFD]/35 bg-white px-3 py-2 text-sm font-bold text-[#0D0F52] transition hover:border-[#159AFD] hover:bg-sky-50 dark:bg-transparent dark:text-sky-200 dark:hover:bg-[#159AFD]/10">
-                    {action.label}
+                    <span>{action.label}</span>
                   </button>
                 ))}
                 <button type="button" onClick={item.remove} className="crud-remove-button inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-bold text-red-600 transition hover:border-red-400 hover:bg-red-50 dark:border-red-400/25 dark:bg-transparent dark:text-red-300 dark:hover:bg-red-500/10">
                   <Trash2 className="h-4 w-4" />
-                  Remover
+                  <span>Remover</span>
                 </button>
               </div>
             </div>

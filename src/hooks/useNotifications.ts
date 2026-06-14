@@ -13,6 +13,13 @@ export type AppNotification = {
   readBy?: string[];
 };
 
+export function isActionableNotification(notification: AppNotification) {
+  const isLegacyNotificationStatusEvent = notification.type === 'status-change'
+    && notification.message?.toLocaleLowerCase('pt-BR').includes('registro em notifications');
+
+  return !isLegacyNotificationStatusEvent;
+}
+
 type UserRole = 'admin' | 'client' | 'technician';
 
 function notificationList(snapshot: { docs: Array<{ id: string; data: () => unknown }> }) {
@@ -35,7 +42,7 @@ export function useNotifications(role?: UserRole, userId?: string, email?: strin
       const merged = Array.from(new Map(
         Array.from(groups.values()).flat().map((item) => [item.id, item]),
       ).values());
-      setNotifications(merged.filter((item) => item.status !== 'Rascunho'));
+      setNotifications(merged.filter((item) => item.status !== 'Rascunho' && isActionableNotification(item)));
     };
     const subscribe = (key: string, source: ReturnType<typeof query>) => onSnapshot(
       source,
@@ -51,7 +58,11 @@ export function useNotifications(role?: UserRole, userId?: string, email?: strin
       return onSnapshot(
         collection(db, 'notifications'),
         (snapshot) => {
-          setNotifications(notificationList(snapshot).filter((item) => item.status !== 'Rascunho' && ['Admin', 'Todos'].includes(item.target || 'Admin')));
+          setNotifications(notificationList(snapshot).filter((item) => (
+            item.status !== 'Rascunho'
+            && ['Admin', 'Todos'].includes(item.target || 'Admin')
+            && isActionableNotification(item)
+          )));
           setError('');
         },
         () => setError('Não foi possível carregar as notificações. Confira as regras do Firestore.'),
