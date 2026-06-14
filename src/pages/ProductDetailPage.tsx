@@ -18,7 +18,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { Link, useParams } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
-import { formatStorePrice, isDemoStoreProduct, marketplaceNotice, type StoreProduct } from '../data/storeCatalog';
+import { formatStorePrice, isPublishedStoreProduct, marketplaceNotice, type StoreProduct } from '../data/storeCatalog';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
 import SiteFooter from '../components/SiteFooter';
 
@@ -56,7 +56,7 @@ export default function ProductDetailPage() {
       doc(db, 'siteContent', productId),
       (snapshot) => {
         const data = snapshot.exists() ? ({ id: snapshot.id, ...snapshot.data() } as StoreProduct) : null;
-        const isPublicProduct = data && ['lojas', 'produtos'].includes(data.page || '') && data.status !== 'Rascunho' && !isDemoStoreProduct(data);
+        const isPublicProduct = data && isPublishedStoreProduct(data);
         setProduct(isPublicProduct ? data : null);
         setIsLoading(false);
       },

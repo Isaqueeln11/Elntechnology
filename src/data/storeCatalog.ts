@@ -39,6 +39,19 @@ export function formatStorePrice(product: StoreProduct) {
   return `${symbol} ${rawPrice}`;
 }
 
+export function normalizeContentValue(value?: string) {
+  return String(value || '').trim().toLocaleLowerCase('pt-BR');
+}
+
+export function isStoreProductPage(page?: string) {
+  return ['lojas', 'produtos'].includes(normalizeContentValue(page));
+}
+
+export function isPublishedStoreProduct(product: StoreProduct) {
+  const status = normalizeContentValue(product.status || 'Publicado');
+  return isStoreProductPage(product.page) && !['rascunho', 'draft', 'arquivado', 'archived'].includes(status);
+}
+
 const demoIds = new Set([
   'sample-iot',
   'sample-esp32-s3',

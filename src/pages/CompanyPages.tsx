@@ -25,7 +25,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useTheme } from '../contexts/ThemeContext';
 import { db } from '../firebase';
-import { formatStorePrice, isDemoStoreProduct, marketplaceNotice, type StoreProduct } from '../data/storeCatalog';
+import { formatStorePrice, isPublishedStoreProduct, marketplaceNotice, normalizeContentValue, type StoreProduct } from '../data/storeCatalog';
 import logoUrl from '../../ELN TECHNOLOGY.svg';
 import SiteFooter from '../components/SiteFooter';
 
@@ -399,19 +399,19 @@ function CompanyPage({ data }: { data: PageData }) {
   const isTeamPage = data.key === 'equipe';
   const isStudyPage = data.key === 'estudos';
   const publishedItems = useMemo(
-    () => contentItems.filter((item) => item.page === data.key && item.status !== 'Rascunho'),
+    () => contentItems.filter((item) => normalizeContentValue(item.page) === data.key && normalizeContentValue(item.status) !== 'rascunho'),
     [contentItems, data.key],
   );
   const teamItems = useMemo(
     () => {
-      const publishedTeam = contentItems.filter((item) => item.page === 'equipe' && item.status !== 'Rascunho');
+      const publishedTeam = contentItems.filter((item) => normalizeContentValue(item.page) === 'equipe' && normalizeContentValue(item.status) !== 'rascunho');
       return publishedTeam.length ? publishedTeam : defaultTeamMembers;
     },
     [contentItems],
   );
   const storeItems = useMemo(() => {
     if (!isStorePage) return [];
-    const items = contentItems.filter((item) => ['lojas', 'produtos'].includes(item.page || '') && item.status !== 'Rascunho' && !isDemoStoreProduct(item));
+    const items = contentItems.filter(isPublishedStoreProduct);
     return items.sort((first, second) => Number(Boolean(second.featured)) - Number(Boolean(first.featured)));
   }, [contentItems, isStorePage]);
   const storeCategories = useMemo(

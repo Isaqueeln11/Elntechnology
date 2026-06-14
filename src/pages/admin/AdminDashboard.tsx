@@ -25,7 +25,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import type { UserPreferences } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { db } from '../../firebase';
-import { formatStorePrice, marketplaceNotice } from '../../data/storeCatalog';
+import { formatStorePrice, isPublishedStoreProduct, isStoreProductPage, marketplaceNotice, normalizeContentValue } from '../../data/storeCatalog';
 import DashboardLayout from '../../components/DashboardLayout';
 import OtaAdminPanel from '../../components/OtaAdminPanel';
 
@@ -714,13 +714,13 @@ const AdminDashboard = () => {
 
   const storeContentItems = useMemo(
     () => siteContent
-      .filter((item) => ['lojas', 'produtos'].includes(item.page || ''))
+      .filter((item) => isStoreProductPage(item.page))
       .sort((first, second) => Number(Boolean(second.featured)) - Number(Boolean(first.featured))),
     [siteContent],
   );
 
   const filteredSiteContent = useMemo(
-    () => sitePageFilter === 'all' ? siteContent : siteContent.filter((item) => item.page === sitePageFilter),
+    () => sitePageFilter === 'all' ? siteContent : siteContent.filter((item) => normalizeContentValue(item.page) === sitePageFilter),
     [siteContent, sitePageFilter],
   );
 
@@ -1269,7 +1269,7 @@ const AdminDashboard = () => {
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           {[
             { label: 'Itens na vitrine', value: String(storeContentItems.length) },
-            { label: 'Publicados', value: String(storeContentItems.filter((item) => item.status !== 'Rascunho').length) },
+            { label: 'Publicados', value: String(storeContentItems.filter(isPublishedStoreProduct).length) },
             { label: 'Destaques', value: String(storeContentItems.filter((item) => item.featured).length) },
           ].map((item) => (
             <div key={item.label} className="rounded-md border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.035]">
