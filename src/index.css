@@ -333,6 +333,23 @@ textarea:focus-visible {
   color: #ffffff !important;
 }
 
+/* Action buttons include a dark-mode blue hover utility in their class list.
+   Keep that utility from making their labels white in the light dashboard. */
+.dashboard-light .admin-dashboard button.crud-action-button,
+.dashboard-light .admin-dashboard button.crud-action-button * {
+  color: #0d0f52 !important;
+}
+
+.dashboard-light .admin-dashboard button.crud-action-button {
+  border-color: rgba(21, 154, 253, 0.45) !important;
+  background: #ffffff !important;
+}
+
+.dashboard-light .admin-dashboard button.crud-action-button:hover {
+  border-color: #159afd !important;
+  background: #eef8ff !important;
+}
+
 .dashboard-light .technician-dashboard [class*="bg-gradient-to-br"] {
   border-color: #d8e2ec !important;
   background: #ffffff !important;
